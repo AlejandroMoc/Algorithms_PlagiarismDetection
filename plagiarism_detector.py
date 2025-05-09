@@ -10,7 +10,20 @@ import os, glob
 ##FUNCIONES
 
 #Algoritmos
-
+def compare_files(file_a, file_b):
+    if file_a == file_b:
+        return
+    else:
+        #Comparar archivos
+        print("Comparando ", file_a.__name__, " y ", file_b.__name__)
+        
+        #Pasar por algoritmos de preprocesamiento
+        #preprocesar bdd
+            #reemplazar nombres de vars
+            #obtener palabras reservadas y cuantas veces aparecen?
+            #por ejemplo
+        
+        return " "
 
 #Ejecución principal
 def main():
@@ -22,12 +35,25 @@ def main():
     archivos_entrenamiento = sorted(glob.glob(os.path.join(data_dir, '*.py')))
     print(f"Se encontraron {len(archivos_entrenamiento)} archivos para entrenamiento.\n")
 
-    #preprocesar bdd
-        #reemplazar nombres de vars
-        #obtener palabras reservadas y cuantas veces aparecen?
+    # PASO 1
+    # Entrenar Algoritmo neural con BDD Entrenamiento
+    
+    ##Obtener todos los resultados
+    all_comparisons = []
+    for file_a in archivos_entrenamiento:
+        for archivo_2 in archivos_entrenamiento:
+            result = compare_files(file_a, file_b)
 
+            #Si el resultado existe, 
+            if result != None:
+                all_comparisons.append(result)
 
-    #entrenar modelo con bdd
+    ##Entrenar algoritmo neural
+
+    
+
+    # PASO 2
+    # Pasar BDD_C por algoritmo neural para obtener resultados
 
     #Abrir BDD de Clasificación
     data_dir = os.path.join(base_path, 'Data', 'Classification')
