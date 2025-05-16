@@ -52,10 +52,10 @@ def bwt_from_tokens(tokens, suffix_array):
     return [tokens[i - 1] if i != 0 else '$' for i in suffix_array]
 
 #Función principal del SA
-def sa_comparator(file1, file2):
+def sa_comparator(file_a, file_b):
     #Tokenización de ambos archivos
-    raw1 = read_file_raw(file1)
-    raw2 = read_file_raw(file2)
+    raw1 = read_file_raw(file_a)
+    raw2 = read_file_raw(file_b)
     tokens1 = preprocess_code(raw1)
     tokens2 = preprocess_code(raw2)
 
@@ -90,16 +90,16 @@ def sa_comparator(file1, file2):
     bwt_result = bwt_from_tokens(combined_tokens, suffix_array)
 
     #Escribir resultados
-    # file1_name = os.path.splitext(os.path.basename(file1))[0]
-    # file2_name = os.path.splitext(os.path.basename(file2))[0]
+    # file1_name = os.path.splitext(os.path.basename(file_a))[0]
+    # file2_name = os.path.splitext(os.path.basename(file_b))[0]
     # output_filename = "resultado_comparador_sa_" + os.path.basename(file1_name) + "_" + os.path.basename(file2_name) + ".txt"
     # with open(output_filename, "w", encoding="utf-8") as report:
-    #     report.write(f"Archivo 1: {os.path.basename(file1)}\n")
+    #     report.write(f"Archivo 1: {os.path.basename(file_a)}\n")
     #     report.write(f"Tokens ({len(tokens1)}):\n")
     #     report.write(' '.join(tokens1) + "\n")
     #     report.write("=" * 60 + "\n")
 
-    #     report.write(f"Archivo 2: {os.path.basename(file2)}\n")
+    #     report.write(f"Archivo 2: {os.path.basename(file_b)}\n")
     #     report.write(f"Tokens ({len(tokens2)}):\n")
     #     report.write(' '.join(tokens2) + "\n")
     #     report.write("=" * 60 + "\n")
