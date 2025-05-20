@@ -1,0 +1,110 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1e2b3b;
+  color: #fff;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #0d0b1a;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 24px;
+}
+
+.menu-icon {
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.main-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 100px 20px;
+  flex-wrap: wrap;
+}
+
+.menu-option {
+  background-color: #5c5470;
+  padding: 40px;
+  border-radius: 16px;
+  width: 200px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.menu-option:hover {
+  transform: scale(1.05);
+}
+
+.menu-option img {
+  width: 50px;
+  margin-bottom: 15px;
+}
+
+.menu-option p {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* ... estilos previos ... */
+
+.main-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  padding: 100px 20px 40px;
+  flex-wrap: wrap;
+}
+
+.menu-option {
+  background-color: #5c5470;
+  padding: 60px 40px;
+  border-radius: 20px;
+  width: 240px;
+  height: 240px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.menu-option:hover {
+  transform: scale(1.05);
+}
+
+.menu-option img {
+  width: 70px;
+  margin-bottom: 20px;
+}
+
+.menu-option p {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Texto de introducción */
+.intro-text {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 18px;
+  color: #ccc;
+  padding: 20px;
+  line-height: 1.6;
+}
