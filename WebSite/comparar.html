@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Comparar Archivos</title>
+  <link rel="stylesheet" href="css/comparar.css">
+</head>
+<body>
+
+  <header>
+    <h1>Comparador de código</h1>
+  </header>
+
+  <section class="upload-controls">
+    <button onclick="alert('Subir archivos')">Subir archivos</button>
+    <button onclick="goTo('index')">Menú principal</button>
+  </section>
+
+  <section class="students-list">
+    <h2>Selecciona dos alumnos</h2>
+    <div class="student-options" id="studentOptions">
+      <!-- Generados por JS -->
+    </div>
+  </section>
+
+  <section class="code-view">
+    <div class="code-box">
+      <h3 id="codeTitle1">Código Alumno A</h3>
+      <pre id="code1">
+// Código ejemplo A
+p1 = 2
+p2 = 3
+r = p1 + p2
+      </pre>
+    </div>
+    <div class="code-box">
+      <h3 id="codeTitle2">Código Alumno D</h3>
+      <pre id="code2">
+// Código ejemplo D
+n1 = 2
+n2 = 3
+result = n1 + n2
+print(result)
+      </pre>
+    </div>
+  </section>
+
+  <section class="compare-button">
+    <button onclick="alert('Comparando códigos...')">Comparar</button>
+  </section>
+
+  <script src="js/comparar.js"></script>
+</body>
+</html>
