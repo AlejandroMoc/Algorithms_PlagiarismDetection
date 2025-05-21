@@ -3,6 +3,7 @@ import os
 import numpy as np
 from zss import simple_distance, Node
 from sklearn.metrics.pairwise import cosine_similarity
+from collections import Counter
 
 # Convertir AST a zss-compatible tree
 def ast_to_zss(node):
@@ -12,65 +13,64 @@ def ast_to_zss(node):
     children = [ast_to_zss(child) for child in ast.iter_child_nodes(node)]
     return Node(label, [child for child in children if child is not None])
 
-# Extraer features estrucutrales del AST
+# Extraer features estructurales del AST
 def extract_ast_features(tree):
     features = {
-        'num_nodes' : 0,
-        'num_functions' : 0,
-        'num_loops' : 0,
-        'num_if' : 0,
-        'max_depth' : 0
+        'num_nodes': 0,
+        'num_functions': 0,
+        'num_loops': 0,
+        'num_if': 0,
+        'max_depth': 0,
+        'num_variables': 0,
+        'num_lists': 0,
+        'num_dicts': 0
     }
-    
+    variable_names = set()
+
     def traverse(node, depth):
         if not isinstance(node, ast.AST):
-            return 0
-        
+            return
         features['num_nodes'] += 1
         features['max_depth'] = max(features['max_depth'], depth)
-        
+
         if isinstance(node, ast.FunctionDef):
             features['num_functions'] += 1
         elif isinstance(node, (ast.For, ast.While)):
             features['num_loops'] += 1
         elif isinstance(node, ast.If):
             features['num_if'] += 1
-        
+        elif isinstance(node, ast.List):
+            features['num_lists'] += 1
+        elif isinstance(node, ast.Dict):
+            features['num_dicts'] += 1
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    variable_names.add(target.id)
+        elif isinstance(node, ast.Name):
+            variable_names.add(node.id)
+
         for child in ast.iter_child_nodes(node):
             traverse(child, depth + 1)
-            
-    traverse(tree, 1)
-    
-    return np.array(list(features.values()), dtype=float), features
 
+    traverse(tree, 1)
+    features['num_variables'] = len(variable_names)
+
+    return np.array(list(features.values()), dtype=float), features, list(variable_names)
 
 # Normalizar los features a [0,1]
 def normalize_features(f1, f2):
     max_vals = np.maximum(f1, f2)
     max_vals[max_vals == 0] = 1
-    
-    return f1 / max_vals, f2 /max_vals
+    return f1 / max_vals, f2 / max_vals
 
 # Leer el código fuente de Python desde el archivo
 def read_code(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
+# Veredicto de plagio
 def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
-    """
-    Decide si dos códigos son plagio combinando similitud TED y de features.
-
-    Parámetros:
-    - ted_sim: similitud por Tree Edit Distance (valor entre 0 y 1)
-    - feature_sim: similitud estructural por features (valor entre 0 y 1)
-    - alpha: peso de TED (entre 0 y 1); 1-alpha es el peso de features
-    - umbral: valor mínimo para considerar plagio (entre 0 y 1)
-
-    Retorna:
-    - True si se considera plagio, False en caso contrario
-    - El score combinado
-    """
-
     score = alpha * ted_sim + (1 - alpha) * feature_sim
     plagio = score >= umbral
 
@@ -80,43 +80,50 @@ def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
 
     return plagio, round(score, 3), umbral
 
-# Función principal
+# Comparar dos archivos .py
 def compare_files_ast(file1, file2):
     code1 = read_code(file1)
     code2 = read_code(file2)
-    
+
     tree_ast1 = ast.parse(code1)
     tree_ast2 = ast.parse(code2)
-    
-    # Calcular TED
+
+    # TED
     tree_zss1 = ast_to_zss(tree_ast1)
     tree_zss2 = ast_to_zss(tree_ast2)
-    
     ted = simple_distance(tree_zss1, tree_zss2)
-    
     max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
-    
     ted_similarity = 1 - (ted / max_nodes)
-    
-    # Similitud de características
-    f1_vector, f1_dict = extract_ast_features(tree_ast1)
-    f2_vector, f2_dict = extract_ast_features(tree_ast2)
-    
+
+    # Features + variables
+    f1_vector, f1_dict, vars1 = extract_ast_features(tree_ast1)
+    f2_vector, f2_dict, vars2 = extract_ast_features(tree_ast2)
     f1_norm, f2_norm = normalize_features(f1_vector, f2_vector)
-    
     features_sim = cosine_similarity([f1_norm], [f2_norm])[0][0]
-    
+
+    # Función para obtener el orden de definiciones
+    def function_order(tree):
+        return [node.name for node in tree.body if isinstance(node, ast.FunctionDef)]
+
+    orden_funcs1 = function_order(tree_ast1)
+    orden_funcs2 = function_order(tree_ast2)
+
     plagio, score, umbral = decidir_plagio(ted_similarity, features_sim)
-    
+
     return [
         round(ted_similarity, 3),        # Índice 0: similitud TED
         round(features_sim, 3),          # Índice 1: similitud de features
-        list(f1_dict.values()),          # Índice 2: features del archivo 1 (orden: nodos, funciones, bucles, if, profundidad)
-        list(f2_dict.values()),          # Índice 3: features del archivo 2
-        score,                           # indice 4: score combinado: TED + features
-        umbral,                          # indice 5: umbral utilizado para detectar si es plagio o no
-        plagio                           # indice 6: Resultado: PLAGIO o NO PLAGIO
+        list(f1_dict.values()),          # Índice 2: features archivo 1
+        list(f2_dict.values()),          # Índice 3: features archivo 2
+        score,                           # Índice 4: score combinado
+        umbral,                          # Índice 5: umbral usado
+        plagio,                          # Índice 6: resultado final
+        vars1,                           # Índice 7: variables archivo 1
+        vars2,                           # Índice 8: variables archivo 2
+        orden_funcs1,                    # Índice 9: orden de funciones archivo 1
+        orden_funcs2                     # Índice 10: orden de funciones archivo 2
     ]
+
 
     
 # Ruta de códigos
