@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subida de Archivos</title>
+  <link rel="stylesheet" href="css/upload.css">
+</head>
+<body>
+
+  <header>
+    <h1>Subida de archivos</h1>
+  </header>
+
+  <main class="upload-container">
+    <div class="upload-options">
+      <section class="upload-files">
+        <h3>Subir archivos</h3>
+        <input type="file" id="fileInput" multiple hidden />
+        <button onclick="document.getElementById('fileInput').click()">
+          <img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Subir archivos" />
+        </button>
+        <ul id="fileList"></ul>
+      </section>
+
+      <section class="upload-folder">
+        <h3>Subir carpeta</h3>
+        <input type="file" id="folderInput" webkitdirectory directory hidden />
+        <button onclick="document.getElementById('folderInput').click()">
+          <img src="https://img.icons8.com/ios-filled/50/folder-invoices--v1.png" alt="Subir carpeta" />
+        </button>
+        <p id="folderPath">/</p>
+      </section>
+    </div>
+
+    <p id="fileCount">0 elementos seleccionados</p>
+
+    <div class="actions">
+      <button class="confirm" onclick="alert('Archivos confirmados')">Confirmar</button>
+      <button class="cancel" onclick="location.href='index.html'">Cancelar</button>
+    </div>
+  </main>
+
+  <script src="js/upload.js"></script>
+</body>
+</html>
