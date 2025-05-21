@@ -1,4 +1,5 @@
-/* Reset básico */
+@import 'variables.css';
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,17 +8,19 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #1e2b3b;
-  color: #fff;
+  background-color: var(--color-background);
+  color: var(--color-white);
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
 }
 
 header {
-  background-color: #0d0b1a;
+  background-color: var(--color-header);
   padding: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
 }
 
 header h1 {
@@ -33,48 +36,13 @@ header h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
-  padding: 100px 20px;
-  flex-wrap: wrap;
-}
-
-.menu-option {
-  background-color: #5c5470;
-  padding: 40px;
-  border-radius: 16px;
-  width: 200px;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.menu-option:hover {
-  transform: scale(1.05);
-}
-
-.menu-option img {
-  width: 50px;
-  margin-bottom: 15px;
-}
-
-.menu-option p {
-  font-weight: bold;
-  font-size: 16px;
-}
-
-/* ... estilos previos ... */
-
-.main-menu {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   gap: 80px;
   padding: 100px 20px 40px;
   flex-wrap: wrap;
 }
 
 .menu-option {
-  background-color: #5c5470;
+  background-color: var(--color-menu-option-bg);
   padding: 60px 40px;
   border-radius: 20px;
   width: 240px;
@@ -102,9 +70,81 @@ header h1 {
 .intro-text {
   max-width: 700px;
   margin: 0 auto;
-  text-align: center;
+  text-align: justify;
   font-size: 18px;
-  color: #ccc;
+  color: var(--color-white);
   padding: 20px;
   line-height: 1.6;
+}
+
+.upload-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: var(--color-menu-option-bg);
+  color: var(--color-white);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.students-list {
+  padding: 20px;
+  text-align: center;
+}
+
+.student-options {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.student {
+  background-color: var(--color-student-bg);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.student:hover,
+.student.selected {
+  background-color: var(--color-white);
+  color: var(--color-green);
+}
+
+.code-view {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.code-box {
+  background-color: var(--color-pre-bg);
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  overflow-x: auto;
+}
+
+pre {
+  background: var(--color-background-color);
+  padding: 10px;
+  border-radius: 6px;
+  color: var(--color-white);
+}
+
+.compare-button {
+  text-align: center;
+  padding: 30px;
 }

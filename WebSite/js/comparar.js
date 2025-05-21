@@ -10,6 +10,7 @@ studentNames.forEach(name => {
   container.appendChild(div);
 });
 
+//Ir al sitio correspondiente
 function goTo(action) {
   if (action === 'index') {
     alert("Navegar a la interfaz de menu principal.");

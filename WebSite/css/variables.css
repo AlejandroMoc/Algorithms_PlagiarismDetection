@@ -1,0 +1,12 @@
+/* Paleta de colores */
+:root {
+  --color-green: #0f5132;
+  --color-background: #1e2b3b;
+  --color-header: #0d0b1a;
+  --color-menu-option-bg: #5c5470;
+  --color-student-bg: #3c3b4f;
+  --color-white: #ececec;
+  --color-pre-bg: #1b1b24;
+  --color-code-box: #2e2e3a;
+  --color-code-box-bg: #2e2e3a;
+}
