@@ -21,6 +21,7 @@ function goTo(action) {
   }
 }
 
+
 function toggleSelect(el) {
   if (el.classList.contains('selected')) {
     el.classList.remove('selected');
