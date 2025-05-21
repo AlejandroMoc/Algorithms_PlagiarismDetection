@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
+  
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Comparador de plagio</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body>
   <header>
-    <h1>Comparador de plagio</h1>
-    <div class="menu-icon">&#9776;</div>
+
+    <!-- Elementos a la izquierda -->
+    <h1><a href="#comparar" onclick="goTo('index')">Comparador de plagio</a></h1>
+
+    <!-- Elementos a la derecha -->
+    <nav class="header-right">
+      <!-- Navigation Bar -->
+      <ul class="nav-links">
+        <li><a href="#comparar" onclick="goTo('comparar')">Comparar archivos</a></li>
+        <li><a href="#subir" onclick="goTo('subir')">Subir archivos</a></li>
+      </ul>
+
+      <!-- Hamburger Menu -->
+      <div class="menu-icon">&#9776;</div>
+    </nav>
+
   </header>
 
-<main class="main-menu">
-  <div class="menu-option" onclick="goTo('comparar')">
-    <img src="https://img.icons8.com/ios-filled/70/FFFFFF/compare.png" alt="Comparar Icono" />
-    <p>Comparar archivos</p>
-  </div>
-  <div class="menu-option" onclick="goTo('subir')">
-    <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir Icono" />
-    <p>Subir archivos</p>
-  </div>
-</main>
+  <main class="main-menu">
+    <div class="menu-option" onclick="goTo('comparar')">
+      <img src="https://img.icons8.com/ios-filled/70/FFFFFF/compare.png" alt="Comparar Icono" />
+      <p>Comparar archivos</p>
+    </div>
+    <div class="menu-option" onclick="goTo('subir')">
+      <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir Icono" />
+      <p>Subir archivos</p>
+    </div>
+  </main>
 
-<div class="intro-text">
-  Esta aplicación te permite detectar similitudes entre archivos de código fuente de forma visual e intuitiva.
-  <br><br>
-  Puedes subir múltiples archivos y compararlos entre sí para identificar posibles casos de plagio entre estudiantes o entregas. La herramienta utiliza algoritmos especializados para brindar resultados confiables y fáciles de interpretar.
-</div>
+  <div class="intro-text">
+    Esta aplicación te permite detectar similitudes entre archivos de código fuente de forma visual e intuitiva.
+    <br><br>
+    Puedes subir múltiples archivos y compararlos entre sí para identificar posibles casos de plagio entre estudiantes o entregas. La herramienta utiliza algoritmos especializados para brindar resultados confiables y fáciles de interpretar.
+  </div>
 
   <script src="js/scripts.js"></script>
 </body>
