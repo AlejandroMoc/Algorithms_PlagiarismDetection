@@ -55,7 +55,31 @@ def normalize_features(f1, f2):
 def read_code(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
-    
+
+def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
+    """
+    Decide si dos códigos son plagio combinando similitud TED y de features.
+
+    Parámetros:
+    - ted_sim: similitud por Tree Edit Distance (valor entre 0 y 1)
+    - feature_sim: similitud estructural por features (valor entre 0 y 1)
+    - alpha: peso de TED (entre 0 y 1); 1-alpha es el peso de features
+    - umbral: valor mínimo para considerar plagio (entre 0 y 1)
+
+    Retorna:
+    - True si se considera plagio, False en caso contrario
+    - El score combinado
+    """
+
+    score = alpha * ted_sim + (1 - alpha) * feature_sim
+    plagio = score >= umbral
+
+    print(f"✅ Score combinado: {score:.3f} (TED={ted_sim:.3f}, Features={feature_sim:.3f})")
+    print(f"📌 Umbral de decisión: {umbral}")
+    print("🛑 Veredicto final:", "PLAGIO" if plagio else "NO PLAGIO")
+
+    return plagio, round(score, 3)
+
 # Función principal
 def compare_files_ast(file1, file2):
     code1 = read_code(file1)
@@ -81,6 +105,8 @@ def compare_files_ast(file1, file2):
     f1_norm, f2_norm = normalize_features(f1_vector, f2_vector)
     
     features_sim = cosine_similarity([f1_norm], [f2_norm])[0][0]
+    
+    plagio, score = decidir_plagio(ted_similarity, features_sim)
     
     return {
         'ted_similarity' : round(ted_similarity, 3),
