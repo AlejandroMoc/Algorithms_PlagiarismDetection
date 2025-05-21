@@ -78,7 +78,7 @@ def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
     print(f"📌 Umbral de decisión: {umbral}")
     print("🛑 Veredicto final:", "PLAGIO" if plagio else "NO PLAGIO")
 
-    return plagio, round(score, 3)
+    return plagio, round(score, 3), umbral
 
 # Función principal
 def compare_files_ast(file1, file2):
@@ -106,17 +106,22 @@ def compare_files_ast(file1, file2):
     
     features_sim = cosine_similarity([f1_norm], [f2_norm])[0][0]
     
-    plagio, score = decidir_plagio(ted_similarity, features_sim)
+    plagio, score, umbral = decidir_plagio(ted_similarity, features_sim)
     
-    return {
-        'ted_similarity' : round(ted_similarity, 3),
-        'feature_similarity' : round(features_sim, 3),
-        'features_file1' : f1_dict,
-        'features_file2' : f2_dict
-    }
+    return [
+        round(ted_similarity, 3),        # Índice 0: similitud TED
+        round(features_sim, 3),          # Índice 1: similitud de features
+        list(f1_dict.values()),          # Índice 2: features del archivo 1 (orden: nodos, funciones, bucles, if, profundidad)
+        list(f2_dict.values()),          # Índice 3: features del archivo 2
+        score,                           # indice 4: score combinado: TED + features
+        umbral,                          # indice 5: umbral utilizado para detectar si es plagio o no
+        plagio                           # indice 6: Resultado: PLAGIO o NO PLAGIO
+    ]
+
     
 # Ruta de códigos
 file_a = "Data/testcase1.py"
 file_b = "Data/testcase7.py"
 
-print(compare_files_ast(file_a, file_b))
+resultado = compare_files_ast(file_a, file_b)
+print(resultado)
