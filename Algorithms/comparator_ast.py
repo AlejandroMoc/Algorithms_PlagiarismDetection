@@ -122,6 +122,7 @@ def comparator_ast(file1, file2):
         orden_funcs2                     # Índice 10: orden de funciones archivo 2
     ]
 
+#Ejecución principal
 def main():
     file_a = "Data/testcase1.py"
     file_b = "Data/testcase7.py"

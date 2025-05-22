@@ -117,3 +117,14 @@ def comparator_sa(file_a, file_b):
     # print(f"📊 Porcentaje de similitud: {similarity:.2f}%")
     # print(f"🌀 BWT generado: {' '.join(bwt_result)}")
     return similarity
+
+#Ejecución principal
+def main():
+    file_a = "Data/testcase1.py"
+    file_b = "Data/testcase7.py"
+
+    resultado = comparator_sa(file_a, file_b)
+    print(resultado)
+
+if __name__ == '__main__':
+    main()

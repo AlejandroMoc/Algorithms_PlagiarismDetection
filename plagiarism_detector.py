@@ -56,36 +56,29 @@ def main():
     if not subdirs:
         return
     
-    #print("Subcarpetas", subdirs)
-
     #Iterar sobre subcarpetas
     for subdir in subdirs:
-        
-        #Crear la ruta completa a la subcarpeta
+        #Crear ruta a subcarpeta y obtener archivos
         subdir_path = os.path.join(data_dir, subdir)
-        
-        #Obtener archivos .py en la subcarpeta
         files_training = sorted(glob.glob(os.path.join(subdir_path, '*.py')))
-        
+
         #Verificar longitud de los archivos
         if len(files_training) < 2:
             print(f"No se encontraron suficientes archivos en {subdir}.")
+            print(f"{subdir_path} y {files_training}\n")
             continue
         
         print(f"Se encontraron {len(files_training)} archivos para entrenamiento en la carpeta {subdir}.\n")
 
         #PASO 1
-        #Entrenar Algoritmo neural con BDD Entrenamiento
-        
-        ##Obtener todos los resultados
+        #Obtener comparasiones
         all_comparisons = []
         for file_a in files_training:
             for file_b in files_training:
-                current_result = compare_files(file_a, file_b)
-
-                #Si el resultado existe, 
-                if current_result != None:
-                    all_comparisons.append(current_result)
+                if file_a != file_b:  #Evitar comparar el mismo archivo
+                    current_result = compare_files(file_a, file_b)
+                    if current_result is not None:
+                        all_comparisons.append(current_result)
 
         ##Entrenar algoritmo neural
 
@@ -93,9 +86,9 @@ def main():
         #Pasar BDD_C por algoritmo neural para obtener resultados
 
         #Abrir BDD de Clasificación
-        data_dir = os.path.join(base_path, 'Data', 'Classification')
-        archivos_clasificación = sorted(glob.glob(os.path.join(data_dir, '*.py')))
-        print(f"Se encontraron {len(archivos_clasificación)} archivos para clasificación.\n")
+        #data_dir = os.path.join(base_path, 'Data')
+        #archivos_clasificación = sorted(glob.glob(os.path.join(data_dir, '*.py')))
+        #print(f"Se encontraron {len(archivos_clasificación)} archivos para clasificación.\n")
 
         #Pasar BDD_C por algoritmos
 
