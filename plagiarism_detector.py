@@ -8,6 +8,7 @@
 import os, glob
 from Algorithms.sa_comparator import sa_comparator
 from Algorithms.difflib_comparator import difflib_comparator
+from Algorithms.ast_comparator import compare_files_ast
 
 ##FUNCIONES
 
@@ -19,10 +20,11 @@ def compare_files(file_a: str, file_b: str):
         return None
     else:
         ##Pasar por algoritmos de preprocesamiento
-        print(f"Comparando ", os.path.basename(file_a), " y ", os.path.basename(file_b))
+        #print(f"Comparando ", os.path.basename(file_a), " y ", os.path.basename(file_b))
         sa_similarity: float                    = sa_comparator(file_a, file_b)       #plagio tipo 1
         (difflib_preprocessed, difflib_plain)   = difflib_comparator(file_a, file_b)  #plagio tipo x
-         
+        result_ast                              = compare_files_ast(file_a, file_b)   #plagio tipo 2 y 3
+
         #porcentaje que sea tipo a,b,c?
 
         ## Medidas
@@ -44,7 +46,7 @@ def main():
 
     # Abrir BDD de Entrenamiento
     base_path = os.path.dirname(__file__)
-    data_dir = os.path.join(base_path, 'Data', 'Training')
+    data_dir = os.path.join(base_path, 'Data')
     files_training = sorted(glob.glob(os.path.join(data_dir, '**', '*.py'), recursive = True))
     print(f"Se encontraron {len(files_training)} archivos para entrenamiento.\n")
 
@@ -62,8 +64,6 @@ def main():
                 all_comparisons.append(current_result)
 
     ##Entrenar algoritmo neural
-
-    
 
     # PASO 2
     # Pasar BDD_C por algoritmo neural para obtener resultados

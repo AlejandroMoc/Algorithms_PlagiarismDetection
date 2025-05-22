@@ -8,18 +8,32 @@
 <body>
 
   <header>
-    <h1>Comparador de códigos</h1>
+
+    <!-- Elementos a la izquierda -->
+    <h1><a href="#comparar" onclick="goTo('index')">Comparador de plagio</a></h1>
+
+    <!-- Elementos a la derecha -->
+    <nav class="header-right">
+      <!-- Navigation Bar -->
+      <ul class="nav-links">
+        <li><a href="#comparar" onclick="goTo('comparar')">Comparar archivos</a></li>
+        <li><a href="#subir" onclick="goTo('subir')">Subir archivos</a></li>
+      </ul>
+
+      <!-- Hamburger Menu -->
+      <div class="menu-icon">&#9776;</div>
+    </nav>
+
   </header>
 
   <section class="upload-controls">
-    <button onclick="alert('Subir archivos')">Subir archivos</button>
+    <button onclick="goTo('upload')">Subir archivos</button>
     <button onclick="goTo('index')">Menú principal</button>
   </section>
 
   <section class="students-list">
     <h2>Selecciona dos alumnos</h2>
     <div class="student-options" id="studentOptions">
-      <!-- Generados por JS -->
     </div>
   </section>
 

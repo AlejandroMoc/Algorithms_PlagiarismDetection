@@ -11,5 +11,16 @@ Detector de plagio usando Machine Learning
 
 Los archivos a verificar son los siguientes:
 
-- El archivo principal, el detector de plagio, puede encontrarse [aquí](plagiarism_detector.py)
-- El artículo, escrito en LaTex, puede ser consultado [aquí](Article/Articulo.tex)
+- Para ejecutar la interfaz gráfica
+
+- Para ejecutar la demostración del detector de plagio:
+
+    
+    python plagiarim_detector.py
+
+<!-- - El archivo principal, el detector de plagio, puede encontrarse [aquí](plagiarism_detector.py)
+- El artículo, escrito en LaTex, puede ser consultado [aquí](Article/Articulo.tex) -->
+
+<!-- ## Créditos
+
+La base de datos utilizada fue -->

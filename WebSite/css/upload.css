@@ -1,0 +1,95 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1e2b3b;
+  color: white;
+  margin: 0;
+}
+
+header {
+  background-color: #0d0b1a;
+  padding: 20px;
+  text-align: center;
+}
+
+.upload-container {
+  padding: 30px;
+  text-align: center;
+}
+
+.upload-options {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  color: white;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  background-color: #2e2e3a;
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  width: 200px;
+}
+
+li span {
+  cursor: pointer;
+  color: #ff4f4f;
+}
+
+#folderPath {
+  font-style: italic;
+  color: #ccc;
+}
+
+#fileCount {
+  font-weight: bold;
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.confirm {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+}
+
+.cancel {
+  background-color: #dc3545;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+}
