@@ -1,17 +1,7 @@
 import ast
 import os
 import numpy as np
-from zss import simple_distance, Node
 from sklearn.metrics.pairwise import cosine_similarity
-from collections import Counter
-
-# Convertir AST a zss-compatible tree
-def ast_to_zss(node):
-    if not isinstance(node, ast.AST):
-        return None
-    label = node.__class__.__name__
-    children = [ast_to_zss(child) for child in ast.iter_child_nodes(node)]
-    return Node(label, [child for child in children if child is not None])
 
 # Extraer features estructurales del AST
 def extract_ast_features(tree):
@@ -74,9 +64,9 @@ def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
     score = alpha * ted_sim + (1 - alpha) * feature_sim
     plagio = score >= umbral
 
-    print(f"✅ Score combinado: {score:.3f} (TED={ted_sim:.3f}, Features={feature_sim:.3f})")
-    print(f"📌 Umbral de decisión: {umbral}")
-    print("🛑 Veredicto final:", "PLAGIO" if plagio else "NO PLAGIO")
+    #print(f"✅ Score combinado: {score:.3f} (TED={ted_sim:.3f}, Features={feature_sim:.3f})")
+    #print(f"📌 Umbral de decisión: {umbral}")
+    #print("🛑 Veredicto final:", "PLAGIO")
 
     return plagio, round(score, 3), umbral
 
@@ -88,12 +78,20 @@ def compare_files_ast(file1, file2):
     tree_ast1 = ast.parse(code1)
     tree_ast2 = ast.parse(code2)
 
-    # TED
-    tree_zss1 = ast_to_zss(tree_ast1)
-    tree_zss2 = ast_to_zss(tree_ast2)
-    ted = simple_distance(tree_zss1, tree_zss2)
+    # Calcular similitud TED basado en la comparación de nodos
+    def count_common_nodes(node1, node2):
+        if not isinstance(node1, ast.AST) or not isinstance(node2, ast.AST):
+            return 0
+        common_count = 0
+        if type(node1) == type(node2):
+            common_count += 1
+        for child1, child2 in zip(ast.iter_child_nodes(node1), ast.iter_child_nodes(node2)):
+            common_count += count_common_nodes(child1, child2)
+        return common_count
+
+    common_nodes = count_common_nodes(tree_ast1, tree_ast2)
     max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
-    ted_similarity = 1 - (ted / max_nodes)
+    ted_similarity = common_nodes / max_nodes if max_nodes > 0 else 0
 
     # Features + variables
     f1_vector, f1_dict, vars1 = extract_ast_features(tree_ast1)
@@ -124,8 +122,6 @@ def compare_files_ast(file1, file2):
         orden_funcs2                     # Índice 10: orden de funciones archivo 2
     ]
 
-
-    
 # Ruta de códigos
 file_a = "Data/testcase1.py"
 file_b = "Data/testcase7.py"
