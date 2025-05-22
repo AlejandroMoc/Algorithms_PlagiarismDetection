@@ -87,7 +87,7 @@ def compare_plain(code1, code2):
     return output
 
 #Función principal del difflib
-def difflib_comparator(file_a, file_b):
+def comparator_difflib(file_a, file_b):
     result_preprocessed = compare_preprocessed(file_a, file_b)
     result_plain        = compare_plain(file_a, file_b)
     return result_preprocessed, result_plain

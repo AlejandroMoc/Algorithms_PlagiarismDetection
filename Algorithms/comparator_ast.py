@@ -60,18 +60,18 @@ def read_code(file_path):
         return f.read()
 
 # Veredicto de plagio
-def decidir_plagio(ted_sim, feature_sim, alpha=0.5, umbral=0.70):
+def decidir_plagio(ted_sim, feature_sim, alpha = 0.5, umbral = 0.70):
     score = alpha * ted_sim + (1 - alpha) * feature_sim
     plagio = score >= umbral
 
     #print(f"✅ Score combinado: {score:.3f} (TED={ted_sim:.3f}, Features={feature_sim:.3f})")
     #print(f"📌 Umbral de decisión: {umbral}")
-    #print("🛑 Veredicto final:", "PLAGIO")
-
+    #print("🛑 AST:", "PLAGIO detectado")
+    
     return plagio, round(score, 3), umbral
 
 # Comparar dos archivos .py
-def compare_files_ast(file1, file2):
+def comparator_ast(file1, file2):
     code1 = read_code(file1)
     code2 = read_code(file2)
 
@@ -122,9 +122,12 @@ def compare_files_ast(file1, file2):
         orden_funcs2                     # Índice 10: orden de funciones archivo 2
     ]
 
-# Ruta de códigos
-file_a = "Data/testcase1.py"
-file_b = "Data/testcase7.py"
+def main():
+    file_a = "Data/testcase1.py"
+    file_b = "Data/testcase7.py"
 
-resultado = compare_files_ast(file_a, file_b)
-print(resultado)
+    resultado = comparator_ast(file_a, file_b)
+    print(resultado)
+
+if __name__ == '__main__':
+    main()

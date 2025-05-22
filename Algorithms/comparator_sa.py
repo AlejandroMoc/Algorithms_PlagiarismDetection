@@ -52,7 +52,7 @@ def bwt_from_tokens(tokens, suffix_array):
     return [tokens[i - 1] if i != 0 else '$' for i in suffix_array]
 
 #Función principal del SA
-def sa_comparator(file_a, file_b):
+def comparator_sa(file_a, file_b):
     #Tokenización de ambos archivos
     raw1 = read_file_raw(file_a)
     raw2 = read_file_raw(file_b)
