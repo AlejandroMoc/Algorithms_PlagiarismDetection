@@ -21,7 +21,7 @@ def main():
 
         print("Enter the adjacency matrix (each row of the matrix should be space-separated values):")
         for i in range(num_vertices):
-            row = list(map(int, input(f"Row {i + 1}: ").split())
+            row = list(map(int, input(f"Row {i + 1}: ").split()))
             if len(row) != num_vertices:
                 print(f"Row {i + 1} does not contain {num_vertices} elements. Please try again.")
                 return
