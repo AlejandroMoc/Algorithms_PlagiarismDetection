@@ -6,9 +6,15 @@
 
 ##LIBRERÍAS
 import os, glob
+import numpy as np
+import pandas as pd
 from Algorithms.comparator_sa import comparator_sa
 from Algorithms.comparator_difflib import comparator_difflib
 from Algorithms.comparator_ast import comparator_ast
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report
 
 ##FUNCIONES
 
@@ -20,28 +26,29 @@ def compare_files(file_a: str, file_b: str):
         return None
     else:
         ##Pasar por algoritmos de preprocesamiento
-        #print(f"Comparando ", os.path.basename(file_a), " y ", os.path.basename(file_b))
-        sa_similarity: float                    = comparator_sa(file_a, file_b)       #plagio tipo 1
-        (difflib_preprocessed, difflib_plain)   = comparator_difflib(file_a, file_b)  #plagio tipo x
-        result_ast                              = comparator_ast(file_a, file_b)      #plagio tipo 2 y 3
+        try:
+            sa_similarity = comparator_sa(file_a, file_b)  # Plagio tipo 1
+            result_ast = comparator_ast(file_a, file_b)    # Plagio tipo 2 y 3
+            ted_similarity = result_ast[0]                 # Tree Edit Distance
+            
+            # Determinar el tipo de plagio
+            plagio_type = determine_plagiarism_type(sa_similarity, ted_similarity)
 
-        #porcentaje que sea tipo a,b,c?
+            return [sa_similarity, ted_similarity, plagio_type]
+        except SyntaxError as e:
+            print(f"SyntaxError in files {file_a} and {file_b}: {e}")
+            return None
+        except Exception as e:
+            print(f"Error comparing files {file_a} and {file_b}: {e}")
+            return None
 
-        ##Medidas
-        #Longest Common Subsequence (LCS) Ratio
-        #Tree Edit Distance (TED)
-        #Similitud Combinada (Weighted Similarity Score)
-
-        #Métricas comunes
-        #Precision
-        #Recall
-        #F1-Score
-        #Accuracy
-
-        #Matriz de similitud
-
-        #TODO aquí debería regresar los resultados
-        return ""
+def determine_plagiarism_type(sa_similarity, ted_similarity):
+    if sa_similarity > 0.8:
+        return 1  #Plagio tipo 1
+    elif ted_similarity > 0.5:
+        return 2  #Plagio tipo 2
+    else:
+        return 0  #No plagio
 
 #Ejecución principal
 def main():
@@ -52,45 +59,47 @@ def main():
     data_dir = os.path.join(base_path, 'Data')
 
     #Obtener todas las subcarpetas dentro de data_dir
-    subdirs = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))]
-    if not subdirs:
-        return
-    
-    #Iterar sobre subcarpetas
+    subdirs = []
+    for root, dirs, files in os.walk(data_dir):
+        for d in dirs:
+            subdirs.append(os.path.join(root, d))
+
+    all_data = []
+
     for subdir in subdirs:
-        #Crear ruta a subcarpeta y obtener archivos
         subdir_path = os.path.join(data_dir, subdir)
         files_training = sorted(glob.glob(os.path.join(subdir_path, '*.py')))
 
-        #Verificar longitud de los archivos
-        if len(files_training) < 2:
+        #Verificar longitud mayor a 2 y que no haya carpetas
+        if len(files_training) < 2 and not any(os.path.isdir(os.path.join(subdir_path, d)) for d in os.listdir(subdir_path)):
             print(f"No se encontraron suficientes archivos en {subdir}.")
-            print(f"{subdir_path} y {files_training}\n")
             continue
         
-        print(f"Se encontraron {len(files_training)} archivos para entrenamiento en la carpeta {subdir}.\n")
-
-        #PASO 1
-        #Obtener comparasiones
-        all_comparisons = []
+        #print(f"Se encontraron {len(files_training)} archivos para entrenamiento en la carpeta {subdir}.\n")
         for file_a in files_training:
             for file_b in files_training:
-                if file_a != file_b:  #Evitar comparar el mismo archivo
+                if file_a != file_b:
                     current_result = compare_files(file_a, file_b)
                     if current_result is not None:
-                        all_comparisons.append(current_result)
+                        all_data.append(current_result)
 
-        ##Entrenar algoritmo neural
+    #Convertir a DataFrame
+    df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
 
-        #PASO 2
-        #Pasar BDD_C por algoritmo neural para obtener resultados
+    #Dividir datos
+    X = df[['sa_similarity', 'ted_similarity']]
+    y = df['plagiarism_type']
 
-        #Abrir BDD de Clasificación
-        #data_dir = os.path.join(base_path, 'Data')
-        #archivos_clasificación = sorted(glob.glob(os.path.join(data_dir, '*.py')))
-        #print(f"Se encontraron {len(archivos_clasificación)} archivos para clasificación.\n")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        #Pasar BDD_C por algoritmos
+    #Entrenar un modelo
+    model = LogisticRegression()
+    #Alternativa: model = DecisionTreeClassifier()
+    model.fit(X_train, y_train)
+
+    #Evaluar el modelo
+    y_pred = model.predict(X_test)
+    print(classification_report(y_test, y_pred))
 
 if __name__ == '__main__':
     main()
