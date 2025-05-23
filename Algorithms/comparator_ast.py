@@ -70,6 +70,17 @@ def decidir_plagio(ted_sim, feature_sim, alpha = 0.5, umbral = 0.70):
     
     return plagio, round(score, 3), umbral
 
+# Calcular similitud TED basado en la comparación de nodos
+def count_common_nodes(node1, node2):
+    if not isinstance(node1, ast.AST) or not isinstance(node2, ast.AST):
+        return 0
+    common_count = 0
+    if type(node1) == type(node2):
+        common_count += 1
+    for child1, child2 in zip(ast.iter_child_nodes(node1), ast.iter_child_nodes(node2)):
+        common_count += count_common_nodes(child1, child2)
+    return common_count
+
 # Comparar dos archivos .py
 def comparator_ast(file1, file2):
     code1 = read_code(file1)
@@ -78,16 +89,11 @@ def comparator_ast(file1, file2):
     tree_ast1 = ast.parse(code1)
     tree_ast2 = ast.parse(code2)
 
-    # Calcular similitud TED basado en la comparación de nodos
-    def count_common_nodes(node1, node2):
-        if not isinstance(node1, ast.AST) or not isinstance(node2, ast.AST):
-            return 0
-        common_count = 0
-        if type(node1) == type(node2):
-            common_count += 1
-        for child1, child2 in zip(ast.iter_child_nodes(node1), ast.iter_child_nodes(node2)):
-            common_count += count_common_nodes(child1, child2)
-        return common_count
+    common_nodes = count_common_nodes(tree_ast1, tree_ast2)
+    print(f"Common nodes between {file1} and {file2}: {common_nodes}")
+
+    max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
+    ted_similarity = common_nodes / max_nodes if max_nodes > 0 else 0
 
     common_nodes = count_common_nodes(tree_ast1, tree_ast2)
     max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
