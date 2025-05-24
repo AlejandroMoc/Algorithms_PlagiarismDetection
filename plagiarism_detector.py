@@ -1,9 +1,3 @@
-#Detector de plagio usando Python
-##A01736339 - Jacqueline Villa Asencio
-##A01736671 - José Juan Irene Cervantes
-##A01736346 - Augusto Gómez Maxil
-##A01736353 - Alejandro Daniel Moctezuma Cruz
-
 ##LIBRERÍAS
 import os, glob
 import numpy as np
@@ -33,10 +27,7 @@ def compare_files(file_a: str, file_b: str):
             print(f"Comparando {file_a} y {file_b}:")
             print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}")
 
-            #Determinar el tipo de plagio
-            plagio_type = determine_plagiarism_type(sa_similarity, ted_similarity)
-
-            return [sa_similarity, ted_similarity, plagio_type]
+            return [sa_similarity, ted_similarity]
         except SyntaxError as e:
             print(f"SyntaxError in files {file_a} and {file_b}: {e}")
             return None
@@ -57,7 +48,7 @@ def main():
     print("Detector de Plagio utilizando Machine Learning")
 
     all_data = []
-    model_path = 'plagiarism_detector_model.joblib'
+    model_path = 'plagiarism_detector_model.joblib'  #Ruta para guardar el modelo
 
     #Intentar cargar el modelo si existe
     if os.path.exists(model_path):
@@ -90,7 +81,7 @@ def main():
                             all_data.append(current_result)
 
         #Convertir a DataFrame
-        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
+        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity'])
 
         #Dividir los datos
         X = df[['sa_similarity', 'ted_similarity']]
@@ -105,18 +96,22 @@ def main():
         print("Modelo guardado en el archivo.")
 
     #Archivos específicos para evaluación
-    file_a = '/home/daniel/Descargas/Algorithms_PlagiarismDetection/Data/algorithms/adjacency_list/adjacency_list.py'
-    file_b = '/home/daniel/Descargas/Algorithms_PlagiarismDetection/Data/algorithms/adjacency_list/adjacency_list_tipo2.py'
+    test_file_a = os.path.join('Data_Check', 'file1.py')
+    test_file_b = os.path.join('Data_Check', 'file2.py')
 
-    #Comparar los archivos específicos
-    specific_result = compare_files(file_a, file_b)
+    specific_result = compare_files(test_file_a, test_file_b)
+
     if specific_result is not None:
-        X_test = np.array([specific_result[:-1]])  #Excluir el tipo de plagio para la predicción
-        y_test = np.array([specific_result[-1]])    #Tipo de plagio para evaluación
+        sa_similarity, ted_similarity = specific_result
+        X_test = np.array([[sa_similarity, ted_similarity]])  #Excluir el tipo de plagio para la predicción
 
         #Predecir usando el modelo
         y_pred = model.predict(X_test)
-        print(classification_report(y_test, y_pred))
+        plagio_type = determine_plagiarism_type(sa_similarity, ted_similarity)
+
+        print(f"Predicción: {y_pred[0]}")  #Imprimir la predicción
+        print(f"Tipo de Plagio: {plagio_type}")  #Imprimir el tipo de plagio
+        print(classification_report([plagio_type], y_pred))
 
 if __name__ == '__main__':
     main()
