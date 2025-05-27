@@ -5,9 +5,9 @@ import pandas as pd
 from Algorithms.comparator_sa import comparator_sa
 from Algorithms.comparator_difflib import comparator_difflib
 from Algorithms.comparator_ast import comparator_ast
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report
-from joblib import dump, load  #Importar joblib
+from joblib import dump, load
 
 ##FUNCIONES
 
@@ -29,26 +29,31 @@ def compare_files(file_a: str, file_b: str):
 
             return [sa_similarity, ted_similarity]
         except SyntaxError as e:
-            print(f"SyntaxError in files {file_a} and {file_b}: {e}")
+            print(f"Error de sintaxis en los archivos {file_a} y {file_b}: {e}")
             return None
         except Exception as e:
-            print(f"Error comparing files {file_a} and {file_b}: {e}")
+            print(f"Error al comparar los archivos {file_a} y {file_b}: {e}")
             return None
 
 def determine_plagiarism_type(sa_similarity, ted_similarity):
-    if sa_similarity > 0.6:  #Ajustar umbral
-        return 1  #Plagio tipo 1
-    elif ted_similarity > 0.4:  #Ajustar umbral
-        return 2  #Plagio tipo 2
+    plagiarism_types = []
+    
+    if sa_similarity > 0.6:
+        plagiarism_types.append(1)  #Plagio tipo 1
+    if ted_similarity > 0.4:
+        plagiarism_types.append(2)  #Plagio tipo 2
+    
+    if plagiarism_types:
+        return plagiarism_types
     else:
-        return 0  #No plagio
+        return [0]
 
 #Ejecución principal
 def main():
     print("Detector de Plagio utilizando Machine Learning")
 
     all_data = []
-    model_path = 'plagiarism_detector_model.joblib'  #Ruta para guardar el modelo
+    model_path = 'plagiarism_detector_model.joblib'
 
     #Intentar cargar el modelo si existe
     if os.path.exists(model_path):
@@ -78,17 +83,27 @@ def main():
                     for file_b in files_b:
                         current_result = compare_files(file_a, file_b)
                         if current_result is not None:
-                            all_data.append(current_result)
+                            sa_similarity, ted_similarity = current_result
+                            
+                            #Determine plagiarism type based on file names or any logic
+                            if "type_1" in file_b:
+                                plagiarism_type = 1
+                            elif "type_2" in file_b:
+                                plagiarism_type = 2
+                            else:
+                                plagiarism_type = 0  #No plagiarism
+                            
+                            all_data.append([sa_similarity, ted_similarity, plagiarism_type])
 
         #Convertir a DataFrame
-        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity'])
+        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
 
         #Dividir los datos
         X = df[['sa_similarity', 'ted_similarity']]
         y = df['plagiarism_type']
 
         #Entrenar un modelo
-        model = DecisionTreeClassifier()
+        model = KNeighborsClassifier(n_neighbors=5)
         model.fit(X, y)
 
         #Guardar el modelo entrenado
@@ -107,11 +122,11 @@ def main():
 
         #Predecir usando el modelo
         y_pred = model.predict(X_test)
-        plagio_type = determine_plagiarism_type(sa_similarity, ted_similarity)
+        plagiarism_types = determine_plagiarism_type(sa_similarity, ted_similarity)
 
         print(f"Predicción: {y_pred[0]}")  #Imprimir la predicción
-        print(f"Tipo de Plagio: {plagio_type}")  #Imprimir el tipo de plagio
-        print(classification_report([plagio_type], y_pred))
+        print(f"Tipo de Plagio: {plagiarism_types}")  #Imprimir el tipo de plagio
+        print(classification_report([plagiarism_types], y_pred))
 
 if __name__ == '__main__':
     main()
