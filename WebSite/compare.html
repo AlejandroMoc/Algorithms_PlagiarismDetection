@@ -7,49 +7,34 @@
 </head>
 <body>
   <header>
-
-    <!-- Elementos a la izquierda -->
     <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
-
-    <!-- Elementos a la derecha -->
     <nav class="header-right">
-      <!-- Navigation Bar -->
       <ul class="nav-links">
         <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
         <li><a href="#subir" onclick="goTo('upload')">Subir archivos</a></li>
       </ul>
-
-      <!-- Hamburger Menu -->
       <div class="menu-icon">&#9776;</div>
     </nav>
-
   </header>
 
   <section class="students-list">
-    <h2>Selecciona dos alumnos</h2>
-    <div class="student-options" id="studentOptions">
-    </div>
+    <h2>Selecciona dos códigos</h2>
   </section>
 
   <section class="code-view">
     <div class="code-box">
-      <h3 id="codeTitle1">Código Alumno A</h3>
-      <pre id="code1">
-// Código ejemplo A
-p1 = 2
-p2 = 3
-r = p1 + p2
-      </pre>
+      <h3 id="codeTitle1">Código A</h3>
+      <br/>
+      <input type="file" id="fileInput1" accept=".py" onchange="loadFileContent('fileInput1', 'code1', 'codeTitle1')" />
+      <p id="fileName1"></p>
+      <pre id="code1">// Código cargado aquí</pre>
     </div>
     <div class="code-box">
-      <h3 id="codeTitle2">Código Alumno D</h3>
-      <pre id="code2">
-// Código ejemplo D
-n1 = 2
-n2 = 3
-result = n1 + n2
-print(result)
-      </pre>
+      <h3 id="codeTitle2">Código B</h3>
+      <br/>
+      <input type="file" id="fileInput2" accept=".py" onchange="loadFileContent('fileInput2', 'code2', 'codeTitle2')" />
+      <p id="fileName2"></p>
+      <pre id="code2">// Código cargado aquí</pre>
     </div>
   </section>
 
@@ -58,5 +43,31 @@ print(result)
   </section>
 
   <script src="js/compare.js"></script>
+  <script>
+    function loadFileContent(inputId, codeId, titleId) {
+      const input = document.getElementById(inputId);
+      const fileNameDisplay = document.getElementById(inputId === 'fileInput1' ? 'fileName1' : 'fileName2');
+      const codeDisplay = document.getElementById(codeId);
+      const titleDisplay = document.getElementById(titleId);
+
+      if (input.files.length > 0) {
+        const file = input.files[0];
+        fileNameDisplay.innerText = file.name;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          codeDisplay.innerText = e.target.result;
+          titleDisplay.innerText = `Código ${file.name}`;
+        };
+        reader.onerror = function() {
+          alert('Error al leer el archivo.');
+        };
+        reader.readAsText(file);
+      } else {
+        codeDisplay.innerText = '// Código cargado aquí';
+        titleDisplay.innerText = `Código ${inputId === 'fileInput1' ? 'A' : 'B'}`;
+      }
+    }
+  </script>
 </body>
 </html>

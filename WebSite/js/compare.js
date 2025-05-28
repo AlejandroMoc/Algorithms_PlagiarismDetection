@@ -1,14 +1,5 @@
-const studentNames = ['Alumno A', 'Alumno B', 'Alumno C', 'Alumno D', 'Alumno E', 'Alumno F'];
 const container = document.getElementById('studentOptions');
 let selected = [];
-
-studentNames.forEach(name => {
-  const div = document.createElement('div');
-  div.className = 'student';
-  div.innerText = name;
-  div.onclick = () => toggleSelect(div);
-  container.appendChild(div);
-});
 
 //Ir al sitio correspondiente
 function goTo(action) {
