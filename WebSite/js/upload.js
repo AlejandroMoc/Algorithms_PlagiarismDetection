@@ -6,6 +6,17 @@ const folderPath = document.getElementById("folderPath");
 
 let filesSelected = [];
 
+//Ir al sitio correspondiente
+function goTo(action) {
+  if (action === 'index') {
+    location.href = "index.html";
+  } else if (action === 'upload') {
+    location.href = "upload.html";
+  } else if (action === 'compare') {
+    location.href = "compare.html";
+  }
+}
+
 fileInput.addEventListener("change", () => {
   for (const file of fileInput.files) {
     addFile(file.name);

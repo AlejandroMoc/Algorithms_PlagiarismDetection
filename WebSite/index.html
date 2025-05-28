@@ -12,14 +12,14 @@
   <header>
 
     <!-- Elementos a la izquierda -->
-    <h1><a href="#comparar" onclick="goTo('index')">Comparador de plagio</a></h1>
+    <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
 
     <!-- Elementos a la derecha -->
     <nav class="header-right">
       <!-- Navigation Bar -->
       <ul class="nav-links">
-        <li><a href="#comparar" onclick="goTo('comparar')">Comparar archivos</a></li>
-        <li><a href="#subir" onclick="goTo('subir')">Subir archivos</a></li>
+        <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
+        <li><a href="#subir" onclick="goTo('upload')">Subir archivos</a></li>
       </ul>
 
       <!-- Hamburger Menu -->
@@ -28,11 +28,14 @@
 
   </header>
 
+<!-- Botones de acciones -->
 <main class="main-menu">
-  <div class="menu-option" onclick="goTo('comparar')">
+
+  <div class="menu-option" onclick="goTo('compare')">
     <img src="https://img.icons8.com/ios-filled/70/FFFFFF/compare.png" alt="Comparar Icono" />
     <p>Comparar archivos</p>
   </div>
+  
   <div class="menu-option" onclick="goTo('upload')">
     <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir Icono" />
     <p>Subir archivos</p>
@@ -45,6 +48,6 @@
     Puedes subir múltiples archivos y compararlos entre sí para identificar posibles casos de plagio entre estudiantes o entregas. La herramienta utiliza algoritmos especializados para brindar resultados confiables y fáciles de interpretar.
   </div>
 
-  <script src="js/scripts.js"></script>
+  <script src="js/index.js"></script>
 </body>
 </html>

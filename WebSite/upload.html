@@ -3,36 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <title>Subida de Archivos</title>
-  <link rel="stylesheet" href="css/upload.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
   <header>
-    <h1>Subida de archivos</h1>
+
+    <!-- Elementos a la izquierda -->
+    <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
+
+    <!-- Elementos a la derecha -->
+    <nav class="header-right">
+      <!-- Navigation Bar -->
+      <ul class="nav-links">
+        <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
+        <li><a href="#subir" onclick="goTo('upload')">Subir archivos</a></li>
+      </ul>
+
+      <!-- Hamburger Menu -->
+      <div class="menu-icon">&#9776;</div>
+    </nav>
+
   </header>
 
+  <!-- Menú con botones -->
   <main class="upload-container">
-    <div class="upload-options">
-      <section class="upload-files">
-        <h3>Subir archivos</h3>
+    <div class="main-menu">
+
+      <section class="menu-option">
         <input type="file" id="fileInput" multiple hidden />
         <button onclick="document.getElementById('fileInput').click()">
-          <img src="https://img.icons8.com/ios-filled/50/upload.png" alt="Subir archivos" />
+          <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir archivos" />
         </button>
+        <p>Subir archivos</p>
         <ul id="fileList"></ul>
       </section>
 
-      <section class="upload-folder">
-        <h3>Subir carpeta</h3>
+      <section class="menu-option">
         <input type="file" id="folderInput" webkitdirectory directory hidden />
         <button onclick="document.getElementById('folderInput').click()">
-          <img src="https://img.icons8.com/ios-filled/50/folder-invoices--v1.png" alt="Subir carpeta" />
+          <img src="https://img.icons8.com/?size=100&id=74359&format=png&color=FFFFFF" alt="Subir carpeta" />
         </button>
-        <p id="folderPath">/</p>
+        <p>Subir carpeta</p>
       </section>
+
     </div>
 
     <p id="fileCount">0 elementos seleccionados</p>
+    <br/>
 
     <div class="actions">
       <button class="confirm" onclick="alert('Archivos confirmados')">Confirmar</button>

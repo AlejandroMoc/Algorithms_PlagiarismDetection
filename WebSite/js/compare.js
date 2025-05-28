@@ -13,14 +13,13 @@ studentNames.forEach(name => {
 //Ir al sitio correspondiente
 function goTo(action) {
   if (action === 'index') {
-    //alert("Navegar a la interfaz de menu principal.");
     location.href = "index.html";
   } else if (action === 'upload') {
-    //alert("Navegar a la interfaz de subida.");
     location.href = "upload.html";
+  } else if (action === 'compare') {
+    location.href = "compare.html";
   }
 }
-
 
 function toggleSelect(el) {
   if (el.classList.contains('selected')) {
