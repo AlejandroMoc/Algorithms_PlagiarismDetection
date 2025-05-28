@@ -126,7 +126,7 @@ def main():
 
         print(f"Predicción: {y_pred[0]}")  #Imprimir la predicción
         print(f"Tipo de Plagio: {plagiarism_types}")  #Imprimir el tipo de plagio
-        print(classification_report([plagiarism_types], y_pred))
+        #print(classification_report([plagiarism_types], y_pred))
 
 if __name__ == '__main__':
     main()
