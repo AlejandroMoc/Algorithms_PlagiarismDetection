@@ -126,6 +126,15 @@ def main():
 
         print(f"Predicción: {y_pred[0]}")  #Imprimir la predicción
         print(f"Tipo de Plagio: {plagiarism_types}")  #Imprimir el tipo de plagio
+
+        #Corrección para evaluación multilabel
+        from sklearn.preprocessing import MultiLabelBinarizer
+        mlb = MultiLabelBinarizer()
+        y_true_bin = mlb.fit_transform([plagiarism_types])
+        y_pred_bin = mlb.transform([y_pred.tolist()])
+        print("Reporte de Clasificación:")
+        print(classification_report(y_true_bin, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_]))
+
         #print(classification_report([plagiarism_types], y_pred))
 
 if __name__ == '__main__':
