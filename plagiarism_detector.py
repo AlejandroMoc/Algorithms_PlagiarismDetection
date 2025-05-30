@@ -1,3 +1,4 @@
+
 ##LIBRERÍAS
 import os, glob
 import numpy as np
@@ -7,6 +8,8 @@ from Algorithms.comparator_difflib import comparator_difflib
 from Algorithms.comparator_ast import comparator_ast
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import MultiLabelBinarizer
 from joblib import dump, load
 
 ##FUNCIONES
@@ -22,7 +25,7 @@ def compare_files(file_a: str, file_b: str):
             sa_similarity = comparator_sa(file_a, file_b)  #Plagio tipo 1
             result_ast = comparator_ast(file_a, file_b)    #Plagio tipo 2 y 3
             ted_similarity = result_ast[0]                 #Tree Edit Distance
-            
+
             #Imprimir similitudes para depuración
             print(f"Comparando {file_a} y {file_b}:")
             print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}")
@@ -37,12 +40,12 @@ def compare_files(file_a: str, file_b: str):
 
 def determine_plagiarism_type(sa_similarity, ted_similarity):
     plagiarism_types = []
-    
+
     if sa_similarity > 0.6:
         plagiarism_types.append(1)  #Plagio tipo 1
     if ted_similarity > 0.4:
         plagiarism_types.append(2)  #Plagio tipo 2
-    
+
     if plagiarism_types:
         return plagiarism_types
     else:
@@ -54,11 +57,13 @@ def main():
 
     all_data = []
     model_path = 'plagiarism_detector_model.joblib'
+    mlb_path = 'mlb.joblib'
 
     #Intentar cargar el modelo si existe
-    if os.path.exists(model_path):
+    if os.path.exists(model_path) and os.path.exists(mlb_path):
         model = load(model_path)
-        print("Modelo cargado desde el archivo.")
+        mlb = load(mlb_path)
+        print("Modelo y binarizador cargados desde archivos.")
     else:
         #Abrir BDD de Entrenamiento
         base_path = os.path.dirname(__file__)
@@ -75,25 +80,26 @@ def main():
             for j in range(i + 1, len(subdirs)):
                 subdir_a = subdirs[i]
                 subdir_b = subdirs[j]
-                
+
                 files_a = sorted(glob.glob(os.path.join(subdir_a, '*.py')))
                 files_b = sorted(glob.glob(os.path.join(subdir_b, '*.py')))
-                
+
                 for file_a in files_a:
                     for file_b in files_b:
                         current_result = compare_files(file_a, file_b)
                         if current_result is not None:
                             sa_similarity, ted_similarity = current_result
-                            
+
                             #Determine plagiarism type based on file names or any logic
+                            types = []
                             if "type_1" in file_b:
-                                plagiarism_type = 1
-                            elif "type_2" in file_b:
-                                plagiarism_type = 2
-                            else:
-                                plagiarism_type = 0  #No plagiarism
-                            
-                            all_data.append([sa_similarity, ted_similarity, plagiarism_type])
+                                types.append(1)
+                            if "type_2" in file_b:
+                                types.append(2)
+                            if not types:
+                                types.append(0)
+
+                            all_data.append([sa_similarity, ted_similarity, types])
 
         #Convertir a DataFrame
         df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
@@ -102,13 +108,18 @@ def main():
         X = df[['sa_similarity', 'ted_similarity']]
         y = df['plagiarism_type']
 
-        #Entrenar un modelo
-        model = KNeighborsClassifier(n_neighbors=5)
-        model.fit(X, y)
+        #Preparar binarización para multilabel
+        mlb = MultiLabelBinarizer()
+        y_bin = mlb.fit_transform(y)
 
-        #Guardar el modelo entrenado
+        #Entrenar un modelo multilabel
+        model = OneVsRestClassifier(KNeighborsClassifier(n_neighbors=3))
+        model.fit(X, y_bin)
+
+        #Guardar el modelo y el binarizador
         dump(model, model_path)
-        print("Modelo guardado en el archivo.")
+        dump(mlb, mlb_path)
+        print("Modelo y binarizador guardados en archivos.")
 
     #Archivos específicos para evaluación
     test_file_a = os.path.join('Data_Check', 'file1.py')
@@ -118,24 +129,18 @@ def main():
 
     if specific_result is not None:
         sa_similarity, ted_similarity = specific_result
-        X_test = np.array([[sa_similarity, ted_similarity]])  #Excluir el tipo de plagio para la predicción
+        X_test = np.array([[sa_similarity, ted_similarity]])
 
-        #Predecir usando el modelo
-        y_pred = model.predict(X_test)
+        #Predecir usando el modelo multilabel
+        y_pred_bin = model.predict(X_test)
         plagiarism_types = determine_plagiarism_type(sa_similarity, ted_similarity)
+        y_true_bin = mlb.transform([plagiarism_types])
 
-        print(f"Predicción: {y_pred[0]}")  #Imprimir la predicción
-        print(f"Tipo de Plagio: {plagiarism_types}")  #Imprimir el tipo de plagio
-
-        #Corrección para evaluación multilabel
-        from sklearn.preprocessing import MultiLabelBinarizer
-        mlb = MultiLabelBinarizer()
-        y_true_bin = mlb.fit_transform([plagiarism_types])
-        y_pred_bin = mlb.transform([y_pred.tolist()])
+        print(f"Similitud SA: {sa_similarity}")
+        print(f"Similitud TED: {ted_similarity}")
+        print(f"Tipo de Plagio real: {plagiarism_types}")
         print("Reporte de Clasificación:")
         print(classification_report(y_true_bin, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_]))
-
-        #print(classification_report([plagiarism_types], y_pred))
 
 if __name__ == '__main__':
     main()
