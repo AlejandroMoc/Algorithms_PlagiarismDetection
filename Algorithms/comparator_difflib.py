@@ -40,7 +40,6 @@ def preprocess_code(content):
             #Si el token es comentario, salto de línea o fin de archivo, saltars
             if token.type in [tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE, tokenize.ENCODING, tokenize.ENDMARKER]:
                 continue
-
             elif token.type == tokenize.NAME:
                 if token.string in reserved_keywords:
                     tokens.append(token.string)
@@ -72,7 +71,7 @@ def compare_preprocessed(code1, code2):
 
     output = f"Similitud (preprocesado): {similarity:.2f}%\n"
     output += "Diferencias:\n" + result_comparison + "\n"
-    return output
+    return similarity, output
 
 #Comparador texto plano
 def compare_plain(code1, code2):
@@ -84,13 +83,13 @@ def compare_plain(code1, code2):
 
     output = f"Similitud (texto llano): {similarity:.2f}%\n"
     output += "Diferencias:\n" + result_comparison + "\n"
-    return output
+    return similarity, output
 
 #Función principal del difflib
 def comparator_difflib(file_a, file_b):
-    result_preprocessed = compare_preprocessed(file_a, file_b)
-    result_plain        = compare_plain(file_a, file_b)
-    return result_preprocessed, result_plain
+    similarity_preprocessed, result_preprocessed = compare_preprocessed(file_a, file_b)
+    similarity_plain, result_plain = compare_plain(file_a, file_b)
+    return (similarity_preprocessed, result_preprocessed, similarity_plain, result_plain)
 
 #Ejecución principal
 def main():

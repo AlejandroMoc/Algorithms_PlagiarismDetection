@@ -60,7 +60,7 @@ def read_code(file_path):
         return f.read()
 
 # Veredicto de plagio
-def decidir_plagio(ted_sim, feature_sim, alpha = 0.5, umbral = 0.70):
+def decide_plagiarism(ted_sim, feature_sim, alpha = 0.5, umbral = 0.70):
     score = alpha * ted_sim + (1 - alpha) * feature_sim
     plagio = score >= umbral
 
@@ -112,7 +112,7 @@ def comparator_ast(file1, file2):
     orden_funcs1 = function_order(tree_ast1)
     orden_funcs2 = function_order(tree_ast2)
 
-    plagio, score, umbral = decidir_plagio(ted_similarity, features_sim)
+    plagio, score, umbral = decide_plagiarism(ted_similarity, features_sim)
 
     return [
         round(ted_similarity, 3),        # Índice 0: similitud TED
@@ -121,7 +121,7 @@ def comparator_ast(file1, file2):
         list(f2_dict.values()),          # Índice 3: features archivo 2
         score,                           # Índice 4: score combinado
         umbral,                          # Índice 5: umbral usado
-        plagio,                          # Índice 6: resultado final
+        plagio,                          # Índice 6: si ast piensa que hay plagio
         vars1,                           # Índice 7: variables archivo 1
         vars2,                           # Índice 8: variables archivo 2
         orden_funcs1,                    # Índice 9: orden de funciones archivo 1
