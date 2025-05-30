@@ -101,8 +101,8 @@ def predict_plagiarism(file1, file2, model, mlb):
     else:
         return None
 
-#Ejecución principal
-def main():
+#Algoritmo
+def algorithm(test_file_a, test_file_b):
     print("Detector de Plagio utilizando Machine Learning")
 
     all_data = []
@@ -186,8 +186,8 @@ def main():
         print("Modelo y binarizador guardados en archivos.")
 
     #Archivos específicos para evaluación
-    test_file_a = os.path.join('Data_Check', 'file1.py')
-    test_file_b = os.path.join('Data_Check', 'file2.py')
+    #test_file_a = os.path.join('Data_Check', 'file1.py')
+    #test_file_b = os.path.join('Data_Check', 'file2.py')
 
     specific_result = predict_plagiarism(test_file_a, test_file_b, model, mlb)
     
@@ -206,5 +206,15 @@ def main():
     else:
         print("No se pudo predecir el tipo de plagio.")
 
+def main():
+    print("Detector de Plagio utilizando Machine Learning")
+
+    #Ruta de los archivos a evaluar
+    test_file_a = os.path.join('Data_Check', 'file1.py')
+    test_file_b = os.path.join('Data_Check', 'file2.py')
+
+    algorithm(test_file_a, test_file_b)
+
+#Ejecución principal
 if __name__ == '__main__':
     main()
