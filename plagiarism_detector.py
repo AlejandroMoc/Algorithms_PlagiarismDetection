@@ -1,5 +1,4 @@
 
-##LIBRERÍAS
 import os, glob
 import numpy as np
 import pandas as pd
@@ -11,205 +10,129 @@ from sklearn.metrics import classification_report
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
 from joblib import dump, load
+from tqdm import tqdm 
 
-##FUNCIONES
-
-#Comparar archivos para entrenamiento
 def compare_files(file_a: str, file_b: str):
-    if file_a == file_b:
+    if file_a == file_b or not file_a or not file_b:
         return None
-    elif (file_a is None) or (file_b is None):
+    try:
+        difflib_results = comparator_difflib(file_a, file_b)
+        similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
+        sa_similarity = comparator_sa(file_a, file_b)
+        result_ast = comparator_ast(file_a, file_b)
+        ted_similarity = result_ast[0]
+        is_ast_plagiarism = result_ast[6]
+        return [sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism]
+    except Exception as e:
+        print(f"Error comparando {file_a} y {file_b}: {e}")
         return None
+
+def generate_training_data_from_leaf_dirs(data_dir):
+    data = []
+    leaf_dirs = [os.path.join(root) for root, dirs, files in os.walk(data_dir)
+                 if any(f.endswith(".py") for f in files)]
+
+    print(f"🔍 Encontradas {len(leaf_dirs)} carpetas hoja.")
+
+    for ruta_subcarpeta in tqdm(leaf_dirs, desc="Procesando carpetas hoja"):
+        archivos = sorted(glob.glob(os.path.join(ruta_subcarpeta, '*.py')))
+        if os.path.exists(os.path.join(ruta_subcarpeta, "plagio_tipo1.txt")):
+            for f in archivos:
+                result = compare_files(f, f)
+                if result:
+                    sa, ted, sim_plain, ast_flag = result
+                    data.append([sa, ted, sim_plain, ast_flag, [1]])
+
+        for i in range(len(archivos)):
+            for j in range(i + 1, len(archivos)):
+                file_a, file_b = archivos[i], archivos[j]
+                result = compare_files(file_a, file_b)
+                if result:
+                    sa, ted, sim_plain, ast_flag = result
+                    name_b = os.path.basename(file_b).lower()
+                    types = []
+                    if "tipo0" in name_b: types.append(0)
+                    if "tipo1" in name_b: types.append(1)
+                    if "tipo2" in name_b: types.append(2)
+                    if "tipo3" in name_b: types.append(3)
+                    if not types: types.append(0)
+                    data.append([sa, ted, sim_plain, ast_flag, types])
+    return data
+
+def algorithm(test_file_a, test_file_b):
+    print("🚀 Detector de Plagio utilizando Machine Learning")
+    model_path = 'plagiarism_detector_model.joblib'
+    mlb_path = 'mlb.joblib'
+
+    if os.path.exists(model_path) and os.path.exists(mlb_path):
+        model = load(model_path)
+        mlb = load(mlb_path)
+        print("✅ Modelo y binarizador cargados.")
     else:
-        try:
-            #Plagio tipo 0
-            difflib_results = comparator_difflib(file_a, file_b)
-            similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
+        base_path = os.path.dirname(__file__)
+        data_dir = os.path.join(base_path, 'Data')
+        print("⚙️  Generando datos de entrenamiento...")
+        all_data = generate_training_data_from_leaf_dirs(data_dir)
 
-            #Plagio tipo 1
-            sa_similarity = comparator_sa(file_a, file_b)
+        if not all_data:
+            print("❌ No hay datos para entrenar.")
+            return
 
-            #Plagio tipo 2 y 3
-            result_ast = comparator_ast(file_a, file_b)
-            ted_similarity = result_ast[0]
-            is_ast_plagiarism = result_ast[6]
+        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'similarity_plain', 'is_ast_plagiarism', 'plagiarism_type'])
+        X = df[['sa_similarity', 'ted_similarity']]
+        y = df['plagiarism_type']
 
-            #Imprimir similitudes para depuración
-            print(f"Comparando {file_a} y {file_b}:")
-            print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}, Plain Similarity: {similarity_plain}, AST considers it plagiarism: {is_ast_plagiarism}")
+        all_labels = sum(y, [])
+        total = len(all_labels)
+        print("\n📊 Distribución de clases en el dataset:")
+        for tipo in range(4):
+            count = all_labels.count(tipo)
+            pct = (count / total) * 100 if total else 0
+            print(f"  Tipo {tipo}: {pct:.2f}% ({count} muestras)")
 
-            return [sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism]
+        mlb = MultiLabelBinarizer()
+        y_bin = mlb.fit_transform(y)
 
-        except SyntaxError as e:
-            print(f"Error de sintaxis en los archivos {file_a} y {file_b}: {e}")
-            return None
-        except Exception as e:
-            print(f"Error al comparar los archivos {file_a} y {file_b}: {e}")
-            return None
+        X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
+        print("🤖 Entrenando modelo...")
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
 
-#Determinar tipo de plagio en base a métricas y umbrales
-def determine_plagiarism_type(sa_similarity, ted_similarity, similarity_plain):
-    plagiarism_types = []
+        print("📈 Evaluación del modelo:")
+        y_pred_bin = model.predict(X_test)
+        print(classification_report(y_test, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
 
-    #Plagio tipo 0
-    if similarity_plain > 0.5:
-        plagiarism_types.append(0)
+        dump(model, model_path)
+        dump(mlb, mlb_path)
+        print("💾 Modelo y binarizador guardados.")
 
-    #Plagio tipo 1
-    if sa_similarity > 0.6:
-        plagiarism_types.append(1)
-
-    #Plagio tipo 2
-    if ted_similarity > 0.4:
-        plagiarism_types.append(2)
-
-    if plagiarism_types:
-        return plagiarism_types
+    print("🔎 Ejecutando predicción de prueba...")
+    result = predict_plagiarism(test_file_a, test_file_b, model, mlb)
+    if result:
+        predicted_types, sa, ted, ast_flag = result
+        print(f"📌 Predicción: {predicted_types}")
+        print(f"  SA Similarity: {sa:.2f}")
+        print(f"  TED Similarity: {ted:.2f}")
+        print(f"  AST considera plagio: {'Sí' if ast_flag else 'No'}")
     else:
-        return [0]
+        print("⚠️  No se pudo realizar la predicción.")
 
-#Predecir plagio en base a modelo y archivos
 def predict_plagiarism(file1, file2, model, mlb):
-    comparison_result = compare_files(file1, file2)
-
-    if comparison_result is not None:
-
-        #Desempacar resultados de compare_files
-        sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism = comparison_result
-
-        #Predecir tipos de plagio
-        X_test = np.array([[sa_similarity, ted_similarity]])
+    result = compare_files(file1, file2)
+    if result:
+        sa, ted, sim_plain, ast_flag = result
+        X_test = np.array([[sa, ted]])
         y_pred_bin = model.predict(X_test)
         if y_pred_bin.ndim == 1:
             y_pred_bin = y_pred_bin.reshape(1, -1)
         predicted_types = mlb.inverse_transform(y_pred_bin)
-
-        #Regresar tipos de predicción y métricas
-        specific_result = predicted_types, sa_similarity, ted_similarity, is_ast_plagiarism
-
-        return specific_result
-    else:
-        return None
-
-#Algoritmo
-def algorithm(test_file_a, test_file_b):
-    print("Detector de Plagio utilizando Machine Learning")
-
-    all_data = []
-    model_path = 'plagiarism_detector_model.joblib'
-    mlb_path = 'mlb.joblib'
-
-    #Intentar cargar el modelo si existe
-    if os.path.exists(model_path) and os.path.exists(mlb_path):
-        model = load(model_path)
-        mlb = load(mlb_path)
-        print("Modelo y binarizador cargados desde archivos.")
-
-    #Si no existe, entrenar el modelo
-    else:
-        #Abrir BDD de Entrenamiento
-        base_path = os.path.dirname(__file__)
-        data_dir = os.path.join(base_path, 'Data')
-
-        #Obtener todas las subcarpetas dentro de data_dir
-        subdirs = []
-        for root, dirs, files in os.walk(data_dir):
-            for d in dirs:
-                subdirs.append(os.path.join(root, d))
-
-        #Comparar archivos entre diferentes subcarpetas
-        for i in range(len(subdirs)):
-            for j in range(i + 1, len(subdirs)):
-                subdir_a = subdirs[i]
-                subdir_b = subdirs[j]
-
-                files_a = sorted(glob.glob(os.path.join(subdir_a, '*.py')))
-                files_b = sorted(glob.glob(os.path.join(subdir_b, '*.py')))
-
-                for file_a in files_a:
-                    for file_b in files_b:
-                        current_result = compare_files(file_a, file_b)
-                        if current_result is not None:
-
-                            #Desempacar resultados de compare_files
-                            sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism = current_result
-
-                            #Determinar tipo de plagio
-                            types = []
-                            if "type_0" in file_b:
-                                types.append(0)
-                            if "type_1" in file_b:
-                                types.append(1)
-                            if "type_2" in file_b:
-                                types.append(2)
-                            if "type_3" in file_b:
-                                types.append(3)
-
-                            if not types:
-                                types.append(0)  # Valor por defecto
-
-                            all_data.append([sa_similarity, ted_similarity, types])
-
-        #Convertir a DataFrame
-        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
-
-        # Verificar si hay datos suficientes
-        if df.empty:
-            print("No se encontraron datos suficientes para entrenar el modelo.")
-            return
-
-        #Dividir los datos
-        X = df[['sa_similarity', 'ted_similarity']]
-        y = df['plagiarism_type']
-
-        #Preparar binarización para multilabel
-        mlb = MultiLabelBinarizer()
-        y_bin = mlb.fit_transform(y)
-
-        #Dividir en entrenamiento y prueba
-        X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
-
-        #Entrenar un modelo multilabel
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-        model.fit(X_train, y_train)
-
-        #Evaluar el modelo
-        y_pred_bin = model.predict(X_test)
-        print("Reporte de Clasificación:")
-        print(classification_report(y_test, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_]))
-
-        #Guardar el modelo y el binarizador
-        dump(model, model_path)
-        dump(mlb, mlb_path)
-        print("Modelo y binarizador guardados en archivos.")
-
-    #Archivos específicos para evaluación
-    specific_result = predict_plagiarism(test_file_a, test_file_b, model, mlb)
-
-    if specific_result:
-        #Desempacar resultados de predict_plagiarism
-        predicted_types, sa_similarity, ted_similarity, is_ast_plagiarism = specific_result
-
-        #Predicción de tipos de plagio
-        print(f"Tipos de plagio predichos entre {test_file_a} y {test_file_b}: {predicted_types}")
-
-        #Métricas relevantes (mostrar en el sitio web)
-        print(f"Similitud SA: {sa_similarity}")
-        print(f"Similitud TED: {ted_similarity}")
-        print(f"AST considera que es plagio: {is_ast_plagiarism}")
-
-    else:
-        print("No se pudo predecir el tipo de plagio.")
+        return predicted_types, sa, ted, ast_flag
+    return None
 
 def main():
-    print("Detector de Plagio utilizando Machine Learning")
-
-    #Ruta de los archivos a evaluar
     test_file_a = os.path.join('Data_Check', 'file1.py')
     test_file_b = os.path.join('Data_Check', 'file2.py')
-
     algorithm(test_file_a, test_file_b)
 
-#Ejecución principal
 if __name__ == '__main__':
     main()

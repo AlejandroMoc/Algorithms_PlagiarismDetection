@@ -1,14 +1,18 @@
-def add_numbers(var_a, var_b):
-    """Suma dos números."""
-    return var_a + var_b
+python
+import asyncio
+import time
+import logging
 
-def multiply_numbers(var_a, var_b):
-    """Multiplica dos números."""
-    return var_a * var_b
+async def tarea():
+    logging.info("Iniciando tarea")
+    await asyncio.sleep(1)
+    logging.info("Tarea completada")
+
+async def principal():
+    inicio_tiempo = time.time()
+    await tarea()
+    tiempo_transcurrido = time.time() - inicio_tiempo
+    logging.info(f"Tarea completada en {tiempo_transcurrido:.2f} segundos")
 
 if __name__ == "__main__":
-    result_add = add_numbers(5, 3)
-    print(f"Suma: {result_add}")
-
-    result_multiply = multiply_numbers(5, 3)
-    print(f"Producto: {result_multiply}")
+    asyncio.run(principal())
