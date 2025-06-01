@@ -32,23 +32,11 @@ def compare_files(file_a: str, file_b: str):
             #Plagio tipo 2 y 3
             result_ast = comparator_ast(file_a, file_b)
             ted_similarity = result_ast[0]
-            # features_sim = result_ast[1]
-            # features_file1 = result_ast[2]
-            # features_file2 = result_ast[3]
-            # combined_score = result_ast[4]
-            # threshold_used = result_ast[5]
             is_ast_plagiarism = result_ast[6]
-            # variables_file1 = result_ast[7]
-            # variables_file2 = result_ast[8]
-            # function_order_file1 = result_ast[9]
-            # function_order_file2 = result_ast[10]
 
             #Imprimir similitudes para depuración
             print(f"Comparando {file_a} y {file_b}:")
-            print(f"  - SA Similarity: {sa_similarity}, \
-                TED Similarity: {ted_similarity}, \
-                Plain Similarity: {similarity_plain}, \
-                AST considers it plagiarism: {is_ast_plagiarism}")
+            print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}, Plain Similarity: {similarity_plain}, AST considers it plagiarism: {is_ast_plagiarism}")
 
             return [sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism]
 
@@ -83,17 +71,19 @@ def determine_plagiarism_type(sa_similarity, ted_similarity, similarity_plain):
 #Predecir plagio en base a modelo y archivos
 def predict_plagiarism(file1, file2, model, mlb):
     comparison_result = compare_files(file1, file2)
-    
+
     if comparison_result is not None:
-        
+
         #Desempacar resultados de compare_files
         sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism = comparison_result
 
         #Predecir tipos de plagio
         X_test = np.array([[sa_similarity, ted_similarity]])
         y_pred_bin = model.predict(X_test)
+        if y_pred_bin.ndim == 1:
+            y_pred_bin = y_pred_bin.reshape(1, -1)
         predicted_types = mlb.inverse_transform(y_pred_bin)
-        
+
         #Regresar tipos de predicción y métricas
         specific_result = predicted_types, sa_similarity, ted_similarity, is_ast_plagiarism
 
@@ -155,10 +145,18 @@ def algorithm(test_file_a, test_file_b):
                             if "type_3" in file_b:
                                 types.append(3)
 
+                            if not types:
+                                types.append(0)  # Valor por defecto
+
                             all_data.append([sa_similarity, ted_similarity, types])
 
         #Convertir a DataFrame
         df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'plagiarism_type'])
+
+        # Verificar si hay datos suficientes
+        if df.empty:
+            print("No se encontraron datos suficientes para entrenar el modelo.")
+            return
 
         #Dividir los datos
         X = df[['sa_similarity', 'ted_similarity']]
@@ -186,11 +184,8 @@ def algorithm(test_file_a, test_file_b):
         print("Modelo y binarizador guardados en archivos.")
 
     #Archivos específicos para evaluación
-    #test_file_a = os.path.join('Data_Check', 'file1.py')
-    #test_file_b = os.path.join('Data_Check', 'file2.py')
-
     specific_result = predict_plagiarism(test_file_a, test_file_b, model, mlb)
-    
+
     if specific_result:
         #Desempacar resultados de predict_plagiarism
         predicted_types, sa_similarity, ted_similarity, is_ast_plagiarism = specific_result
