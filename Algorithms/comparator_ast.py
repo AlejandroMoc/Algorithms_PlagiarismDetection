@@ -60,15 +60,19 @@ def read_code(file_path):
         return f.read()
 
 # Veredicto de plagio
-def decide_plagiarism(ted_sim, feature_sim, alpha = 0.5, umbral = 0.70):
+def decide_plagiarism(ted_sim, feature_sim, alpha = 0.5, threshold = 0.70):
     score = alpha * ted_sim + (1 - alpha) * feature_sim
-    plagio = score >= umbral
+    plagio = score >= threshold
+
+    #Escribir el umbral en un archivo txt (depuración)
+    #with open(f'threshold_report_{threshold}.txt', 'a') as file:
+        #file.write(f"{score:.3f}\n")
 
     #print(f"✅ Score combinado: {score:.3f} (TED={ted_sim:.3f}, Features={feature_sim:.3f})")
-    #print(f"📌 Umbral de decisión: {umbral}")
+    #print(f"📌 Umbral de decisión: {threshold}")
     #print("🛑 AST:", "PLAGIO detectado")
     
-    return plagio, round(score, 3), umbral
+    return plagio, round(score, 3)
 
 # Calcular similitud TED basado en la comparación de nodos
 def count_common_nodes(node1, node2):
@@ -112,7 +116,8 @@ def comparator_ast(file1, file2):
     orden_funcs1 = function_order(tree_ast1)
     orden_funcs2 = function_order(tree_ast2)
 
-    plagio, score, umbral = decide_plagiarism(ted_similarity, features_sim)
+    ast_flag_0, score = decide_plagiarism(ted_sim = ted_similarity, feature_sim = features_sim, threshold=0.9)
+    ast_flag_1, score = decide_plagiarism(ted_sim = ted_similarity, feature_sim = features_sim, threshold=0.35)
 
     return [
         round(ted_similarity, 3),        # Índice 0: similitud TED
@@ -120,12 +125,15 @@ def comparator_ast(file1, file2):
         list(f1_dict.values()),          # Índice 2: features archivo 1
         list(f2_dict.values()),          # Índice 3: features archivo 2
         score,                           # Índice 4: score combinado
-        umbral,                          # Índice 5: umbral usado
-        plagio,                          # Índice 6: si ast piensa que hay plagio
-        vars1,                           # Índice 7: variables archivo 1
-        vars2,                           # Índice 8: variables archivo 2
-        orden_funcs1,                    # Índice 9: orden de funciones archivo 1
-        orden_funcs2                     # Índice 10: orden de funciones archivo 2
+        vars1,                           # Índice 5: variables archivo 1
+        vars2,                           # Índice 6: variables archivo 2
+        orden_funcs1,                    # Índice 7: orden de funciones archivo 1
+        orden_funcs2,                    # Índice 8: orden de funciones archivo 2
+
+        #Regresar qué tipo de plagio considera
+        ast_flag_0,                      # Índice 9: Plagio de tipo exacto
+        ast_flag_1,                      # Índice 10: Plagio de tipo 2?
+        
     ]
 
 #Ejecución principal
