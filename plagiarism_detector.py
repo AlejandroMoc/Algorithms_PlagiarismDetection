@@ -14,8 +14,25 @@ from sklearn.model_selection import train_test_split
 from joblib import dump, load
 from tqdm import tqdm
 import difflib
+import ast
 
 ##FUNCIONES
+#Funciones adicionales para contar nodos, funciones y bucles en el AST
+def ast_nodes(file):
+    with open(file, "r") as source:
+        tree = ast.parse(source.read())
+    return [node for node in ast.walk(tree)]
+
+def count_functions(file):
+    with open(file, "r") as source:
+        tree = ast.parse(source.read())
+    return len([node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)])
+
+def count_loops(file):
+    with open(file, "r") as source:
+        tree = ast.parse(source.read())
+    return len([node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))])
+
 #Comparar archivos para entrenamiento
 def compare_files(file_a: str, file_b: str):
     if file_a == file_b:
@@ -45,6 +62,11 @@ def compare_files(file_a: str, file_b: str):
                 d = difflib.ndiff(f1_lines, f2_lines)
                 edit_distance = sum(1 for _ in d if _[0] != ' ')
 
+            #Nuevas métricas estructurales
+            num_nodes_diff = abs(len(ast_nodes(file_a)) - len(ast_nodes(file_b)))
+            num_funcs_diff = abs(count_functions(file_a) - count_functions(file_b))
+            num_loops_diff = abs(count_loops(file_a) - count_loops(file_b))
+
             #Imprimir similitudes
             print(f"Comparando {file_a} y {file_b}:")
             print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}, Edit Distance: {edit_distance}, AST considera plagio: {is_ast_plagiarism_0}")
@@ -55,7 +77,10 @@ def compare_files(file_a: str, file_b: str):
                 features_similarity,
                 is_ast_plagiarism_0,
                 is_ast_plagiarism_1,
-                edit_distance  #Incluir la distancia de edición
+                edit_distance,
+                num_nodes_diff,
+                num_funcs_diff,
+                num_loops_diff
             ]
 
         except SyntaxError as e:
@@ -78,15 +103,15 @@ def generate_training_data_from_leaf_dirs(data_dir):
             for f in archivos:
                 result = compare_files(f, f)
                 if result:
-                    sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance = result
-                    data.append([sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, [1]])
+                    sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
+                    data.append([sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff, [1]])
 
         for i in range(len(archivos)):
             for j in range(i + 1, len(archivos)):
                 file_a, file_b = archivos[i], archivos[j]
                 result = compare_files(file_a, file_b)
                 if result:
-                    sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance = result
+                    sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
                     name_b = os.path.basename(file_b).lower()
                     types = []
                     if "tipo0" in name_b: types.append(0)
@@ -94,13 +119,13 @@ def generate_training_data_from_leaf_dirs(data_dir):
                     if "tipo2" in name_b: types.append(2)
                     if "tipo3" in name_b: types.append(3)
                     if not types: types.append(0)
-                    data.append([sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, types])
+                    data.append([sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff, types])
     return data
 
 def algorithm(test_file_a, test_file_b):
     print("🚀 Detector de Plagio utilizando Machine Learning")
-    model_path = 'plagiarism_model.joblib'
-    mlb_path = 'mlb.joblib'
+    model_path = 'plagiarism.joblib'
+    mlb_path = 'multilabelbinarizer.joblib'
 
     #Si existe, cargar el modelo
     if os.path.exists(model_path) and os.path.exists(mlb_path):
@@ -120,8 +145,8 @@ def algorithm(test_file_a, test_file_b):
             print("❌ No hay datos para entrenar.")
             return
 
-        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'features_similarity', 'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance', 'plagiarism_type'])
-        X = df[['sa_similarity', 'ted_similarity', 'edit_distance']]
+        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'features_similarity', 'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff', 'plagiarism_type'])
+        X = df[['sa_similarity', 'ted_similarity', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff']]
         y = df['plagiarism_type']
 
         all_labels = sum(y, [])
@@ -153,26 +178,29 @@ def algorithm(test_file_a, test_file_b):
     print("🔍 Ejecutando predicción de prueba...")
     result = predict_plagiarism(test_file_a, test_file_b, prediction_model, mlb)
     if result:
-        predicted_types, sa, ted, ast_flag_0, ast_flag_1, edit_distance = result
+        predicted_types, sa, ted, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
         print(f"📋 Predicción: {predicted_types}")
         print(f"  SA Similarity: {sa:.2f}")
         print(f"  TED Similarity: {ted:.2f}")
         print(f"  Edit Distance: {edit_distance}")
         print(f"  AST - Plagio exacto: {'Sí' if ast_flag_0 else 'No'}")
         print(f"  AST - Plagio parcial: {'Sí' if ast_flag_1 else 'No'}")
+        print(f"  Diferencia en número de nodos: {num_nodes_diff}")
+        print(f"  Diferencia en número de funciones: {num_funcs_diff}")
+        print(f"  Diferencia en número de bucles: {num_loops_diff}")
     else:
         print("⚠️  No se pudo realizar la predicción.")
 
 def predict_plagiarism(file1, file2, prediction_model, mlb):
     result = compare_files(file1, file2)
     if result:
-        sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance = result
-        X_test = np.array([[sa, ted, edit_distance]])
+        sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
+        X_test = np.array([[sa, ted, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff]])
         y_pred_bin = prediction_model.predict(X_test)
         if y_pred_bin.ndim == 1:
             y_pred_bin = y_pred_bin.reshape(1, -1)
         predicted_types = mlb.inverse_transform(y_pred_bin)
-        return predicted_types, sa, ted, ast_flag_0, ast_flag_1, edit_distance
+        return predicted_types, sa, ted, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff
     return None
 
 def main():
