@@ -14,6 +14,8 @@ from sklearn.model_selection import train_test_split
 from joblib import dump, load
 from tqdm import tqdm
 import difflib
+import time
+
 
 ##FUNCIONES
 #Comparar archivos para entrenamiento
@@ -102,19 +104,23 @@ def algorithm(test_file_a, test_file_b):
     model_path = 'plagiarism_model.joblib'
     mlb_path = 'mlb.joblib'
 
-    #Si existe, cargar el modelo
+    # Si existe, cargar el modelo
     if os.path.exists(model_path) and os.path.exists(mlb_path):
         prediction_model = load(model_path)
         mlb = load(mlb_path)
         print("✅ Modelo y binarizador cargados.")
 
-    #Si no existe, entrenar el modelo
+    # Si no existe, entrenar el modelo
     else:
-        #Abrir BDD de Entrenamiento
         base_path = os.path.dirname(__file__)
         data_dir = os.path.join(base_path, 'Data')
+
+        # ⏱️ Medición de tiempo de preprocesamiento
         print("⚙️  Generando datos de entrenamiento...")
+        start_preproc = time.time()
         all_data = generate_training_data_from_leaf_dirs(data_dir)
+        end_preproc = time.time()
+        print(f"⏱️ Tiempo de preprocesamiento: {end_preproc - start_preproc:.2f} segundos")
 
         if not all_data:
             print("❌ No hay datos para entrenar.")
@@ -135,21 +141,31 @@ def algorithm(test_file_a, test_file_b):
         mlb = MultiLabelBinarizer()
         y_bin = mlb.fit_transform(y)
 
-        #Dividir en entrenamiento y prueba
-        X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
+        # División de datos
+        X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.3, random_state=42)
+
+        # ⏱️ Medición de tiempo de entrenamiento
         print("🤖 Entrenando modelo...")
+        start_train = time.time()
         prediction_model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
+        end_train = time.time()
+        print(f"⏱️ Tiempo de entrenamiento: {end_train - start_train:.2f} segundos")
 
-        #Evaluar el modelo
+        # ⏱️ Medición de tiempo de evaluación
         print("📈 Evaluación del modelo:")
+        start_eval = time.time()
         y_pred_bin = prediction_model.predict(X_test)
         print(classification_report(y_test, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
+        end_eval = time.time()
+        print(f"⏱️ Tiempo de evaluación (prueba con 30%): {end_eval - start_eval:.2f} segundos")
 
+        # Guardar modelo y binarizador
         dump(prediction_model, model_path)
         dump(mlb, mlb_path)
         print("💾 Modelo y binarizador guardados.")
 
+    # Predicción de prueba
     print("🔍 Ejecutando predicción de prueba...")
     result = predict_plagiarism(test_file_a, test_file_b, prediction_model, mlb)
     if result:
@@ -162,6 +178,8 @@ def algorithm(test_file_a, test_file_b):
         print(f"  AST - Plagio parcial: {'Sí' if ast_flag_1 else 'No'}")
     else:
         print("⚠️  No se pudo realizar la predicción.")
+
+
 
 def predict_plagiarism(file1, file2, prediction_model, mlb):
     result = compare_files(file1, file2)
