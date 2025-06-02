@@ -9,10 +9,5 @@
 *.gz
 *.pyc
 
-#Report
-reporte_similitud.txt
-resultado_comparador_difflib.txt
-resultado_comparador_sa.txt
-
 #Secrets
 *.env
