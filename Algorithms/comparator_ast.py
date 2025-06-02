@@ -90,7 +90,7 @@ def comparator_ast(file1, file2):
     tree_ast2 = ast.parse(code2)
 
     common_nodes = count_common_nodes(tree_ast1, tree_ast2)
-    print(f"Common nodes between {file1} and {file2}: {common_nodes}")
+    print(f"Nodos comunes entre {file1} y {file2}: {common_nodes}")
 
     max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
     ted_similarity = common_nodes / max_nodes if max_nodes > 0 else 0

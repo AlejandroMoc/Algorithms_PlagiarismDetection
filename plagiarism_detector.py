@@ -1,4 +1,4 @@
-
+##LIBRERÍAS
 import os, glob
 import numpy as np
 import pandas as pd
@@ -12,20 +12,40 @@ from sklearn.model_selection import train_test_split
 from joblib import dump, load
 from tqdm import tqdm 
 
+##FUNCIONES
+#Comparar archivos para entrenamiento
+#Comparar archivos para entrenamiento
 def compare_files(file_a: str, file_b: str):
-    if file_a == file_b or not file_a or not file_b:
+    if file_a == file_b:
         return None
-    try:
-        difflib_results = comparator_difflib(file_a, file_b)
-        similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
-        sa_similarity = comparator_sa(file_a, file_b)
-        result_ast = comparator_ast(file_a, file_b)
-        ted_similarity = result_ast[0]
-        is_ast_plagiarism = result_ast[6]
-        return [sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism]
-    except Exception as e:
-        print(f"Error comparando {file_a} y {file_b}: {e}")
+    elif (file_a is None) or (file_b is None):
         return None
+    else:
+        try:
+            #Plagio tipo 0
+            difflib_results = comparator_difflib(file_a, file_b)
+            similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
+
+            #Plagio tipo 1
+            sa_similarity = comparator_sa(file_a, file_b)
+
+            #Plagio tipo 2 y 3
+            result_ast = comparator_ast(file_a, file_b)
+            ted_similarity = result_ast[0]
+            is_ast_plagiarism = result_ast[6]
+
+            #Imprimir similitudes para depuración
+            print(f"Comparando {file_a} y {file_b}:")
+            print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}, Plain Similarity: {similarity_plain}, AST considers it plagiarism: {is_ast_plagiarism}")
+
+            return [sa_similarity, ted_similarity, similarity_plain, is_ast_plagiarism]
+
+        except SyntaxError as e:
+            print(f"Error de sintaxis en los archivos {file_a} y {file_b}: {e}")
+            return None
+        except Exception as e:
+            print(f"Error al comparar los archivos {file_a} y {file_b}: {e}")
+            return None
 
 def generate_training_data_from_leaf_dirs(data_dir):
     data = []
@@ -64,11 +84,15 @@ def algorithm(test_file_a, test_file_b):
     model_path = 'plagiarism_detector_model.joblib'
     mlb_path = 'mlb.joblib'
 
+    #Si existe, cargar el modelo
     if os.path.exists(model_path) and os.path.exists(mlb_path):
         model = load(model_path)
         mlb = load(mlb_path)
         print("✅ Modelo y binarizador cargados.")
+    
+    #Si no existe, entrenar el modelo
     else:
+        #Abrir BDD de Entrenamiento
         base_path = os.path.dirname(__file__)
         data_dir = os.path.join(base_path, 'Data')
         print("⚙️  Generando datos de entrenamiento...")
@@ -92,12 +116,14 @@ def algorithm(test_file_a, test_file_b):
 
         mlb = MultiLabelBinarizer()
         y_bin = mlb.fit_transform(y)
-
+        
+        #Dividir en entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
         print("🤖 Entrenando modelo...")
         model = RandomForestClassifier(n_estimators=100, random_state=42)
         model.fit(X_train, y_train)
 
+        #Evaluar el modelo
         print("📈 Evaluación del modelo:")
         y_pred_bin = model.predict(X_test)
         print(classification_report(y_test, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
@@ -130,9 +156,14 @@ def predict_plagiarism(file1, file2, model, mlb):
     return None
 
 def main():
+    print("Detector de Plagio utilizando Machine Learning")
+
+    #Ruta de los archivos a evaluar
     test_file_a = os.path.join('Data_Check', 'file1.py')
     test_file_b = os.path.join('Data_Check', 'file2.py')
+
     algorithm(test_file_a, test_file_b)
 
+#Ejecución principal
 if __name__ == '__main__':
     main()
