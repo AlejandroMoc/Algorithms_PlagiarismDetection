@@ -1,22 +1,72 @@
-
 ##LIBRERÍAS
-import os
-import glob
 import numpy as np
 import pandas as pd
-from Algorithms.comparator_sa import comparator_sa
-from Algorithms.comparator_difflib import comparator_difflib
-from Algorithms.comparator_ast import comparator_ast
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
-from joblib import dump, load
 from tqdm import tqdm
-import difflib
-import ast
+import os, ast, glob, difflib
+from joblib import dump, load
+from sklearn.metrics import classification_report
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MultiLabelBinarizer
+from Algorithms.comparator_sa import comparator_sa
+from Algorithms.comparator_ast import comparator_ast
+from Algorithms.comparator_difflib import comparator_difflib
 
 ##FUNCIONES
+#Limpieza de comentarios y espacios innecesarios
+def clean_code(code):
+    lines = code.split('\n')
+    cleaned_lines = []
+    for line in lines:
+        stripped_line = line.strip()
+        if stripped_line and not stripped_line.startswith('#'):
+            cleaned_lines.append(line)  # Conserva la indentación original
+    return '\n'.join(cleaned_lines)
+
+#Renombramiento de variables
+class VariableRenamer(ast.NodeTransformer):
+    def __init__(self):
+        self.variable_count = 0
+        self.renamed_vars = {}
+
+    def visit_FunctionDef(self, node):
+        self.generic_visit(node)
+        return node
+
+    def visit_ClassDef(self, node):
+        self.generic_visit(node)
+        return node
+
+    def visit_Name(self, node):
+        if isinstance(node.ctx, ast.Store):
+            if node.id not in self.renamed_vars:
+                new_name = f"var_{self.variable_count}"
+                self.renamed_vars[node.id] = new_name
+                self.variable_count += 1
+            return ast.copy_location(ast.Name(id=self.renamed_vars[node.id], ctx=node.ctx), node)
+        elif isinstance(node.ctx, ast.Load) and node.id in self.renamed_vars:
+            return ast.copy_location(ast.Name(id=self.renamed_vars[node.id], ctx=node.ctx), node)
+        return node
+
+def rename_variables(code):
+    try:
+        tree = ast.parse(code)
+        renamer = VariableRenamer()
+        renamed_tree = renamer.visit(tree)
+        ast.fix_missing_locations(renamed_tree)
+        return ast.unparse(renamed_tree)
+    except Exception as e:
+        print(f"Error al renombrar variables: {e}")
+        return code  # Devuelve el código original si falla
+
+#Normalización del código
+def normalize_code(file_path):
+    with open(file_path, 'r') as file:
+        code = file.read()
+    cleaned_code = clean_code(code)
+    renamed_code = rename_variables(cleaned_code)
+    return renamed_code
+
 #Funciones adicionales para contar nodos, funciones y bucles en el AST
 def ast_nodes(file):
     with open(file, "r") as source:
@@ -41,19 +91,23 @@ def compare_files(file_a: str, file_b: str):
         return None
     else:
         try:
+            #Normalizar código
+            normalized_code_a = normalize_code(file_a)
+            normalized_code_b = normalize_code(file_b)
+
             #Plagio tipo 0
-            difflib_results = comparator_difflib(file_a, file_b)
+            difflib_results = comparator_difflib(normalized_code_a, normalized_code_b)
             similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
 
             #Plagio tipo 1
-            sa_similarity = comparator_sa(file_a, file_b)
+            sa_similarity = comparator_sa(normalized_code_a, normalized_code_b)
 
             #Plagio tipo 2 y 3
-            result_ast = comparator_ast(file_a, file_b)
-            ted_similarity = result_ast[0]  #Similitud TED
-            features_similarity = result_ast[1]  #Similitud de features
-            is_ast_plagiarism_0 = result_ast[9]  #Plagio tipo exacto
-            is_ast_plagiarism_1 = result_ast[10]  #Plagio tipo 2
+            result_ast = comparator_ast(normalized_code_a, normalized_code_b)
+            ted_similarity = result_ast[0]          #Similitud TED
+            features_similarity = result_ast[1]     #Similitud de features
+            is_ast_plagiarism_0 = result_ast[9]     #Plagio tipo 1 (exacto)
+            is_ast_plagiarism_1 = result_ast[10]    #Plagio tipo 2
 
             #Nueva comparación de distancia de edición
             with open(file_a) as f1, open(file_b) as f2:
@@ -124,8 +178,8 @@ def generate_training_data_from_leaf_dirs(data_dir):
 
 def algorithm(test_file_a, test_file_b):
     print("🚀 Detector de Plagio utilizando Machine Learning")
-    model_path = 'plagiarism.joblib'
-    mlb_path = 'multilabelbinarizer.joblib'
+    model_path = 'plagiarism_model.joblib'
+    mlb_path = 'mlb_model.joblib'
 
     #Si existe, cargar el modelo
     if os.path.exists(model_path) and os.path.exists(mlb_path):
@@ -146,6 +200,7 @@ def algorithm(test_file_a, test_file_b):
             return
 
         df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'features_similarity', 'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff', 'plagiarism_type'])
+        
         X = df[['sa_similarity', 'ted_similarity', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff']]
         y = df['plagiarism_type']
 
@@ -163,7 +218,7 @@ def algorithm(test_file_a, test_file_b):
         #Dividir en entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
         print("🤖 Entrenando modelo...")
-        prediction_model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+        prediction_model = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
 
         #Evaluar el modelo

@@ -1,23 +1,17 @@
 from io import BytesIO
 import difflib, os, glob, itertools, tokenize
 
-#Lectura de archivos
-def read_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file_read:
-        return file_read.readlines()
-
-def read_file_raw(file_path):
-    with open(file_path, 'rb') as file:
-        return file.read()
+def read_code_bytes(file_content: str) -> bytes:
+    return file_content.encode('utf-8')
 
 #Diferencias texto
-def compare_contents(content1, content2):
-    differences = difflib.ndiff(content1, content2)
+def compare_contents(content_1, content_2):
+    differences = difflib.ndiff(content_1, content_2)
     return '\n'.join(differences)
 
 #Similitud con ratio()
-def compare_similarity_ratio(tokens1, tokens2):
-    matcher = difflib.SequenceMatcher(None, tokens1, tokens2)
+def compare_similarity_ratio(tokens_1, tokens_2):
+    matcher = difflib.SequenceMatcher(None, tokens_1, tokens_2)
     return matcher.ratio() * 100
 
 #Preprocesamiento léxico
@@ -59,34 +53,32 @@ def preprocess_code(content):
     return tokens
 
 #Comparador preprocesado
-def compare_preprocessed(code1, code2):
-    raw1 = read_file_raw(code1)
-    raw2 = read_file_raw(code2)
+def compare_preprocessed(code_1: str, code_2: str):
+    raw_1 = read_code_bytes(code_1)
+    raw_2 = read_code_bytes(code_2)
 
-    tokens1 = preprocess_code(raw1)
-    tokens2 = preprocess_code(raw2)
+    tokens_1 = preprocess_code(raw_1)
+    tokens_2 = preprocess_code(raw_2)
 
-    similarity = compare_similarity_ratio(tokens1, tokens2)
-    result_comparison = compare_contents(tokens1, tokens2)
+    similarity = compare_similarity_ratio(tokens_1, tokens_2)
+    result_comparison = compare_contents(tokens_1, tokens_2)
 
     output = f"Similitud (preprocesado): {similarity:.2f}%\n"
     output += "Diferencias:\n" + result_comparison + "\n"
     return similarity, output
 
 #Comparador texto plano
-def compare_plain(code1, code2):
-    content1 = read_file(code1)
-    content2 = read_file(code2)
+def compare_plain(content_1: str, content_2: str):
 
-    similarity = compare_similarity_ratio(content1, content2)
-    result_comparison = compare_contents(content1, content2)
+    similarity = compare_similarity_ratio(content_1, content_2)
+    result_comparison = compare_contents(content_1, content_2)
 
     output = f"Similitud (texto llano): {similarity:.2f}%\n"
     output += "Diferencias:\n" + result_comparison + "\n"
     return similarity, output
 
 #Función principal del difflib
-def comparator_difflib(file_a, file_b):
+def comparator_difflib(file_a: str, file_b: str):
     similarity_preprocessed, result_preprocessed = compare_preprocessed(file_a, file_b)
     similarity_plain, result_plain = compare_plain(file_a, file_b)
     return (similarity_preprocessed, result_preprocessed, similarity_plain, result_plain)
