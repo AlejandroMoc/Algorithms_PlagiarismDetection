@@ -8,35 +8,28 @@
 <body>
 
   <header>
-
     <!-- Elementos a la izquierda -->
     <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
 
     <!-- Elementos a la derecha -->
     <nav class="header-right">
-      <!-- Navigation Bar -->
       <ul class="nav-links">
         <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
-        <li><a href="#subir" onclick="goTo('upload')">Subir archivos</a></li>
+        <li><a href="#index" onclick="goTo('index')">Menu principal</a></li>
       </ul>
-
-      <!-- Hamburger Menu -->
       <div class="menu-icon">&#9776;</div>
     </nav>
-
   </header>
 
-  <!-- Menú con botones -->
   <main class="upload-container">
-    <div class="main-menu">
 
+    <div class="main-menu-upload">
       <section class="menu-option">
         <input type="file" id="fileInput" multiple hidden />
         <button onclick="document.getElementById('fileInput').click()">
           <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir archivos" />
         </button>
         <p>Subir archivos</p>
-        <ul id="fileList"></ul>
       </section>
 
       <section class="menu-option">
@@ -46,16 +39,20 @@
         </button>
         <p>Subir carpeta</p>
       </section>
-
     </div>
 
-    <p id="fileCount">0 elementos seleccionados</p>
-    <br/>
+    <div class="file-dropzone">
+      <h3>Archivos seleccionados</h3>
+      <ul id="fileList"></ul>
+      <p id="fileCount">0 elementos seleccionados</p>
+      <p id="folderPath"></p>
+    </div>
 
     <div class="actions">
       <button class="confirm" onclick="alert('Archivos confirmados')">Confirmar</button>
       <button class="cancel" onclick="location.href='index.html'">Cancelar</button>
     </div>
+
   </main>
 
   <script src="js/upload.js"></script>
