@@ -3,10 +3,12 @@ const folderInput = document.getElementById("folderInput");
 const fileList = document.getElementById("fileList");
 const fileCount = document.getElementById("fileCount");
 const folderPath = document.getElementById("folderPath");
+const uploadButton = document.getElementById("uploadButton");
 
 let filesSelected = [];
+let filesMap = {}; // Mapea nombres a objetos File
 
-//Ir al sitio correspondiente
+// Navegación
 function goTo(action) {
   if (action === 'index') {
     location.href = "index.html";
@@ -17,38 +19,48 @@ function goTo(action) {
   }
 }
 
+// Selección de archivos individuales
 fileInput.addEventListener("change", () => {
   for (const file of fileInput.files) {
-    addFile(file.name);
+    addFile(file);
   }
   updateCounter();
 });
 
+// Selección de carpeta completa
 folderInput.addEventListener("change", () => {
   if (folderInput.files.length > 0) {
     const fullPath = folderInput.files[0].webkitRelativePath;
     const folder = fullPath.split("/")[0];
-    folderPath.textContent = `/${folder}/*`;
+    if (folderPath) folderPath.textContent = `/${folder}/*`;
 
     for (const file of folderInput.files) {
-      addFile(file.name);
+      addFile(file);
     }
     updateCounter();
+
+    // 🔁 Subir automáticamente al seleccionar carpeta
+    subirArchivos();  // <<<<< ESTA LÍNEA ejecuta la subida al seleccionar carpeta
   }
 });
 
-function addFile(name) {
-  if (filesSelected.includes(name)) return;
+// Agrega archivo a lista visual
+function addFile(file) {
+  if (filesSelected.includes(file.name)) return;
 
-  filesSelected.push(name);
+  filesSelected.push(file.name);
+  filesMap[file.name] = file;
+
   const li = document.createElement("li");
-  li.textContent = name;
+  li.textContent = file.name;
 
   const removeBtn = document.createElement("span");
-  removeBtn.textContent = "✖";
+  removeBtn.textContent = " ✖";
+  removeBtn.style.cursor = "pointer";
   removeBtn.onclick = () => {
     li.remove();
-    filesSelected = filesSelected.filter(f => f !== name);
+    filesSelected = filesSelected.filter(f => f !== file.name);
+    delete filesMap[file.name];
     updateCounter();
   };
 
@@ -56,6 +68,38 @@ function addFile(name) {
   fileList.appendChild(li);
 }
 
+// Contador de archivos
 function updateCounter() {
   fileCount.textContent = `${filesSelected.length} elementos seleccionados`;
 }
+
+// Subida al backend (función reutilizable)
+function subirArchivos() {
+  if (filesSelected.length === 0) {
+    alert("⚠️ No hay archivos para subir.");
+    return;
+  }
+
+  const formData = new FormData();
+  for (const name of filesSelected) {
+    formData.append("files[]", filesMap[name]);
+  }
+
+  fetch("http://localhost:5000/upload", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert("✅ Archivos subidos correctamente:\n" + data.uploaded.join("\n"));
+      // Redirigir a compare.html si deseas automatizar el flujo
+      window.location.href = "compare.html";
+    })
+    .catch(err => {
+      alert("❌ Error al subir archivos.");
+      console.error(err);
+    });
+}
+
+// Subida manual con botón
+uploadButton.addEventListener("click", subirArchivos);
