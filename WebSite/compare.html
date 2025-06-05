@@ -3,41 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Comparar Archivos</title>
+  <title>Resultados de Comparación</title>
+  <link rel="stylesheet" href="css/styles.css">
   <script defer src="js/compare.js"></script>
-  <style>
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    th {
-      background-color: #f0f0f0;
-    }
-    .yes { background-color: #c8f7c5; }
-    .no { background-color: #f7c5c5; }
-  </style>
 </head>
 <body>
-  <h1>Resultados de Comparación de Archivos</h1>
-  <table id="tablaResultados">
-    <thead>
-      <tr>
-        <th>Archivo 1</th>
-        <th>Archivo 2</th>
-        <th>¿Plagio?</th>
-        <th>Tipos</th>
-        <th>% Similitud</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Resultados serán insertados aquí -->
-    </tbody>
-  </table>
+
+  <header>
+    <h1><a href="#home" onclick="goTo('index')">Comparador de plagio</a></h1>
+    <nav class="header-right">
+      <ul class="nav-links">
+        <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
+        <li><a href="#upload" onclick="goTo('upload')">Subir archivos</a></li>
+      </ul>
+      <div class="menu-icon">&#9776;</div>
+    </nav>
+  </header>
+
+  <main class="results-container">
+    <h2>Resultados de Comparación de Archivos</h2>
+
+    <div class="table-wrapper">
+      <table id="tablaResultados">
+        <thead>
+          <tr>
+            <th>Archivo 1</th>
+            <th>Archivo 2</th>
+            <th>¿Plagio?</th>
+            <th>Tipos</th>
+            <th>% Similitud</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Se rellena con compare.js -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
 </body>
 </html>

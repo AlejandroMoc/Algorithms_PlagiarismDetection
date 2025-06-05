@@ -308,9 +308,9 @@ def compare_all_pairs():
 
 def main():
     print("Detector de Plagio Binario")
-    # test_file_a = os.path.join('Data_Check', 'file1.py')
-    # test_file_b = os.path.join('Data_Check', 'file2.py')
-    # algorithm(test_file_a, test_file_b)
+    test_file_a = os.path.join('Data_Check', 'file1.py')
+    test_file_b = os.path.join('Data_Check', 'file2.py')
+    algorithm(test_file_a, test_file_b)
     print("Comparando todos los archivos de 'uploads/'...")
     compare_all_pairs()
 
