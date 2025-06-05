@@ -1,73 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Comparar Archivos</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <script defer src="js/compare.js"></script>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .yes { background-color: #c8f7c5; }
+    .no { background-color: #f7c5c5; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
-    <nav class="header-right">
-      <ul class="nav-links">
-        <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
-        <li><a href="#subir" onclick="goTo('upload')">Subir archivos</a></li>
-      </ul>
-      <div class="menu-icon">&#9776;</div>
-    </nav>
-  </header>
-
-  <section class="students-list">
-    <h2>Selecciona dos códigos</h2>
-  </section>
-
-  <section class="code-view">
-    <div class="code-box">
-      <h3 id="codeTitle1">Código A</h3>
-      <br/>
-      <input type="file" id="fileInput1" accept=".py" onchange="loadFileContent('fileInput1', 'code1', 'codeTitle1')" />
-      <p id="fileName1"></p>
-      <pre id="code1">// Código cargado aquí</pre>
-    </div>
-    <div class="code-box">
-      <h3 id="codeTitle2">Código B</h3>
-      <br/>
-      <input type="file" id="fileInput2" accept=".py" onchange="loadFileContent('fileInput2', 'code2', 'codeTitle2')" />
-      <p id="fileName2"></p>
-      <pre id="code2">// Código cargado aquí</pre>
-    </div>
-  </section>
-
-  <section class="compare-button">
-    <button onclick="alert('Comparando códigos...')">Comparar</button>
-  </section>
-
-  <script src="js/compare.js"></script>
-  <script>
-    function loadFileContent(inputId, codeId, titleId) {
-      const input = document.getElementById(inputId);
-      const fileNameDisplay = document.getElementById(inputId === 'fileInput1' ? 'fileName1' : 'fileName2');
-      const codeDisplay = document.getElementById(codeId);
-      const titleDisplay = document.getElementById(titleId);
-
-      if (input.files.length > 0) {
-        const file = input.files[0];
-        fileNameDisplay.innerText = file.name;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          codeDisplay.innerText = e.target.result;
-          titleDisplay.innerText = `Código ${file.name}`;
-        };
-        reader.onerror = function() {
-          alert('Error al leer el archivo.');
-        };
-        reader.readAsText(file);
-      } else {
-        codeDisplay.innerText = '// Código cargado aquí';
-        titleDisplay.innerText = `Código ${inputId === 'fileInput1' ? 'A' : 'B'}`;
-      }
-    }
-  </script>
+  <h1>Resultados de Comparación de Archivos</h1>
+  <table id="tablaResultados">
+    <thead>
+      <tr>
+        <th>Archivo 1</th>
+        <th>Archivo 2</th>
+        <th>¿Plagio?</th>
+        <th>Tipos</th>
+        <th>% Similitud</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Resultados serán insertados aquí -->
+    </tbody>
+  </table>
 </body>
 </html>

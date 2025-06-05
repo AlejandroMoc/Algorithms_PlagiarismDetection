@@ -1,35 +1,38 @@
 import os
 import sys
+import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from werkzeug.utils import secure_filename
+from plagiarism_detector import algorithm
 
 # Agrega la carpeta padre (raíz del proyecto) al path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from flask import Flask, request, jsonify
-from plagiarism_detector import algorithm
-from flask_cors import CORS
-from werkzeug.utils import secure_filename  # ✅ Import necesario para limpiar nombres
-
 # Crear instancia de la app
 app = Flask(__name__)
-CORS(app)  # Esto permite todas las solicitudes cross-origin (útil para pruebas locales)
+CORS(app)
 
-# Crear carpeta de subida si no existe
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Función auxiliar para tipos sueltos
+def to_serializable(obj):
+    if isinstance(obj, (np.int64, np.int32)):
+        return int(obj)
+    if isinstance(obj, (np.float64, np.float32)):
+        return float(obj)
+    return obj
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
     files = request.files.getlist('files[]')
     saved = []
-
     for file in files:
-        # ✅ Elimina cualquier ruta de subcarpetas del nombre del archivo
         filename = secure_filename(os.path.basename(file.filename))
         filepath = os.path.join(UPLOAD_FOLDER, filename)
-
         file.save(filepath)
         saved.append(filename)
-
     return jsonify({'uploaded': saved})
 
 @app.route('/list', methods=['GET'])
@@ -45,7 +48,24 @@ def compare_all():
     from plagiarism_detector import compare_all_pairs
     matriz = compare_all_pairs(rutas)
 
-    return jsonify({'comparaciones': matriz})
+    # Función recursiva robusta para convertir todo a tipos JSON-safe
+    def convert(val):
+        if isinstance(val, (int, float, str, bool)):
+            return val
+        elif isinstance(val, tuple):
+            return [convert(v) for v in val]
+        elif isinstance(val, list):
+            return [convert(v) for v in val]
+        elif hasattr(val, "tolist"):
+            return val.tolist()
+        else:
+            return str(val)
+
+    matriz_convertida = [
+        [convert(valor) for valor in fila]
+        for fila in matriz
+    ]
+    return jsonify({'comparaciones': matriz_convertida})
 
 @app.route('/compare', methods=['POST'])
 def compare_uploaded_files():
@@ -64,15 +84,15 @@ def compare_uploaded_files():
 
     types, sa, ted, ast_flag_0, ast_flag_1, edit_distance, n1, f1, l1 = result
     return jsonify({
-        'tipos': types,
-        'sa': sa,
-        'ted': ted,
-        'edit_distance': edit_distance,
-        'plagio_0': ast_flag_0,
-        'plagio_1': ast_flag_1,
-        'nodos_diff': n1,
-        'funciones_diff': f1,
-        'bucles_diff': l1
+        'tipos': to_serializable(types),
+        'sa': to_serializable(sa),
+        'ted': to_serializable(ted),
+        'edit_distance': to_serializable(edit_distance),
+        'plagio_0': bool(ast_flag_0),
+        'plagio_1': bool(ast_flag_1),
+        'nodos_diff': to_serializable(n1),
+        'funciones_diff': to_serializable(f1),
+        'bucles_diff': to_serializable(l1)
     })
 
 if __name__ == '__main__':

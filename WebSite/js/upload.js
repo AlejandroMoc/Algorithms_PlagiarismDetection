@@ -27,7 +27,7 @@ fileInput.addEventListener("change", () => {
   updateCounter();
 });
 
-// Selección de carpeta completa
+// Selección de carpeta completa (sin subida automática)
 folderInput.addEventListener("change", () => {
   if (folderInput.files.length > 0) {
     const fullPath = folderInput.files[0].webkitRelativePath;
@@ -38,9 +38,6 @@ folderInput.addEventListener("change", () => {
       addFile(file);
     }
     updateCounter();
-
-    // 🔁 Subir automáticamente al seleccionar carpeta
-    subirArchivos();  // <<<<< ESTA LÍNEA ejecuta la subida al seleccionar carpeta
   }
 });
 
@@ -73,10 +70,11 @@ function updateCounter() {
   fileCount.textContent = `${filesSelected.length} elementos seleccionados`;
 }
 
-// Subida al backend (función reutilizable)
+// Subida al backend
 function subirArchivos() {
   if (filesSelected.length === 0) {
     alert("⚠️ No hay archivos para subir.");
+    window.location.href = "./compare.html"; // Redirige incluso si no hay archivos
     return;
   }
 
@@ -92,8 +90,7 @@ function subirArchivos() {
     .then(res => res.json())
     .then(data => {
       alert("✅ Archivos subidos correctamente:\n" + data.uploaded.join("\n"));
-      // Redirigir a compare.html si deseas automatizar el flujo
-      window.location.href = "compare.html";
+      window.location.href = "./compare.html"; // Redirige tras subir
     })
     .catch(err => {
       alert("❌ Error al subir archivos.");
@@ -101,5 +98,5 @@ function subirArchivos() {
     });
 }
 
-// Subida manual con botón
+// Evento del botón "Subir Archivos"
 uploadButton.addEventListener("click", subirArchivos);
