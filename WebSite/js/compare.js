@@ -1,97 +1,32 @@
-const fileInput = document.getElementById("fileInput");
-const folderInput = document.getElementById("folderInput");
-const fileList = document.getElementById("fileList");
-const fileCount = document.getElementById("fileCount");
-const folderPath = document.getElementById("folderPath");
-const uploadButton = document.getElementById("uploadButton");
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loaderOverlay");
+  const tabla = document.querySelector("#tablaResultados tbody");
 
-let filesSelected = [];
-let filesMap = {}; // Mapear nombre a objeto File
+ 
 
-// Navegación
-function goTo(action) {
-  if (action === 'index') {
-    location.href = "index.html";
-  } else if (action === 'upload') {
-    location.href = "upload.html";
-  } else if (action === 'compare') {
-    location.href = "compare.html";
-  }
-}
-
-// Selección de archivos individuales
-fileInput.addEventListener("change", () => {
-  for (const file of fileInput.files) {
-    addFile(file);
-  }
-  updateCounter();
-});
-
-// Selección de carpeta completa
-folderInput.addEventListener("change", () => {
-  if (folderInput.files.length > 0) {
-    const fullPath = folderInput.files[0].webkitRelativePath;
-    const folder = fullPath.split("/")[0];
-    folderPath.textContent = `/${folder}/*`;
-
-    for (const file of folderInput.files) {
-      addFile(file);
-    }
-    updateCounter();
-  }
-});
-
-// Agregar archivo a lista visual
-function addFile(file) {
-  if (filesSelected.includes(file.name)) return;
-
-  filesSelected.push(file.name);
-  filesMap[file.name] = file;
-
-  const li = document.createElement("li");
-  li.textContent = file.name;
-
-  const removeBtn = document.createElement("span");
-  removeBtn.textContent = " ✖";
-  removeBtn.style.cursor = "pointer";
-  removeBtn.onclick = () => {
-    li.remove();
-    filesSelected = filesSelected.filter(f => f !== file.name);
-    delete filesMap[file.name];
-    updateCounter();
-  };
-
-  li.appendChild(removeBtn);
-  fileList.appendChild(li);
-}
-
-// Contador de archivos
-function updateCounter() {
-  fileCount.textContent = `${filesSelected.length} elementos seleccionados`;
-}
-
-// Subir archivos al backend
-uploadButton.addEventListener("click", () => {
-  if (filesSelected.length === 0) {
-    alert("No hay archivos para subir.");
-    return;
-  }
-
-  const formData = new FormData();
-  for (const name of filesSelected) {
-    formData.append("files[]", filesMap[name]);
-  }
-
-  fetch("http://localhost:5000/upload", {
-    method: "POST",
-    body: formData
-  })
+  fetch("http://localhost:5000/compare-all")
     .then(res => res.json())
     .then(data => {
-      alert("✅ Archivos subidos correctamente:\n" + data.uploaded.join("\n"));
+      tabla.innerHTML = "";  // Limpiar tabla previa si existe
+
+      data.comparaciones.forEach(fila => {
+        const [archivo1, archivo2, plagio, tipos, similitud] = fila;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${archivo1}</td>
+          <td>${archivo2}</td>
+          <td class="${plagio === 'Sí' ? 'yes' : 'no'}">${plagio}</td>
+          <td>${tipos.length > 0 ? tipos.join(", ") : "-"}</td>
+          <td>${similitud}%</td>
+        `;
+        tabla.appendChild(tr);
+      });
     })
-    .catch(err => {
-      alert("❌ Error al subir archivos.");
-      console.error(err);
+    .catch(error => {
+      console.error("❌ Error al obtener resultados:", error);
+    })
+    .finally(() => {
+      loader.style.display = "none"; // Ocultar loader cuando termina
     });
 });
