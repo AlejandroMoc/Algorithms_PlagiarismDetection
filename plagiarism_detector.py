@@ -134,25 +134,36 @@ def generate_training_data_from_leaf_dirs(data_dir):
 
     print(f"Encontradas {len(leaf_dirs)} carpetas hoja.")
 
-    for ruta_subcarpeta in tqdm(leaf_dirs, desc="Procesando carpetas hoja"):
-        archivos = sorted(glob.glob(os.path.join(ruta_subcarpeta, '*.py')))
-        for i in range(len(archivos)):
-            for j in range(i + 1, len(archivos)):
-                file_a, file_b = archivos[i], archivos[j]
-                result = compare_files(file_a, file_b)
-                if result:
-                    sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
-                    name_b = os.path.basename(file_b).lower()
-                    tipo_1 = int("tipo1" in name_b)
-                    tipo_2 = int("tipo2" in name_b)
-                    tipo_3 = int("tipo3" in name_b)
-                    is_plagiarism = int(tipo_1 or tipo_2 or tipo_3)
+    for carpeta in tqdm(leaf_dirs, desc="Procesando carpetas hoja"):
+        archivos = glob.glob(os.path.join(carpeta, "*.py"))
+        archivos = sorted(archivos)
 
-                    data.append([
-                        sa, ted, features_similarity, ast_flag_0, ast_flag_1,
-                        edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff,
-                        is_plagiarism, tipo_1, tipo_2, tipo_3
-                    ])
+        originales = [a for a in archivos if not any(sufijo in a for sufijo in ["_tipo1", "_tipo2", "_tipo3", "_tipo0"])]
+
+        for original in originales:
+            for modificado in archivos:
+                if original == modificado:
+                    continue
+
+                # Comparar
+                features = compare_files(original, modificado)
+                if features is None:
+                    continue
+
+                nombre = os.path.basename(modificado).lower()
+                tipo_1 = nombre.endswith("_tipo1.py")
+                tipo_2 = nombre.endswith("_tipo2.py")
+                tipo_3 = nombre.endswith("_tipo3.py")
+                tipo_0 = nombre.endswith("_tipo0.py")
+
+                is_plagiarism = int(tipo_1 or tipo_2 or tipo_3)
+                
+                # Solo tomar si es comparación válida
+                data.append(features + [
+                    is_plagiarism,
+                    int(tipo_1), int(tipo_2), int(tipo_3)
+                ])
+    
     return data
 
 
@@ -229,6 +240,10 @@ def predict_plagiarism(file1, file2, model):
     return None
 
 def entrenar_modelo_multilabel(data):
+    if not data:
+        print("❌ No hay datos para entrenar el modelo multilabel.")
+        return
+
     df = pd.DataFrame(data, columns=[
         'sa_similarity', 'ted_similarity', 'features_similarity',
         'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance',
@@ -245,7 +260,7 @@ def entrenar_modelo_multilabel(data):
     modelo.fit(X_train, y_train)
 
     dump(modelo, "modelo_multilabel.joblib")
-    print("Modelo multilabel entrenado y guardado.")
+    print("✅ Modelo multilabel entrenado y guardado.")
 
 def predecir_tipos(file1, file2):
     model_path = "modelo_multilabel.joblib"
@@ -281,13 +296,35 @@ def compare_all_pairs():
         print("Se necesitan al menos dos archivos para comparar.")
         return []
 
+    # ⚠️ Verificar y entrenar modelo binario si no existe
     model_path = 'plagiarism_model_binario.joblib'
     if not os.path.exists(model_path):
-        raise FileNotFoundError("Modelo no entrenado. Ejecuta el algoritmo al menos una vez para generarlo.")
+        print("Modelo binario no encontrado. Entrenando ahora...")
+        base_path = os.path.dirname(__file__)
+        data_dir = os.path.join(base_path, 'Data')
+        all_data = generate_training_data_from_leaf_dirs(data_dir)
+        if all_data:
+            df = pd.DataFrame(all_data, columns=[
+                'sa_similarity', 'ted_similarity', 'features_similarity',
+                'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance',
+                'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff',
+                'plagiarism', 'tipo1', 'tipo2', 'tipo3'
+            ])
+            X = df.drop(columns=['plagiarism', 'tipo1', 'tipo2', 'tipo3'])
+            y = df['plagiarism']
+
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+            modelo_binario = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
+            modelo_binario.fit(X_train, y_train)
+            dump(modelo_binario, model_path)
+            print("✅ Modelo binario entrenado y guardado.")
+        else:
+            print("❌ No se pudo entrenar el modelo binario. Datos insuficientes.")
+            return
 
     model = load(model_path)
-    
-        # ⚠️ Verificar y entrenar modelo multilabel si no existe
+
+    # ⚠️ Verificar y entrenar modelo multilabel si no existe
     if not os.path.exists("modelo_multilabel.joblib"):
         print("Modelo multilabel no encontrado. Entrenando ahora...")
         base_path = os.path.dirname(__file__)
@@ -316,24 +353,22 @@ def compare_all_pairs():
                         nombre_a,
                         nombre_b,
                         "Sí" if pred == 1 else "No",
-                        tipos if pred == 1 else [],  # Evita mostrar tipos si no hay plagio
+                        tipos if pred == 1 else [],
                         round(sa * 100, 2)
                     ]
                     resultados.append(fila)
                     print(f"Comparación: {fila}")
             except Exception as e:
                 print(f"Error comparando {file_a} y {file_b}: {e}")
-                
+
     # Imprimir tabla formateada en consola
     print("\n📊 Resultados de Comparación:\n")
 
-    # Definir anchos de columna
     ancho_archivo = 25
     ancho_plagio = 10
     ancho_tipo = 18
     ancho_similitud = 16
 
-    # Encabezados
     encabezado = (
         "Archivo 1".ljust(ancho_archivo) +
         "Archivo 2".ljust(ancho_archivo) +
@@ -344,7 +379,6 @@ def compare_all_pairs():
     print(encabezado)
     print("-" * (ancho_archivo * 2 + ancho_plagio + ancho_tipo + ancho_similitud))
 
-    # Filas de resultados
     for fila in resultados:
         archivo1, archivo2, plagio, tipos, similitud = fila
         tipos_str = ", ".join(tipos) if tipos else "-"
@@ -356,8 +390,8 @@ def compare_all_pairs():
             f"{similitud:.2f}".ljust(ancho_similitud)
         )
 
-
     return resultados
+
 
 
 
