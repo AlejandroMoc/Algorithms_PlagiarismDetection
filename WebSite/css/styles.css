@@ -203,3 +203,50 @@ nav {
   padding: 30px;
   text-align: center;
 }
+
+
+.main-menu-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  padding: 40px 20px 20px;
+  flex-wrap: wrap;
+}
+
+.file-dropzone {
+  background-color: var(--color-pre-bg);
+  border: 2px dashed var(--color-white);
+  padding: 30px;
+  margin: 30px auto;
+  border-radius: 16px;
+  width: 60%;
+  min-height: 200px;
+  color: var(--color-white);
+  text-align: center;
+}
+
+.file-dropzone ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.file-dropzone li {
+  background-color: rgba(255,255,255,0.05);
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-white);
+}
+
+.file-dropzone li span {
+  color: #ff4f4f;
+  cursor: pointer;
+  font-weight: bold;
+}

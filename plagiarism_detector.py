@@ -11,6 +11,8 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from Algorithms.comparator_sa import comparator_sa
 from Algorithms.comparator_ast import comparator_ast
 from Algorithms.comparator_difflib import comparator_difflib
+import time
+
 
 ##FUNCIONES
 #Limpieza de comentarios y espacios innecesarios
@@ -181,19 +183,23 @@ def algorithm(test_file_a, test_file_b):
     model_path = 'plagiarism_model.joblib'
     mlb_path = 'mlb_model.joblib'
 
-    #Si existe, cargar el modelo
+    # Si existe, cargar el modelo
     if os.path.exists(model_path) and os.path.exists(mlb_path):
         prediction_model = load(model_path)
         mlb = load(mlb_path)
         print("✅ Modelo y binarizador cargados.")
 
-    #Si no existe, entrenar el modelo
+    # Si no existe, entrenar el modelo
     else:
-        #Abrir BDD de Entrenamiento
         base_path = os.path.dirname(__file__)
         data_dir = os.path.join(base_path, 'Data')
+
+        # ⏱️ Medición de tiempo de preprocesamiento
         print("⚙️  Generando datos de entrenamiento...")
+        start_preproc = time.time()
         all_data = generate_training_data_from_leaf_dirs(data_dir)
+        end_preproc = time.time()
+        print(f"⏱️ Tiempo de preprocesamiento: {end_preproc - start_preproc:.2f} segundos")
 
         if not all_data:
             print("❌ No hay datos para entrenar.")
@@ -236,13 +242,17 @@ def algorithm(test_file_a, test_file_b):
         print("🤖 Entrenando modelo...")
         prediction_model = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
+        end_train = time.time()
+        print(f"⏱️ Tiempo de entrenamiento: {end_train - start_train:.2f} segundos")
 
         # Evaluar el modelo
         print("📈 Evaluación del modelo:")
+        start_eval = time.time()
         y_pred_bin = prediction_model.predict(X_test)
         print(classification_report(y_test, y_pred_bin,
               target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
 
+        # Guardar modelo y binarizador
         dump(prediction_model, model_path)
         dump(mlb, mlb_path)
         print("💾 Modelo y binarizador guardados.")
@@ -263,6 +273,8 @@ def algorithm(test_file_a, test_file_b):
         print(f"  Diferencia en número de bucles: {num_loops_diff}")
     else:
         print("⚠️  No se pudo realizar la predicción.")
+
+
 
 def predict_plagiarism(file1, file2, prediction_model, mlb):
     result = compare_files(file1, file2)
