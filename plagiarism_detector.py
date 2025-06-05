@@ -199,9 +199,25 @@ def algorithm(test_file_a, test_file_b):
             print("❌ No hay datos para entrenar.")
             return
 
-        df = pd.DataFrame(all_data, columns=['sa_similarity', 'ted_similarity', 'features_similarity', 'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff', 'plagiarism_type'])
-        
-        X = df[['sa_similarity', 'ted_similarity', 'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff']]
+        df = pd.DataFrame(all_data, columns=[
+            'sa_similarity',
+            'ted_similarity',
+            'features_similarity',
+            'is_ast_plagiarism_0',
+            'is_ast_plagiarism_1',
+            'edit_distance',
+            'num_nodes_diff',
+            'num_funcs_diff',
+            'num_loops_diff',
+            'plagiarism_type'
+        ])
+
+        # ✅ Usamos ahora 9 características completas
+        X = df[
+            ['sa_similarity', 'ted_similarity', 'features_similarity',
+             'is_ast_plagiarism_0', 'is_ast_plagiarism_1',
+             'edit_distance', 'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff']
+        ]
         y = df['plagiarism_type']
 
         all_labels = sum(y, [])
@@ -215,20 +231,22 @@ def algorithm(test_file_a, test_file_b):
         mlb = MultiLabelBinarizer()
         y_bin = mlb.fit_transform(y)
 
-        #Dividir en entrenamiento y prueba
+        # Dividir en entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
         print("🤖 Entrenando modelo...")
         prediction_model = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
 
-        #Evaluar el modelo
+        # Evaluar el modelo
         print("📈 Evaluación del modelo:")
         y_pred_bin = prediction_model.predict(X_test)
-        print(classification_report(y_test, y_pred_bin, target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
+        print(classification_report(y_test, y_pred_bin,
+              target_names=[f"Tipo {cls}" for cls in mlb.classes_], zero_division=0))
 
         dump(prediction_model, model_path)
         dump(mlb, mlb_path)
         print("💾 Modelo y binarizador guardados.")
+
 
     print("🔍 Ejecutando predicción de prueba...")
     result = predict_plagiarism(test_file_a, test_file_b, prediction_model, mlb)
@@ -250,7 +268,8 @@ def predict_plagiarism(file1, file2, prediction_model, mlb):
     result = compare_files(file1, file2)
     if result:
         sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
-        X_test = np.array([[sa, ted, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff]])
+        X_test = np.array([[sa, ted, features_similarity, ast_flag_0, ast_flag_1,
+                            edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff]])
         y_pred_bin = prediction_model.predict(X_test)
         if y_pred_bin.ndim == 1:
             y_pred_bin = y_pred_bin.reshape(1, -1)
