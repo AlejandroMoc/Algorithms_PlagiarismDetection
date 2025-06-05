@@ -29,7 +29,7 @@ def clean_code(code):
     return '\n'.join(cleaned_lines)
 
 class VariableRenamer(ast.NodeTransformer):
-    def _init_(self):
+    def __init__(self):
         self.variable_count = 0
         self.renamed_vars = {}
 
@@ -83,6 +83,29 @@ def count_loops(file):
     with open(file, "r") as source:
         tree = ast.parse(source.read())
     return len([node for node in ast.walk(tree) if isinstance(node, (ast.For, ast.While))])
+
+from sklearn.metrics import classification_report
+import pandas as pd
+
+# def evaluar_multilabel(y_true_df, y_pred_df):
+#     def combinar(df):
+#         df = df.copy()
+#         df["tipo_2o3"] = (df["tipo2"] | df["tipo3"]).astype(int)
+#         return df[["tipo1", "tipo_2o3"]]
+
+#     y_true_comb = combinar(y_true_df)
+#     y_pred_comb = combinar(y_pred_df)
+
+#     reporte = classification_report(
+#         y_true_comb,
+#         y_pred_comb,
+#         target_names=["Tipo 1", "Tipo 2 o 3"],
+#         zero_division=0,
+#         output_dict=True
+#     )
+#     df_reporte = pd.DataFrame(reporte).transpose()
+#     print("\n📊 Métricas multilabel (Tipo 1, Tipo 2 o 3):\n")
+#     print(df_reporte.round(3).to_string())
 
 
 ## COMPARACIÓN DE ARCHIVOS
@@ -212,7 +235,9 @@ def algorithm(test_file_a, test_file_b):
         print(classification_report(y_test, y_pred, target_names=["No Plagio", "Plagio"], zero_division=0))
 
         dump(prediction_model, model_path)
-        print("Modelo guardado.")
+        print("✅ Modelo multilabel entrenado y guardado.")
+        # evaluar_multilabel()  # <- esto evalúa inmediatamente después del entrenamiento
+
 
     result = predict_plagiarism(test_file_a, test_file_b, prediction_model)
     if result:
@@ -262,6 +287,10 @@ def entrenar_modelo_multilabel(data):
     dump(modelo, "modelo_multilabel.joblib")
     print("✅ Modelo multilabel entrenado y guardado.")
 
+    y_pred = modelo.predict(X_test)
+    #evaluar_multilabel(y_test, pd.DataFrame(y_pred, columns=['tipo1', 'tipo2', 'tipo3']))
+
+
 def predecir_tipos(file1, file2):
     model_path = "modelo_multilabel.joblib"
     if not os.path.exists(model_path):
@@ -276,10 +305,12 @@ def predecir_tipos(file1, file2):
     X = np.array([result])
     pred = model.predict(X)[0]
     tipos = []
-    if pred[0]: tipos.append("Tipo 1")
-    if pred[1]: tipos.append("Tipo 2")
-    if pred[2]: tipos.append("Tipo 3")
+    if pred[0]:
+        tipos.append("Tipo 1")
+    if pred[1] or pred[2]:
+        tipos.append("Tipo 2 o 3")
     return tipos
+
 
 
  
