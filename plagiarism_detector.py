@@ -14,6 +14,7 @@ from Algorithms.comparator_difflib import comparator_difflib
 import time
 
 
+
 ##FUNCIONES
 #Limpieza de comentarios y espacios innecesarios
 def clean_code(code):
@@ -24,6 +25,7 @@ def clean_code(code):
         if stripped_line and not stripped_line.startswith('#'):
             cleaned_lines.append(line)  # Conserva la indentación original
     return '\n'.join(cleaned_lines)
+
 
 #Renombramiento de variables
 class VariableRenamer(ast.NodeTransformer):
@@ -60,7 +62,7 @@ def rename_variables(code):
     except Exception as e:
         print(f"Error al renombrar variables: {e}")
         return code  # Devuelve el código original si falla
-
+    
 #Normalización del código
 def normalize_code(file_path):
     with open(file_path, 'r') as file:
@@ -93,37 +95,30 @@ def compare_files(file_a: str, file_b: str):
         return None
     else:
         try:
-            #Normalizar código
             normalized_code_a = normalize_code(file_a)
             normalized_code_b = normalize_code(file_b)
 
-            #Plagio tipo 0
             difflib_results = comparator_difflib(normalized_code_a, normalized_code_b)
             similarity_preprocessed, result_preprocessed, similarity_plain, result_plain = difflib_results
 
-            #Plagio tipo 1
             sa_similarity = comparator_sa(normalized_code_a, normalized_code_b)
 
-            #Plagio tipo 2 y 3
             result_ast = comparator_ast(normalized_code_a, normalized_code_b)
-            ted_similarity = result_ast[0]          #Similitud TED
-            features_similarity = result_ast[1]     #Similitud de features
-            is_ast_plagiarism_0 = result_ast[9]     #Plagio tipo 1 (exacto)
-            is_ast_plagiarism_1 = result_ast[10]    #Plagio tipo 2
+            ted_similarity = result_ast[0]
+            features_similarity = result_ast[1]
+            is_ast_plagiarism_0 = result_ast[9]
+            is_ast_plagiarism_1 = result_ast[10]
 
-            #Nueva comparación de distancia de edición
             with open(file_a) as f1, open(file_b) as f2:
                 f1_lines = f1.readlines()
                 f2_lines = f2.readlines()
                 d = difflib.ndiff(f1_lines, f2_lines)
                 edit_distance = sum(1 for _ in d if _[0] != ' ')
 
-            #Nuevas métricas estructurales
             num_nodes_diff = abs(len(ast_nodes(file_a)) - len(ast_nodes(file_b)))
             num_funcs_diff = abs(count_functions(file_a) - count_functions(file_b))
             num_loops_diff = abs(count_loops(file_a) - count_loops(file_b))
 
-            #Imprimir similitudes
             print(f"Comparando {file_a} y {file_b}:")
             print(f"  - SA Similarity: {sa_similarity}, TED Similarity: {ted_similarity}, Edit Distance: {edit_distance}, AST considera plagio: {is_ast_plagiarism_0}")
 
@@ -239,11 +234,17 @@ def algorithm(test_file_a, test_file_b):
 
         # Dividir en entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
+        # Dividir en entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y_bin, test_size=0.2, random_state=42)
         print("🤖 Entrenando modelo...")
+
+        start_train = time.time()  # ✅ AÑADIR ESTA LÍNEA
         prediction_model = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
         end_train = time.time()
+
         print(f"⏱️ Tiempo de entrenamiento: {end_train - start_train:.2f} segundos")
+
 
         # Evaluar el modelo
         print("📈 Evaluación del modelo:")
@@ -289,6 +290,38 @@ def predict_plagiarism(file1, file2, prediction_model, mlb):
         return predicted_types, sa, ted, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff
     return None
 
+def compare_all_pairs(file_paths):
+    model_path = 'plagiarism_model.joblib'
+    mlb_path = 'mlb_model.joblib'
+
+    if not os.path.exists(model_path) or not os.path.exists(mlb_path):
+        print("❌ Modelo no entrenado.")
+        return []
+
+    prediction_model = load(model_path)
+    mlb = load(mlb_path)
+
+    resultados = []
+
+    for i in range(len(file_paths)):
+        for j in range(i + 1, len(file_paths)):
+            f1, f2 = file_paths[i], file_paths[j]
+            result = predict_plagiarism(f1, f2, prediction_model, mlb)
+            if result:
+                predicted_types, sa, ted, ast_flag_0, ast_flag_1, *_ = result
+                porcentaje_similitud = round((sa + ted) / 2, 2)
+                hay_plagio = "Sí" if predicted_types and porcentaje_similitud > 30.0 else "No"
+                tipos = predicted_types[0] if predicted_types else []
+                resultados.append([
+                    os.path.basename(f1),
+                    os.path.basename(f2),
+                    hay_plagio,
+                    tipos,
+                    porcentaje_similitud
+                ])
+    return resultados
+
+
 def main():
     print("Detector de Plagio utilizando Machine Learning")
 
@@ -301,3 +334,17 @@ def main():
 #Ejecución principal
 if __name__ == '__main__':
     main()
+    folder = 'uploads'
+    files = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith('.py')]
+    matrix = compare_all_pairs(files)
+
+    df = pd.DataFrame(matrix, columns=["Archivo 1", "Archivo 2", "¿Plagio?", "Tipo", "% Similitud"])
+
+    # Imprimir la matriz en consola
+    print("\n📊 Comparaciones realizadas:")
+    print(df.to_string(index=False))
+
+    # Guardar en CSV
+    output_path = os.path.join(folder, 'matriz_resultados.csv')
+    df.to_csv(output_path, index=False)
+    print(f"\n💾 Matriz guardada en: {output_path}")

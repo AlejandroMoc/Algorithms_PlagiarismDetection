@@ -37,6 +37,16 @@ def list_files():
     archivos = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.py')]
     return jsonify(archivos)
 
+@app.route('/compare-all', methods=['GET'])
+def compare_all():
+    archivos = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.py')]
+    rutas = [os.path.join(UPLOAD_FOLDER, f) for f in archivos]
+
+    from plagiarism_detector import compare_all_pairs
+    matriz = compare_all_pairs(rutas)
+
+    return jsonify({'comparaciones': matriz})
+
 @app.route('/compare', methods=['POST'])
 def compare_uploaded_files():
     data = request.get_json()
