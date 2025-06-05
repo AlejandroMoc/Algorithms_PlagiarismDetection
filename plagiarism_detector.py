@@ -1,4 +1,3 @@
-
 ## LIBRERÍAS
 import numpy as np
 import pandas as pd
@@ -13,6 +12,7 @@ import time
 from Algorithms.comparator_sa import comparator_sa
 from Algorithms.comparator_ast import comparator_ast
 from Algorithms.comparator_difflib import comparator_difflib
+from sklearn.multioutput import MultiOutputClassifier
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -29,7 +29,7 @@ def clean_code(code):
     return '\n'.join(cleaned_lines)
 
 class VariableRenamer(ast.NodeTransformer):
-    def __init__(self):
+    def _init_(self):
         self.variable_count = 0
         self.renamed_vars = {}
 
@@ -132,7 +132,7 @@ def generate_training_data_from_leaf_dirs(data_dir):
     leaf_dirs = [os.path.join(root) for root, _, files in os.walk(data_dir)
                  if any(f.endswith(".py") for f in files)]
 
-    print(f"🔍 Encontradas {len(leaf_dirs)} carpetas hoja.")
+    print(f"Encontradas {len(leaf_dirs)} carpetas hoja.")
 
     for ruta_subcarpeta in tqdm(leaf_dirs, desc="Procesando carpetas hoja"):
         archivos = sorted(glob.glob(os.path.join(ruta_subcarpeta, '*.py')))
@@ -143,35 +143,39 @@ def generate_training_data_from_leaf_dirs(data_dir):
                 if result:
                     sa, ted, features_similarity, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
                     name_b = os.path.basename(file_b).lower()
-                    is_plagiarism = int(any(tipo in name_b for tipo in ["tipo1", "tipo2", "tipo3"]))
+                    tipo_1 = int("tipo1" in name_b)
+                    tipo_2 = int("tipo2" in name_b)
+                    tipo_3 = int("tipo3" in name_b)
+                    is_plagiarism = int(tipo_1 or tipo_2 or tipo_3)
+
                     data.append([
                         sa, ted, features_similarity, ast_flag_0, ast_flag_1,
                         edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff,
-                        is_plagiarism
+                        is_plagiarism, tipo_1, tipo_2, tipo_3
                     ])
     return data
 
 
 ## ENTRENAMIENTO Y EVALUACIÓN
 def algorithm(test_file_a, test_file_b):
-    print("🚀 Detector de Plagio (Binario)")
+    print("Detector de Plagio (Binario)")
     model_path = 'plagiarism_model_binario.joblib'
 
     if os.path.exists(model_path):
         prediction_model = load(model_path)
-        print("✅ Modelo cargado.")
+        print("Modelo cargado.")
     else:
         base_path = os.path.dirname(__file__)
         data_dir = os.path.join(base_path, 'Data')
 
-        print("⚙️  Generando datos de entrenamiento...")
+        print("Generando datos de entrenamiento...")
         start_preproc = time.time()
         all_data = generate_training_data_from_leaf_dirs(data_dir)
         end_preproc = time.time()
-        print(f"⏱️ Tiempo de preprocesamiento: {end_preproc - start_preproc:.2f} s")
+        print(f"Tiempo de preprocesamiento: {end_preproc - start_preproc:.2f} s")
 
         if not all_data:
-            print("❌ No se encontraron datos.")
+            print("No se encontraron datos.")
             return
 
         df = pd.DataFrame(all_data, columns=[
@@ -185,24 +189,24 @@ def algorithm(test_file_a, test_file_b):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-        print("🤖 Entrenando modelo...")
+        print("Entrenando modelo...")
         start_train = time.time()
         prediction_model = RandomForestClassifier(n_estimators=400, random_state=42, class_weight='balanced')
         prediction_model.fit(X_train, y_train)
         end_train = time.time()
-        print(f"⏱️ Tiempo de entrenamiento: {end_train - start_train:.2f} s")
+        print(f"Tiempo de entrenamiento: {end_train - start_train:.2f} s")
 
-        print("📈 Evaluación del modelo:")
+        print("Evaluación del modelo:")
         y_pred = prediction_model.predict(X_test)
         print(classification_report(y_test, y_pred, target_names=["No Plagio", "Plagio"], zero_division=0))
 
         dump(prediction_model, model_path)
-        print("💾 Modelo guardado.")
+        print("Modelo guardado.")
 
     result = predict_plagiarism(test_file_a, test_file_b, prediction_model)
     if result:
         pred, sa, ted, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff = result
-        print(f"📋 Plagio detectado: {'Sí' if pred == 1 else 'No'}")
+        print(f"Plagio detectado: {'Sí' if pred == 1 else 'No'}")
         print(f"  SA Similarity: {sa:.2f}")
         print(f"  TED Similarity: {ted:.2f}")
         print(f"  Edit Distance: {edit_distance}")
@@ -210,7 +214,9 @@ def algorithm(test_file_a, test_file_b):
         print(f"  AST - Plagio parcial: {'Sí' if ast_flag_1 else 'No'}")
         print(f"  Nodos: {num_nodes_diff}, Funciones: {num_funcs_diff}, Bucles: {num_loops_diff}")
     else:
-        print("⚠️  No se pudo realizar la predicción.")
+        print("No se pudo realizar la predicción.")
+    
+    entrenar_modelo_multilabel(all_data)
 
 
 def predict_plagiarism(file1, file2, model):
@@ -222,6 +228,46 @@ def predict_plagiarism(file1, file2, model):
         return pred, sa, ted, ast_flag_0, ast_flag_1, edit_distance, num_nodes_diff, num_funcs_diff, num_loops_diff
     return None
 
+def entrenar_modelo_multilabel(data):
+    df = pd.DataFrame(data, columns=[
+        'sa_similarity', 'ted_similarity', 'features_similarity',
+        'is_ast_plagiarism_0', 'is_ast_plagiarism_1', 'edit_distance',
+        'num_nodes_diff', 'num_funcs_diff', 'num_loops_diff',
+        'plagiarism', 'tipo1', 'tipo2', 'tipo3'
+    ])
+
+    X = df.drop(columns=['plagiarism', 'tipo1', 'tipo2', 'tipo3'])
+    y = df[['tipo1', 'tipo2', 'tipo3']]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    modelo = MultiOutputClassifier(RandomForestClassifier(n_estimators=300, random_state=42))
+    modelo.fit(X_train, y_train)
+
+    dump(modelo, "modelo_multilabel.joblib")
+    print("Modelo multilabel entrenado y guardado.")
+
+def predecir_tipos(file1, file2):
+    model_path = "modelo_multilabel.joblib"
+    if not os.path.exists(model_path):
+        print("No se ha entrenado el modelo multilabel.")
+        return []
+
+    model = load(model_path)
+    result = compare_files(file1, file2)
+    if not result:
+        return []
+
+    X = np.array([result])
+    pred = model.predict(X)[0]
+    tipos = []
+    if pred[0]: tipos.append("Tipo 1")
+    if pred[1]: tipos.append("Tipo 2")
+    if pred[2]: tipos.append("Tipo 3")
+    return tipos
+
+
+ 
 def compare_all_pairs():
     upload_folder = os.path.join(os.path.dirname(__file__), 'uploads')
     if not os.path.exists(upload_folder):
@@ -240,6 +286,18 @@ def compare_all_pairs():
         raise FileNotFoundError("Modelo no entrenado. Ejecuta el algoritmo al menos una vez para generarlo.")
 
     model = load(model_path)
+    
+        # ⚠️ Verificar y entrenar modelo multilabel si no existe
+    if not os.path.exists("modelo_multilabel.joblib"):
+        print("Modelo multilabel no encontrado. Entrenando ahora...")
+        base_path = os.path.dirname(__file__)
+        data_dir = os.path.join(base_path, 'Data')
+        all_data = generate_training_data_from_leaf_dirs(data_dir)
+        if all_data:
+            entrenar_modelo_multilabel(all_data)
+        else:
+            print("No se pudo entrenar modelo multilabel. Datos insuficientes.")
+
     resultados = []
 
     for i in range(len(rutas)):
@@ -252,16 +310,13 @@ def compare_all_pairs():
                     pred, sa, ted, plagio_0, plagio_1, ed, n, f, l = result
                     nombre_a = os.path.basename(file_a)
                     nombre_b = os.path.basename(file_b)
-                    tipos = []
-                    if plagio_0:
-                        tipos.append("Tipo 1")
-                    elif plagio_1:
-                        tipos.append("Tipo 2 o 3")
+                    tipos = predecir_tipos(file_a, file_b)
+
                     fila = [
                         nombre_a,
                         nombre_b,
                         "Sí" if pred == 1 else "No",
-                        tipos,
+                        tipos if pred == 1 else [],  # Evita mostrar tipos si no hay plagio
                         round(sa * 100, 2)
                     ]
                     resultados.append(fila)
