@@ -310,7 +310,7 @@ def compare_all_pairs(file_paths):
             if result:
                 predicted_types, sa, ted, ast_flag_0, ast_flag_1, *_ = result
                 porcentaje_similitud = round((sa + ted) / 2, 2)
-                hay_plagio = "Sí" if predicted_types and porcentaje_similitud > 30.0 else "No"
+                hay_plagio = "Sí" if predicted_types else "No"
                 tipos = predicted_types[0] if predicted_types else []
                 resultados.append([
                     os.path.basename(f1),
