@@ -1,10 +1,14 @@
-import ast
-import os
+import io, os, ast
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+#Leer archivo como bits
+def read_file_raw(file_path: str) -> io.BufferedReader:
+    with open(file_path, 'rb') as file:
+        return file.read()
+
 # Extraer features estructurales del AST
-def extract_ast_features(tree):
+def extract_ast_features(tree) -> tuple[dict[str, int], np.ndarray, list[str]]:
     features = {
         'num_nodes': 0,
         'num_functions': 0,
@@ -54,11 +58,6 @@ def normalize_features(f1, f2):
     max_vals[max_vals == 0] = 1
     return f1 / max_vals, f2 / max_vals
 
-# Leer el código fuente de Python desde el archivo
-def read_code(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
-
 # Veredicto de plagio
 def decide_plagiarism(ted_sim, feature_sim, alpha = 0.5, threshold = 0.70):
     score = alpha * ted_sim + (1 - alpha) * feature_sim
@@ -86,24 +85,21 @@ def count_common_nodes(node1, node2):
     return common_count
 
 # Comparar dos archivos .py
-def comparator_ast(file1, file2):
-    code1 = read_code(file1)
-    code2 = read_code(file2)
+def comparator_ast(code1: str, code2: str):
 
-    tree_ast1 = ast.parse(code1)
-    tree_ast2 = ast.parse(code2)
+    tree_ast1: ast.Module = ast.parse(code1)
+    tree_ast2: ast.Module = ast.parse(code2)
 
-    common_nodes = count_common_nodes(tree_ast1, tree_ast2)
-    print(f"Nodos comunes entre {file1} y {file2}: {common_nodes}")
+    # Obtener nodos comuness, máximos y similitud TED
+    common_nodes: int = count_common_nodes(tree_ast1, tree_ast2)
+    max_nodes: int = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
+    ted_similarity: float = common_nodes / max_nodes if max_nodes > 0 else 0
 
-    max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
-    ted_similarity = common_nodes / max_nodes if max_nodes > 0 else 0
+    common_nodes: int = count_common_nodes(tree_ast1, tree_ast2)
+    max_nodes: int = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
+    ted_similarity: float = common_nodes / max_nodes if max_nodes > 0 else 0
 
-    common_nodes = count_common_nodes(tree_ast1, tree_ast2)
-    max_nodes = max(len(list(ast.walk(tree_ast1))), len(list(ast.walk(tree_ast2))))
-    ted_similarity = common_nodes / max_nodes if max_nodes > 0 else 0
-
-    # Features + variables
+    #Obtener vectores y características
     f1_vector, f1_dict, vars1 = extract_ast_features(tree_ast1)
     f2_vector, f2_dict, vars2 = extract_ast_features(tree_ast2)
     f1_norm, f2_norm = normalize_features(f1_vector, f2_vector)
@@ -133,15 +129,18 @@ def comparator_ast(file1, file2):
         #Regresar qué tipo de plagio considera
         ast_flag_0,                      # Índice 9: Plagio de tipo exacto
         ast_flag_1,                      # Índice 10: Plagio de tipo 2?
-        
     ]
 
 #Ejecución principal
 def main():
-    file_a = "Data/testcase1.py"
-    file_b = "Data/testcase7.py"
+    file_a = "Data_Check/file1.py"
+    file_b = "Data_Check/file2.py"
 
-    resultado = comparator_ast(file_a, file_b)
+    #Abrir archivos como bits
+    content_a = read_file_raw(file_a)
+    content_b = read_file_raw(file_b)
+
+    resultado = comparator_ast(content_a, content_b)
     print(resultado)
 
 if __name__ == '__main__':

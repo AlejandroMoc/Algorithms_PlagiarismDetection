@@ -2,9 +2,8 @@ import os, tokenize
 from io import BytesIO
 
 # Leer archivo en modo binario
-def read_file_raw(file_path):
-    with open(file_path, 'rb') as file:
-        return file.read()
+def read_code_bytes(file_content: str) -> bytes:
+    return file_content.encode('utf-8')
 
 # Tokenización con normalización de identificadores, números y cadenas
 def preprocess_code(content):
@@ -52,12 +51,15 @@ def bwt_from_tokens(tokens, suffix_array):
     return [tokens[i - 1] if i != 0 else '$' for i in suffix_array]
 
 #Función principal del SA
-def comparator_sa(file_a, file_b):
+def comparator_sa(code_1, code_2):
+
+    #Convertir código de string a bytes
+    bytes_1 = read_code_bytes(code_1)
+    bytes_2 = read_code_bytes(code_2)
+
     #Tokenización de ambos archivos
-    raw1 = read_file_raw(file_a)
-    raw2 = read_file_raw(file_b)
-    tokens1 = preprocess_code(raw1)
-    tokens2 = preprocess_code(raw2)
+    tokens1 = preprocess_code(bytes_1)
+    tokens2 = preprocess_code(bytes_2)
 
     #Unir tokens para análisis con separadores
     combined_tokens = tokens1 + ['#'] + tokens2 + ['$']
