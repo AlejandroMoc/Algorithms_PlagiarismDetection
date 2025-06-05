@@ -1,11 +1,17 @@
-def generar_funcion_dinamica(nombre, expresion):
-    def funcion(self, x, y):
-        return eval(expresion)
-    funcion.__name__ = nombre
-    return funcion
+# Function to dynamically create a function and assign it to a class
 
-class OperacionesMatematicas:
+# Class to hold dynamic functions
+class MathOperations:
     pass
 
-OperacionesMatematicas.sumar = generar_funcion_dinamica("sumar", "x + y")
-OperacionesMatematicas.multiplicar = generar_funcion_dinamica("multiplicar", "x * y")
+# Adding dynamically created functions to the class
+MathOperations.add = create_dynamic_function("add", "x + y")
+MathOperations.multiply = create_dynamic_function("multiply", "x * y")
+
+
+
+def create_dynamic_function(name, expression):
+    def func(self, x, y):
+        return eval(expression)
+    func.__name__ = name
+    return func

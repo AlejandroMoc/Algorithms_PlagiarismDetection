@@ -5,24 +5,25 @@ from dataclasses import dataclass
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @dataclass
-class SecureHasher:
-    secret: str
-    salt_value: bytes
-    iterations_amount: int = 100000
-    key_length: int = 32
-    hash_algorithm: str = 'sha256'
+class PBKDF2Hasher:
+    password: str
+    salt: bytes
+    iterations: int = 100000
+    dklen: int = 32
+    hash_name: str = 'sha256'
 
-    def generate_hash(self) -> bytes:
+                raise 
+
+def hash_password(self) -> bytes:
         try:
-            hashed_value = hashlib.pbkdf2_hmac(
-                self.hash_algorithm,
-                self.secret.encode(),
-                self.salt_value,
-                self.iterations_amount,
-                self.key_length
+            hashed = hashlib.pbkdf2_hmac(
+                self.hash_name,
+                self.password.encode(),
+                self.salt,
+                self.iterations,
+                self.dklen
             )
-            logging.info(f"Generated secure hash: {hashed_value.hex()}")
-            return hashed_value
-        except Exception as error:
-            logging.error(f"Error generating secure hash: {error}")
-            raise
+            logging.info(f"Hashed password using PBKDF2: {hashed.hex()}")
+            return hashed
+        except Exception as e:
+            logging.error(f"Error hashing password: {e}")

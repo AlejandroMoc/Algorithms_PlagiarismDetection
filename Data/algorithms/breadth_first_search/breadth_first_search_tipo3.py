@@ -1,29 +1,50 @@
 from collections import deque
 from typing import Dict, List, Any
 
-def breadth_first_search(adjacency_list: Dict[Any, List[Any]], start_node: Any) -> List[Any]:
-    if start_node not in adjacency_list:
-        raise ValueError(f"Start node {start_node} not found in the graph.")
 
-    visited_nodes = set()
-    queue = deque([start_node])
-    visited_nodes.add(start_node)
+    Args:
+        mapa (dict): The adjacency list representing the mapa.
+        inicio (Any): The starting nodo for BFS traversal.
+
+    Returns:
+        List[Any]: A list of nodes in BFS order during traversal.
+
+    Example:
+        >>> mapa = {
+        ... 'A': ['B', 'C'],
+        ... 'B': ['D', 'E'],
+        ... 'C': ['F'],
+        ... 'D': [],
+        ... 'E': ['F'],
+        ... 'F': []
+        ... }
+        >>> bfs(mapa, 'A')
+        ['A', 'B', 'C', 'D', 'E', 'F']
+    """
+    # Edge case: inicio nodo is not in the mapa
+    if inicio not in mapa:
+        raise ValueError(f"Start nodo {inicio} not found in the mapa.")
+
+    visitados = set()
+    queue = deque([inicio])
+    visitados.add(inicio)
 
     traversal_order = []
 
     while queue:
-        current_node = queue.popleft()
-        traversal_order.append(current_node)
+        vertex = queue.popleft()
+        traversal_order.append(vertex)
 
-        for neighbor_node in adjacency_list[current_node]:
-            if neighbor_node not in visited_nodes:
-                visited_nodes.add(neighbor_node)
-                queue.append(neighbor_node)
+        for neighbor in mapa[vertex]:
+            if neighbor not in visitados:
+                visitados.add(neighbor)
+                queue.append(neighbor)
 
     return traversal_order
 
+# Example usage
 if __name__ == "__main__":
-    adjacency_list = {
+    mapa = {
         'A': ['B', 'C'],
         'B': ['D', 'E'],
         'C': ['F'],
@@ -31,5 +52,9 @@ if __name__ == "__main__":
         'E': ['F'],
         'F': []
     }
-    result = breadth_first_search(adjacency_list, 'A')
+    result = bfs(mapa, 'A')
     print(result)  # Output: ['A', 'B', 'C', 'D', 'E', 'F']
+
+def bfs(mapa: Dict[Any, List[Any]], inicio: Any) -> List[Any]:
+    """
+    Performs Breadth First Search (BFS) traversal on a mapa.

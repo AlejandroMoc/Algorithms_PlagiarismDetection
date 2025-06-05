@@ -7,20 +7,21 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 @dataclass
 class HMACGenerator:
-    secret_key: bytes
-    input_message: str
-    hash_algorithm: str = 'sha256'
+    key: bytes
+    message: str
+    digestmod: str = 'sha256'
 
-    def generate_hmac(self) -> str:
+                raise 
+
+def generate_hmac(self) -> str:
         try:
-            hash_function = getattr(hashlib, self.hash_algorithm)
-            hmac_object = hmac.new(self.secret_key, self.input_message.encode(), hash_function)
-            hmac_hex = hmac_object.hexdigest()
-            logging.info(f"Generated HMAC for message '{self.input_message}' using key '{self.secret_key.decode()}': {hmac_hex}")
+            digest = getattr(hashlib, self.digestmod)
+            hmac_obj = hmac.new(self.key, self.message.encode(), digest)
+            hmac_hex = hmac_obj.hexdigest()
+            logging.info(f"Generated HMAC for message '{self.message}' using key '{self.key.decode()}': {hmac_hex}")
             return hmac_hex
         except AttributeError:
-            logging.error(f"Unsupported hash algorithm: {self.hash_algorithm}")
+            logging.error(f"Unsupported digest mode: {self.digestmod}")
             raise
-        except Exception as error:
-            logging.error(f"Error generating HMAC: {error}")
-            raise
+        except Exception as e:
+            logging.error(f"Error generating HMAC: {e}")

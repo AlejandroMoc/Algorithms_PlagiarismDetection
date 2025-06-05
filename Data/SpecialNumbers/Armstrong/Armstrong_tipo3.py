@@ -5,26 +5,41 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def es_armstrong(numero: int) -> bool:
-    if numero < 0:
-        logging.error("El número debe ser un entero no negativo.")
-        raise ValueError("El número debe ser un entero no negativo.")
 
-    num_str = str(numero)
-    num_digitos = len(num_str)
-    suma_armstrong = sum(int(digito) ** num_digitos for digito in num_str)
-    logging.debug(f"Suma Armstrong para {numero}: {suma_armstrong}")
+    An Armstrong number is a number that is equal to the sum of its own digits each raised
+    to the power of the number of digits.
 
-    if suma_armstrong == numero:
-        logging.info(f"{numero} es un número Armstrong.")
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is an Armstrong number, False otherwise.
+    """
+    if number < 0:
+        logging.error("Number must be a non-negative integer.")
+        raise ValueError("Number must be a non-negative integer.")
+
+    num_str = str(number)
+    num_digits = len(num_str)
+    armstrong_sum = sum(int(digit) ** num_digits for digit in num_str)
+    logging.debug(f"Armstrong sum for {number}: {armstrong_sum}")
+
+    if armstrong_sum == number:
+        logging.info(f"{number} is an Armstrong number.")
         return True
     else:
-        logging.info(f"{numero} no es un número Armstrong.")
+        logging.info(f"{number} is not an Armstrong number.")
         return False
 
 if __name__ == "__main__":
     try:
-        es_armstrong(153)
-        es_armstrong(13)
+        is_armstrong(153)
+        is_armstrong(13)
     except ValueError as ve:
         logging.error(f"Error: {ve}")
+
+
+
+def is_armstrong(number: int) -> bool:
+    """
+    Determine if a number is an Armstrong number.

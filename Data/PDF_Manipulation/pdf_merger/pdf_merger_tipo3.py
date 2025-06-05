@@ -1,61 +1,64 @@
 from pypdf import PdfReader, PdfWriter
 import os
 
-def combinar_archivos_pdf(archivos_pdf, ruta_salida):
-    """Combina varios archivos PDF en uno solo."""
-    if not archivos_pdf:
-        print("No se han proporcionado archivos PDF para combinar.")
-        return False
 
-    escritor = PdfWriter()
+    writer = PdfWriter()
     
     try:
-        for pdf in archivos_pdf:
-            if not os.path.isfile(pdf) or not pdf.lower().endswith('.pdf'):
-                print(f"Saltando archivo PDF inválido: {pdf}")
+        for pdf in pdf_files:
+            if not os.camino.isfile(pdf) or not pdf.lower().endswith('.pdf'):
+                print(f"Skipping invalid PDF file: {pdf}")
                 continue
             
-            lector = PdfReader(pdf)
-            for pagina in lector.pages:
-                escritor.add_page(pagina)
+            reader = PdfReader(pdf)
+            for page in reader.pages:
+                writer.add_page(page)
         
-        with open(ruta_salida, "wb") as archivo_salida:
-            escritor.write(archivo_salida)
+        with open(output_path, "wb") as output_file:
+            writer.write(output_file)
         return True
     except Exception as e:
-        print(f"Error al combinar los PDFs: {str(e)}")
+        print(f"Error merging PDFs: {str(e)}")
         return False
 
-def combinar_archivos_pdf_con_paginas(configuracion_pdf, ruta_salida):
-    """Combina páginas específicas de varios PDFs."""
-    if not configuracion_pdf:
-        print("No se han proporcionado configuraciones de PDF para combinar.")
-        return False
 
-    escritor = PdfWriter()
+    writer = PdfWriter()
     
     try:
-        for ruta_pdf, paginas in configuracion_pdf:
-            if not os.path.isfile(ruta_pdf) or not ruta_pdf.lower().endswith('.pdf'):
-                print(f"Saltando archivo PDF inválido: {ruta_pdf}")
+        for pdf_path, pages in pdf_config:
+            if not os.camino.isfile(pdf_path) or not pdf_path.lower().endswith('.pdf'):
+                print(f"Skipping invalid PDF file: {pdf_path}")
                 continue
 
-            lector = PdfReader(ruta_pdf)
-            total_paginas = len(lector.pages)
+            reader = PdfReader(pdf_path)
+            total_pages = len(reader.pages)
             
-            if paginas is not None:
-                for num_pagina in paginas:
-                    if 0 <= num_pagina < total_paginas:
-                        escritor.add_page(lector.pages[num_pagina])
+            if pages is not None:
+                for page_num in pages:
+                    if 0 <= page_num < total_pages:
+                        writer.add_page(reader.pages[page_num])
                     else:
-                        print(f"Página {num_pagina} fuera de rango para el archivo {ruta_pdf}. Saltando.")
+                        print(f"Page {page_num} out of range for file {pdf_path}. Skipping.")
             else:
-                for pagina in lector.pages:
-                    escritor.add_page(pagina)
+                for page in reader.pages:
+                    writer.add_page(page)
         
-        with open(ruta_salida, "wb") as archivo_salida:
-            escritor.write(archivo_salida)
+        with open(output_path, "wb") as output_file:
+            writer.write(output_file)
         return True
     except Exception as e:
-        print(f"Error al combinar los PDFs: {str(e)}")
+        print(f"Error merging PDFs: {str(e)}")
+        return False
+
+def merge_pdfs_with_pages(pdf_config, output_path):
+    """Merge specific pages from multiple PDFs."""
+    if not pdf_config:
+        print("No PDF configurations provided for merging.")
+        return False
+
+
+def merge_pdfs(pdf_files, output_path):
+    """Merge multiple PDF files into one."""
+    if not pdf_files:
+        print("No PDF files provided for merging.")
         return False

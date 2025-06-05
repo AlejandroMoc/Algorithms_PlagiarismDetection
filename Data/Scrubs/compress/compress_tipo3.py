@@ -3,31 +3,51 @@ import json
 from sklearn.preprocessing import LabelEncoder
 from .clip import clip_categorical
 
-def reduce_numeric(col_data):
-    if 'float' in str(col_data.dtype):
-        print("Downcasting {} to float".format(col_data.name))
-        result_data = pd.to_numeric(col_data, downcast='float', errors='ignore')
-    elif 'int' in str(col_data.dtype):
-        print("Downcasting {} to int".format(col_data.name))
-        result_data = pd.to_numeric(col_data, downcast='integer', errors='ignore')
-    else:
-        print("{} is not numeric. Returning as-is".format(col_data.name))
-        result_data = col_data
-    return result_data
 
-def reduce_categorical(col_data):
-    if col_data.nunique() > 8:
+
+    le = LabelEncoder()
+    lookup = pd.Series(le.classes_).to_dict()
+    COL_encoded = pd.Series(le.transform(COL_clipped), index=COL.index, name=COL.name)
+
+    path_persist = "data/interim/{}_lookup.json".format(COL.name)
+    print("Persisting encoder at {}".format(path_persist))
+    with open(path_persist, 'w') as fp:
+        json.dump(lookup, fp)
+    return COL_encoded
+
+def compress_categorical(COL):
+    """
+    Encode categorical variables with >2 classes
+    Persist the encoder as JSON
+    """
+    if COL.nunique() > 8:
         print("{} has too many levels, clipping it.")
-        col_data_clipped = clip_categorical(col_data, MIN_LEVELS=8)
+        COL_clipped = clip_categorical(COL, MIN_LEVELS=8)
     else:
-        col_data_clipped = col_data.copy()
+        COL_clipped = COL.copy()
 
-    label_encoder = LabelEncoder()
-    lookup_dict = pd.Series(label_encoder.classes_).to_dict()
-    col_encoded = pd.Series(label_encoder.transform(col_data_clipped), index=col_data.index, name=col_data.name)
 
-    persist_path = "data/interim/{}_lookup.json".format(col_data.name)
-    print("Persisting encoder at {}".format(persist_path))
-    with open(persist_path, 'w') as file_pointer:
-        json.dump(lookup_dict, file_pointer)
-    return col_encoded
+def compress_numeric(COL):
+    """
+    If the passed COL is numeric,
+    downcast it to the lowest size.
+    Else,
+    Return as-is.
+    Parameters
+    -----------
+    COL: pandas.Series
+        The Series to shrink
+    Returns
+    -------
+    if numeric, a compressed series
+    """
+    if 'float' in str(COL.dtype):
+        print("Downcasting {} to float".format(COL.name))
+        result = pd.to_numeric(COL, downcast='float', errors='ignore')
+    elif 'int' in str(COL.dtype):
+        print("Downcasting {} to int".format(COL.name))
+        result = pd.to_numeric(COL, downcast='integer', errors='ignore')
+    else:
+        print("{} is not numeric. Returning as-is".format(COL.name))
+        result = COL
+    return result

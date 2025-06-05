@@ -1,12 +1,12 @@
-python
 import logging
 
-def configurar_registro(nombre: str, nivel: int = logging.INFO) -> logging.Logger:
-    registro = logging.getLogger(nombre)
-    if not registro.handlers:
-        manejador = logging.StreamHandler()
-        formateador = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        manejador.setFormatter(formateador)
-        registro.setLevel(nivel)
-        registro.addHandler(manejador)
-    return registro
+    return logger 
+
+def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        logger.setLevel(level)
+        logger.addHandler(handler)

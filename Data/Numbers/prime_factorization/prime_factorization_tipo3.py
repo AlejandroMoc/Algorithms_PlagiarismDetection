@@ -1,20 +1,31 @@
-def factorizacion_primos(numero: int) -> list:
-    if not isinstance(numero, int):
-        raise TypeError("El input debe ser un entero.")
-    if numero <= 0:
-        raise ValueError("El input debe ser un entero positivo.")
 
-    factores = []
+    Args:
+        n (int): The integer to factorize. Must be a positive integer.
+
+    Returns:
+        list: A list of prime factors of n.
+    """
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer.")
+    if n <= 0:
+        raise ValueError("Input must be a positive integer.")
+
+    factors = []
     divisor = 2
-    while numero > 1:
-        while numero % divisor == 0:
-            factores.append(divisor)
-            numero //= divisor
+    while n > 1:
+        while n % divisor == 0:
+            factors.append(divisor)
+            n //= divisor
         divisor += 1
-    return factores
+    return factors
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso
-    resultado = factorizacion_primos(28)
-    print(resultado)  # Salida: [2, 2, 7]
+    # Example usage
+    result = prime_factorization(28)
+    print(result)  # Output: [2, 2, 7]
+
+
+def prime_factorization(n: int) -> list:
+    """
+    Returns the prime factors of the given integer n.

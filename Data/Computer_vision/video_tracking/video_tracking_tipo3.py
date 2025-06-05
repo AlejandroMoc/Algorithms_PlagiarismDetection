@@ -1,46 +1,48 @@
 import cv2
 
-def seguir_objeto_en_video(ruta_video):
-    # Inicializar captura de video
-    captura = cv2.VideoCapture(ruta_video)
     
-    # Leer primer fotograma
-    ret, fotograma = captura.read()
+    # Read first frame
+    ret, frame = cap.read()
     if not ret:
-        print("Fallo al leer video")
+        print("Failed to read video")
         return
     
-    # Seleccionar ROI (Región de Interés)
-    roi = cv2.selectROI(fotograma)
+    # Select ROI (Region of Interest)
+    roi = cv2.selectROI(frame)
     
-    # Inicializar tracker
-    rastreador = cv2.TrackerCSRT_create()
-    rastreador.init(fotograma, roi)
+    # Initialize tracker
+    tracker = cv2.TrackerCSRT_create()
+    tracker.init(frame, roi)
     
     while True:
-        ret, fotograma = captura.read()
+        ret, frame = cap.read()
         if not ret:
             break
         
-        # Actualizar tracker
-        exito, caja = rastreador.update(fotograma)
+        # Update tracker
+        success, box = tracker.update(frame)
         
-        if exito:
-            # Dibujar cuadro delimitador
-            x, y, w, h = [int(v) for v in caja]
-            cv2.rectangle(fotograma, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        if success:
+            # Draw bounding box
+            x, y, w, h = [int(v) for v in box]
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
-        # Mostrar resultado
-        cv2.imshow('Seguimiento', fotograma)
+        # Display result
+        cv2.imshow('Tracking', frame)
         
-        # Salir si se presiona 'q'
+        # Exit if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
-    captura.release()
+    cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # Ejemplo de uso
-    archivo_video = "video_ejemplo.mp4"  # Reemplazar con tu archivo de video
-    seguir_objeto_en_video(archivo_video)
+    # Example usage
+    video_file = "sample_video.mp4"  # Replace with your video file
+    track_object_in_video(video_file)
+
+
+def track_object_in_video(video_path):
+    # Initialize video capture
+    cap = cv2.VideoCapture(video_path)

@@ -1,104 +1,241 @@
 from tensorflow.keras import layers, models # type: ignore
+
 from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
+
 import matplotlib.pyplot as plt
 
-def cargar_y_procesar_datos(dir_datos, altura_img=224, ancho_img=224, tam_lote=32):
-    datagen_entrenamiento = ImageDataGenerator(
+
+
+def load_and_preprocess_data(data_dir, img_height=224, img_width=224, batch_size=32):
+
+    """
+
+    Load and preprocess image data from directory
+
+    """
+
+    train_datagen = ImageDataGenerator(
+
         rescale=1./255,
+
         rotation_range=20,
+
         width_shift_range=0.2,
+
         height_shift_range=0.2,
+
         shear_range=0.2,
+
         zoom_range=0.2,
+
         horizontal_flip=True,
+
         validation_split=0.2
+
     )
 
-    generador_entrenamiento = datagen_entrenamiento.flow_from_directory(
-        dir_datos,
-        target_size=(altura_img, ancho_img),
-        batch_size=tam_lote,
+
+
+    train_generator = train_datagen.flow_from_directory(
+
+        data_dir,
+
+        target_size=(img_height, img_width),
+
+        batch_size=batch_size,
+
         class_mode='categorical',
+
         subset='training'
+
     )
 
-    generador_validacion = datagen_entrenamiento.flow_from_directory(
-        dir_datos,
-        target_size=(altura_img, ancho_img),
-        batch_size=tam_lote,
+
+
+    validation_generator = train_datagen.flow_from_directory(
+
+        data_dir,
+
+        target_size=(img_height, img_width),
+
+        batch_size=batch_size,
+
         class_mode='categorical',
+
         subset='validation'
+
     )
 
-    return generador_entrenamiento, generador_validacion
 
-def crear_modelo(num_clases):
-    modelo = models.Sequential([
+
+    return train_generator, validation_generator
+
+
+
+def create_model(num_classes):
+
+    """
+
+    Create a CNN model for image classification
+
+    """
+
+    model = models.Sequential([
+
         layers.Conv2D(32, 3, activation='relu', input_shape=(224, 224, 3)),
+
         layers.MaxPooling2D(),
+
         layers.Conv2D(64, 3, activation='relu'),
+
         layers.MaxPooling2D(),
+
         layers.Conv2D(64, 3, activation='relu'),
+
         layers.MaxPooling2D(),
+
         layers.Flatten(),
+
         layers.Dense(64, activation='relu'),
+
         layers.Dropout(0.5),
-        layers.Dense(num_clases, activation='softmax')
+
+        layers.Dense(num_classes, activation='softmax')
+
     ])
 
-    return modelo
 
-def entrenar_modelo(modelo, generador_entrenamiento, generador_validacion, epocas=10):
-    modelo.compile(
+
+    return model
+
+
+
+def train_model(model, train_generator, validation_generator, epochs=10):
+
+    """
+
+    Train the model
+
+    """
+
+    model.compile(
+
         optimizer='adam',
+
         loss='categorical_crossentropy',
+
         metrics=['accuracy']
+
     )
 
-    historial = modelo.fit(
-        generador_entrenamiento,
-        validation_data=generador_validacion,
-        epochs=epocas
+
+
+    history = model.fit(
+
+        train_generator,
+
+        validation_data=validation_generator,
+
+        epochs=epochs
+
     )
 
-    return historial
 
-def graficar_historial_entrenamiento(historial):
-    acc = historial.history['accuracy']
-    val_acc = historial.history['val_accuracy']
-    loss = historial.history['loss']
-    val_loss = historial.history['val_loss']
 
-    rangos_epocas = range(len(acc))
+    return history
+
+
+
+def plot_training_history(history):
+
+    """
+
+    Plot training history
+
+    """
+
+    acc = history.history['accuracy']
+
+    val_acc = history.history['val_accuracy']
+
+    loss = history.history['loss']
+
+    val_loss = history.history['val_loss']
+
+
+
+    epochs_range = range(len(acc))
+
+
 
     plt.figure(figsize=(12, 4))
 
+    
+
     plt.subplot(1, 2, 1)
-    plt.plot(rangos_epocas, acc, label='Precisión de Entrenamiento')
-    plt.plot(rangos_epocas, val_acc, label='Precisión de Validación')
-    plt.title('Precisión de Entrenamiento y Validación')
+
+    plt.plot(epochs_range, acc, label='Training Accuracy')
+
+    plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+
+    plt.title('Training and Validation Accuracy')
+
     plt.legend()
 
+
+
     plt.subplot(1, 2, 2)
-    plt.plot(rangos_epocas, loss, label='Pérdida de Entrenamiento')
-    plt.plot(rangos_epocas, val_loss, label='Pérdida de Validación')
-    plt.title('Pérdida de Entrenamiento y Validación')
+
+    plt.plot(epochs_range, loss, label='Training Loss')
+
+    plt.plot(epochs_range, val_loss, label='Validation Loss')
+
+    plt.title('Training and Validation Loss')
+
     plt.legend()
+
+
 
     plt.show()
 
-def principal():
-    dir_datos = 'ruta/a/dataset_de_imagenes'
-    num_clases = 10  # Actualizar según tu dataset
 
-    generador_entrenamiento, generador_validacion = cargar_y_procesar_datos(dir_datos)
 
-    modelo = crear_modelo(num_clases)
-    historial = entrenar_modelo(modelo, generador_entrenamiento, generador_validacion)
+def main():
 
-    graficar_historial_entrenamiento(historial)
+    # Example usage
 
-    modelo.save('clasificador_de_imagenes.h5')
+    data_dir = 'camino/to/image/dataset'
+
+    num_classes = 10  # Update based on your dataset
+
+    
+
+    # Load and preprocess data
+
+    train_generator, validation_generator = load_and_preprocess_data(data_dir)
+
+    
+
+    # Create and train model
+
+    model = create_model(num_classes)
+
+    history = train_model(model, train_generator, validation_generator)
+
+    
+
+    # Plot results
+
+    plot_training_history(history)
+
+    
+
+    # Save model
+
+    model.save('image_classifier.h5')
+
+
 
 if __name__ == "__main__":
-    principal()
+
+    main()

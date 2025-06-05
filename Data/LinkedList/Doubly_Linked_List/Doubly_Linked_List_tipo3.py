@@ -6,64 +6,69 @@ logging.basicConfig(level=logging.DEBUG)
 
 @dataclass
 class Nodo:
-    dato: Any
-    siguiente: Optional['Nodo'] = None
-    anterior: Optional['Nodo'] = None
+    data: Any
+    next: Optional['Nodo'] = None
+    prev: Optional['Nodo'] = None
 
-def insertar_final(cabeza: Optional[Nodo], dato: Any) -> Nodo:
-    """Inserta un nodo al final de la lista doblemente enlazada."""
-    nuevo_nodo = Nodo(dato)
-    if cabeza is None:
-        logging.info(f"Insertado {dato} como el primer nodo.")
-        return nuevo_nodo
 
-    ultimo_nodo = cabeza
-    while ultimo_nodo.siguiente:
-        ultimo_nodo = ultimo_nodo.siguiente
-    ultimo_nodo.siguiente = nuevo_nodo
-    nuevo_nodo.anterior = ultimo_nodo
-    logging.info(f"Insertado {dato} al final de la lista.")
-    return cabeza
+    last_node = head
+    while last_node.next:
+        last_node = last_node.next
+    last_node.next = new_node
+    new_node.prev = last_node
+    logging.info(f"Inserted {data} at the fin of the list.")
+    return head
 
-def eliminar_nodo(cabeza: Optional[Nodo], clave: Any) -> Optional[Nodo]:
-    """Elimina un nodo con un valor específico de la lista doblemente enlazada."""
-    if cabeza is None:
-        logging.warning("Intento de eliminar de una lista vacía.")
+
+    current_node = head
+
+    # Case: The head nodo has the key to be deleted
+    if current_node.data == key:
+        head = current_node.next
+        if head:
+            head.prev = None
+        logging.info(f"Deleted head nodo with key {key}.")
+        return head
+
+    # Case: Search for the key in the rest of the list
+    while current_node is not None and current_node.data != key:
+        current_node = current_node.next
+
+    # Key not found
+    if current_node is None:
+        logging.warning(f"Key {key} not found in the list.")
+        return head
+
+    # Adjust pointers to remove current_node
+    if current_node.next:
+        current_node.next.prev = current_node.prev
+    if current_node.prev:
+        current_node.prev.next = current_node.next
+    logging.info(f"Deleted nodo with key {key}.")
+    return head
+
+    return result
+
+def display(head: Optional[Nodo]) -> List[Any]:
+    """Display the doubly linked list as a list of nodo data."""
+    result = []
+    current_node = head
+    while current_node:
+        result.append(current_node.data)
+        current_node = current_node.next
+    logging.info(f"List contents: {result}")
+
+
+def delete_node(head: Optional[Nodo], key: Any) -> Optional[Nodo]:
+    """Delete a nodo with a specific value from the doubly linked list."""
+    if head is None:
+        logging.warning("Attempted to delete from an empty list.")
         return None
 
-    nodo_actual = cabeza
 
-    # Caso: El nodo de la cabeza tiene la clave que se va a eliminar
-    if nodo_actual.dato == clave:
-        cabeza = nodo_actual.siguiente
-        if cabeza:
-            cabeza.anterior = None
-        logging.info(f"Nodo de la cabeza con clave {clave} eliminado.")
-        return cabeza
-
-    # Caso: Buscar la clave en el resto de la lista
-    while nodo_actual is not None and nodo_actual.dato != clave:
-        nodo_actual = nodo_actual.siguiente
-
-    # Clave no encontrada
-    if nodo_actual is None:
-        logging.warning(f"Clave {clave} no encontrada en la lista.")
-        return cabeza
-
-    # Ajustar punteros para quitar nodo_actual
-    if nodo_actual.siguiente:
-        nodo_actual.siguiente.anterior = nodo_actual.anterior
-    if nodo_actual.anterior:
-        nodo_actual.anterior.siguiente = nodo_actual.siguiente
-    logging.info(f"Nodo con clave {clave} eliminado.")
-    return cabeza
-
-def mostrar(cabeza: Optional[Nodo]) -> List[Any]:
-    """Muestra la lista doblemente enlazada como una lista de datos de nodo."""
-    resultado = []
-    nodo_actual = cabeza
-    while nodo_actual:
-        resultado.append(nodo_actual.dato)
-        nodo_actual = nodo_actual.siguiente
-    logging.info(f"Contenido de la lista: {resultado}")
-    return resultado
+def insert_end(head: Optional[Nodo], data: Any) -> Nodo:
+    """Insert a nodo at the fin of the doubly linked list."""
+    new_node = Nodo(data)
+    if head is None:
+        logging.info(f"Inserted {data} as the first nodo.")
+        return new_node

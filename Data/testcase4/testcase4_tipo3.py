@@ -1,12 +1,16 @@
-class NodoArbol:
-    def __init__(self, valor=0, izquierdo=None, derecho=None):
-        self.valor = valor
-        self.izquierdo = izquierdo
-        self.derecho = derecho
+class TreeNode:
+    
 
-def es_arbol_busqueda(nodo, valor_min=float('-inf'), valor_max=float('inf')):
-    if not nodo:
+
+def is_bst(root, min_val=float('-inf'), max_val=float('inf')):
+    if not root:
         return True
-    if not (valor_min < nodo.valor < valor_max):
+    if not (min_val < root.value < max_val):
         return False
-    return es_arbol_busqueda(nodo.izquierdo, valor_min, nodo.valor) and es_arbol_busqueda(nodo.derecho, nodo.valor, valor_max)
+    return is_bst(root.left, min_val, root.value) and is_bst(root.right, root.value, max_val)
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

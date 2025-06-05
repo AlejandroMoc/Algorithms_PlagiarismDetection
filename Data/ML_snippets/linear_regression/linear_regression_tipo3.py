@@ -1,63 +1,68 @@
 import numpy as np
 
-class ModeloRegresionLineal:
+class LinearRegressionModel:
     """
-    Un modelo de regresión lineal simple utilizando la ecuación normal.
+    A simple linear regression model using the normal equation.
     """
 
-    def __init__(self):
-        self.coeficientes = None
-        self.intercepto = None
-
-    def ajustar(self, X: np.ndarray, y: np.ndarray):
-        """
-        Ajusta el modelo de regresión lineal a los datos de entrenamiento.
-
-        Parámetros:
+    
+    
+        Parameters:
         -----------
         X : np.ndarray
-            Datos de entrenamiento, forma (n_muestras, n_características).
+            Training data, shape (n_samples, n_features).
         y : np.ndarray
-            Valores objetivo, forma (n_muestras,).
+            Target values, shape (n_samples,).
         """
-        # Agrega una columna de unos a X para el término de intercepción
+        # Add a column of ones to X for the intercept term
         X_b = np.c_[np.ones((X.shape[0], 1)), X]
         
-        # Calcula los parámetros óptimos utilizando la pseudoinversa para estabilidad
-        theta_mejor = np.linalg.pinv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
+        # Compute the optimal parameters using the pseudo-inverse for stability
+        theta_best = np.linalg.pinv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
         
-        # Establece el intercepto y los coeficientes
-        self.intercepto = theta_mejor[0]
-        self.coeficientes = theta_mejor[1:]
+        # Set the intercept and coefficients
+        self.intercept = theta_best[0]
+        self.coefficients = theta_best[1:]
 
-    def predecir(self, X: np.ndarray) -> np.ndarray:
-        """
-        Predice los valores objetivo para los datos de prueba dados.
-
-        Parámetros:
+    
+        Parameters:
         -----------
         X : np.ndarray
-            Datos de prueba, forma (n_muestras, n_características).
+            Test data, shape (n_samples, n_features).
         
-        Devoluciones:
+        Returns:
         --------
         np.ndarray
-            Valores objetivo predichos, forma (n_muestras,).
+            Predicted target values, shape (n_samples,).
         """
-        return self.intercepto + X.dot(self.coeficientes)
+        return self.intercept + X.dot(self.coefficients)
 
 
-# Uso de ejemplo
+# Example usage
 if __name__ == "__main__":
-    # Conjunto de datos de ejemplo
-    X_entrenamiento = np.array([[1], [2], [3], [4], [5]])
-    y_entrenamiento = np.array([1.5, 1.8, 3.2, 3.9, 5.1])
+    # Toy dataset
+    X_train = np.array([[1], [2], [3], [4], [5]])
+    y_train = np.array([1.5, 1.8, 3.2, 3.9, 5.1])
 
-    # Inicializa y ajusta el modelo
-    modelo = ModeloRegresionLineal()
-    modelo.ajustar(X_entrenamiento, y_entrenamiento)
+    # Initialize and fit the model
+    model = LinearRegressionModel()
+    model.fit(X_train, y_train)
 
-    # Predicciones
-    X_prueba = np.array([[1.5], [3.5], [6]])
-    predicciones = modelo.predecir(X_prueba)
-    print("Predicciones:", predicciones)
+    # Predictions
+    X_test = np.array([[1.5], [3.5], [6]])
+    predictions = model.predict(X_test)
+    print("Predictions:", predictions)
+
+def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict target values for the given test data.
+
+
+def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Fit the linear regression model to the training data.
+
+
+def __init__(self):
+        self.coefficients = None
+        self.intercept = None

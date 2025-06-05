@@ -1,18 +1,23 @@
 import unittest
-from image_processing import resize_image, apply_filter, rotate_image
+from image_processing import resize, filter_image, rotate
 
 class TestImageProcessing(unittest.TestCase):
-    def test_resize_image(self):
-        resize_image('input_image.jpg', 'output_image_resized.jpg', (100, 100))
-        # Add assertions to check if the output image is as expected
-
-    def test_apply_filter(self):
-        apply_filter('input_image.jpg', 'output_image_filtered.jpg', 'BLUR')
-        # Add assertions to check if the output image is as expected
-
-    def test_rotate_image(self):
-        rotate_image('input_image.jpg', 'output_image_rotated.jpg', 90)
-        # Add assertions to check if the output image is as expected
-
+    
+    
+    
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main() 
+
+def test_rotate(self):
+        rotate('input_image.jpg', 'output_image_rotated.jpg', 90)
+        # Add assertions to check if the output image is as expected
+
+
+def test_filter_image(self):
+        filter_image('input_image.jpg', 'output_image_filtered.jpg', 'BLUR')
+        # Add assertions to check if the output image is as expected
+
+
+def test_resize(self):
+        resize('input_image.jpg', 'output_image_resized.jpg', (100, 100))
+        # Add assertions to check if the output image is as expected

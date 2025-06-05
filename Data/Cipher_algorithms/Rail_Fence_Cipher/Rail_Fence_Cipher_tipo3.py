@@ -1,98 +1,104 @@
 # Constants for placeholder characters
-EMPTY = '\n'  # Used in encryption matrix
-MARKER = '*'  # Used in decryption matrix
+EMPTY_CHAR = '\n'  # Used in encryption matrix
+MARKER_CHAR = '*'  # Used in decryption matrix
 
-def change_direction(r, k, is_down):
-    """
-    Helper function to change direction in the rail matrix.
     
     Parameters:
-    - r (int): Current row index.
-    - k (int): Total number of rails (key).
-    - is_down (bool): Current direction.
+    - row (int): Current row index.
+    - key (int): Total number of rails (key).
+    - dir_down (bool): Current direction.
     
     Returns:
     - tuple: Updated row and direction.
     """
-    if r == 0:
-        is_down = True
-    elif r == k - 1:
-        is_down = False
-    return r + (1 if is_down else -1), is_down
+    if row == 0:
+        dir_down = True
+    elif row == key - 1:
+        dir_down = False
+    return row + (1 if dir_down else -1), dir_down
 
-def encrypt_rail_fence(message, key):
-    """
-    Encrypts the given text using the Rail Fence Cipher method.
     
     Parameters:
-    - message (str): The text to encrypt.
+    - text (str): The text to encrypt.
     - key (int): The number of rails to use in the cipher.
 
     Returns:
     - str: The encrypted text.
     """
-    if not isinstance(message, str) or not isinstance(key, int):
-        raise ValueError("Invalid input types. 'message' must be a string and 'key' must be an integer.")
+    if not isinstance(text, str) or not isinstance(key, int):
+        raise ValueError("Invalid input types. 'text' must be a string and 'key' must be an integer.")
     if key <= 0:
         raise ValueError("Key must be a positive integer.")
     
     # Initialize the rail matrix
-    rail = [[EMPTY for _ in range(len(message))] for _ in range(key)]
-    is_down = False
-    r, c = 0, 0
+    rail = [[EMPTY_CHAR for _ in range(len(text))] for _ in range(key)]
+    dir_down = False
+    row, col = 0, 0
 
     # Fill the rail matrix with characters in zig-zag fashion
-    for char in message:
-        rail[r][c] = char
-        c += 1
-        r, is_down = change_direction(r, key, is_down)
+    for char in text:
+        rail[row][col] = char
+        col += 1
+        row, dir_down = toggle_direction(row, key, dir_down)
 
     # Collect the encrypted text
-    result = [rail[i][j] for i in range(key) for j in range(len(message)) if rail[i][j] != EMPTY]
+    result = [rail[i][j] for i in range(key) for j in range(len(text)) if rail[i][j] != EMPTY_CHAR]
     return "".join(result)
 
-def decrypt_rail_fence(encoded, key):
-    """
-    Decrypts the given cipher text using the Rail Fence Cipher method.
+
     
     Parameters:
-    - encoded (str): The encrypted text to decrypt.
+    - cipher (str): The encrypted text to decrypt.
     - key (int): The number of rails to use in the cipher.
 
     Returns:
     - str: The decrypted text.
     """
-    if not isinstance(encoded, str) or not isinstance(key, int):
-        raise ValueError("Invalid input types. 'encoded' must be a string and 'key' must be an integer.")
+    if not isinstance(cipher, str) or not isinstance(key, int):
+        raise ValueError("Invalid input types. 'cipher' must be a string and 'key' must be an integer.")
     if key <= 0:
         raise ValueError("Key must be a positive integer.")
     
     # Initialize the rail matrix
-    rail = [[EMPTY for _ in range(len(encoded))] for _ in range(key)]
-    is_down = None
-    r, c = 0, 0
+    rail = [[EMPTY_CHAR for _ in range(len(cipher))] for _ in range(key)]
+    dir_down = None
+    row, col = 0, 0
 
-    # Mark the pattern path in the rail matrix
-    for _ in range(len(encoded)):
-        rail[r][c] = MARKER
-        c += 1
-        r, is_down = change_direction(r, key, is_down)
+    # Mark the pattern camino in the rail matrix
+    for _ in range(len(cipher)):
+        rail[row][col] = MARKER_CHAR
+        col += 1
+        row, dir_down = toggle_direction(row, key, dir_down)
 
     # Place characters in the marked positions
-    idx = 0
+    index = 0
     for i in range(key):
-        for j in range(len(encoded)):
-            if rail[i][j] == MARKER and idx < len(encoded):
-                rail[i][j] = encoded[idx]
-                idx += 1
+        for j in range(len(cipher)):
+            if rail[i][j] == MARKER_CHAR and index < len(cipher):
+                rail[i][j] = cipher[index]
+                index += 1
 
     # Read the matrix in zig-zag fashion to decrypt
     result = []
-    r, c = 0, 0
-    for _ in range(len(encoded)):
-        if rail[r][c] != MARKER:
-            result.append(rail[r][c])
-            c += 1
-        r, is_down = change_direction(r, key, is_down)
+    row, col = 0, 0
+    for _ in range(len(cipher)):
+        if rail[row][col] != MARKER_CHAR:
+            result.append(rail[row][col])
+            col += 1
+        row, dir_down = toggle_direction(row, key, dir_down)
 
     return "".join(result)
+
+def rail_fence_cipher_decrypt(cipher, key):
+    """
+    Decrypts the given cipher text using the Rail Fence Cipher method.
+
+
+def rail_fence_cipher_encrypt(text, key):
+    """
+    Encrypts the given text using the Rail Fence Cipher method.
+
+
+def toggle_direction(row, key, dir_down):
+    """
+    Helper function to toggle direction in the rail matrix.

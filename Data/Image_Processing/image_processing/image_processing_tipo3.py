@@ -1,28 +1,33 @@
 from PIL import Image, ImageFilter
 
-def cambiar_tamaño(ruta_imagen, ruta_salida, tamaño):
-    """
-    Cambia el tamaño de la imagen al tamaño especificado.
-    """
-    with Image.open(ruta_imagen) as img:
-        img = img.resize(tamaño, Image.ANTIALIAS)  # Utiliza ANTIALIAS para mejor calidad
-        img.save(ruta_salida)
 
-def aplicar_filtro(ruta_imagen, ruta_salida, tipo_filtro):
+
+        img.save(output_path) 
+
+def rotate(image_path, output_path, angle):
     """
-    Aplica un filtro a la imagen y la guarda.
+    Rotates the image by the specified angle.
     """
-    with Image.open(ruta_imagen) as img:
-        if tipo_filtro == 'DESENFOQUE':
+    with Image.open(image_path) as img:
+        img = img.rotate(angle, expand=True)  # Expand to fit the new size
+
+
+def filter_image(image_path, output_path, filter_type):
+    """
+    Applies a filter to the image and saves it.
+    """
+    with Image.open(image_path) as img:
+        if filter_type == 'BLUR':
             img = img.filter(ImageFilter.BLUR)
-        elif tipo_filtro == 'CONTORNO':
+        elif filter_type == 'CONTOUR':
             img = img.filter(ImageFilter.CONTOUR)
-        img.save(ruta_salida)
+        img.save(output_path)
 
-def rotar_imagen(ruta_imagen, ruta_salida, ángulo):
+
+def resize(image_path, output_path, size):
     """
-    Rota la imagen por el ángulo especificado.
+    Resizes the image to the specified size.
     """
-    with Image.open(ruta_imagen) as img:
-        img = img.rotate(ángulo, expand=True)  # Expandir para ajustar al nuevo tamaño
-        img.save(ruta_salida)
+    with Image.open(image_path) as img:
+        img = img.resize(size, Image.ANTIALIAS)  # Use ANTIALIAS for better quality
+        img.save(output_path)

@@ -1,7 +1,9 @@
 # gui_logic.py
-def procesar_entrada(entrada_usuario):
-    """Maneja la entrada del usuario y devuelve mensajes apropiados."""
-    if entrada_usuario:
-        return f"¡Ingresaste: {entrada_usuario}!"
+
+
+def handle_input(user_input):
+    """Handles user input and returns appropriate messages."""
+    if user_input:
+        return f"You entered: {user_input}"
     else:
-        return "¡Por favor ingresa algún texto!"
+        return "Please enter some text!"

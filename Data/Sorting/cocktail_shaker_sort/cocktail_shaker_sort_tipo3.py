@@ -10,50 +10,6 @@ class SortItem:
     key: Any
     value: Any
 
-def cocktail_shaker_sort_modified(input_list: List[Any]) -> List[Any]:
-    try:
-        if not isinstance(input_list, list):
-            logging.error("Input must be a list.")
-            raise TypeError("input_list must be a list.")
-        
-        n = len(input_list)
-        logging.debug(f"Starting Cocktail Shaker Sort with n={n}")
-        
-        start_index = 0
-        end_index = n - 1
-        is_swapped = True
-        
-        while is_swapped:
-            is_swapped = False
-            
-            # Forward pass
-            for i in range(start_index, end_index):
-                if input_list[i] > input_list[i + 1]:
-                    logging.debug(f"Swapping indices {i} and {i + 1}: {input_list[i]} <-> {input_list[i + 1]}")
-                    input_list[i], input_list[i + 1] = input_list[i + 1], input_list[i]
-                    is_swapped = True
-            
-            if not is_swapped:
-                logging.debug("No swaps made in the forward pass, list might be sorted already.")
-                break
-            
-            end_index -= 1
-            is_swapped = False
-            
-            # Backward pass
-            for i in range(end_index, start_index, -1):
-                if input_list[i] < input_list[i - 1]:
-                    logging.debug(f"Swapping indices {i - 1} and {i}: {input_list[i - 1]} <-> {input_list[i]}")
-                    input_list[i], input_list[i - 1] = input_list[i - 1], input_list[i]
-                    is_swapped = True
-            
-            if not is_swapped:
-                logging.debug("No swaps made in the backward pass, list might be sorted already.")
-            
-            start_index += 1
-        
-        logging.info("Cocktail Shaker Sort completed.")
-        return input_list
     
     except Exception as e:
         logging.error(f"An error occurred during Cocktail Shaker Sort: {e}")
@@ -61,6 +17,52 @@ def cocktail_shaker_sort_modified(input_list: List[Any]) -> List[Any]:
 
 # Example usage:
 if __name__ == "__main__":
-    sample_input = [5, 3, 8, 4, 2]
-    sorted_output = cocktail_shaker_sort_modified(sample_input)
-    print("Sorted List:", sorted_output)
+    sample_list = [5, 3, 8, 4, 2]
+    sorted_list = cocktail_shaker_sort(sample_list)
+    print("Sorted List:", sorted_list)
+
+
+def cocktail_shaker_sort(arr: List[Any]) -> List[Any]:
+    try:
+        if not isinstance(arr, list):
+            logging.error("Input must be a list.")
+            raise TypeError("arr must be a list.")
+        
+        n = len(arr)
+        logging.debug(f"Starting Cocktail Shaker Sort with n={n}")
+        
+        inicio = 0
+        fin = n - 1
+        swapped = True
+        
+        while swapped:
+            swapped = False
+            
+            # Forward pass
+            for i in range(inicio, fin):
+                if arr[i] > arr[i + 1]:
+                    logging.debug(f"Swapping indices {i} and {i + 1}: {arr[i]} <-> {arr[i + 1]}")
+                    arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                    swapped = True
+            
+            if not swapped:
+                logging.debug("No swaps made in the forward pass, list might be sorted already.")
+                break
+            
+            fin -= 1
+            swapped = False
+            
+            # Backward pass
+            for i in range(fin, inicio, -1):
+                if arr[i] < arr[i - 1]:
+                    logging.debug(f"Swapping indices {i - 1} and {i}: {arr[i - 1]} <-> {arr[i]}")
+                    arr[i], arr[i - 1] = arr[i - 1], arr[i]
+                    swapped = True
+            
+            if not swapped:
+                logging.debug("No swaps made in the backward pass, list might be sorted already.")
+            
+            inicio += 1
+        
+        logging.info("Cocktail Shaker Sort completed.")
+        return arr

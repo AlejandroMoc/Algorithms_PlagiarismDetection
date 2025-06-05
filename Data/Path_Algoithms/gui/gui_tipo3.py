@@ -2,28 +2,29 @@ import tkinter as tk
 from dijkstra import dijkstra
 from utils import create_graph
 
-def ejecutar_demo():
-    vertices = ['A', 'B', 'C', 'D']
-    aristas = {
+
+    root = tk.Tk()
+    root.title("Dijkstra Demo")
+    tk.Label(root, text=message).pack(pady=20)
+    tk.Button(root, text="Exit", command=root.destroy).pack(pady=10)
+    root.mainloop()
+
+if __name__ == "__main__":
+    run_demo() 
+
+def run_demo():
+    puntos = ['A', 'B', 'C', 'D']
+    conexiones = {
         'A': {'B': 1, 'C': 4},
         'B': {'C': 2, 'D': 5},
         'C': {'D': 1},
         'D': {}
     }
-    grafo = create_graph(vertices, aristas)
+    mapa = create_graph(puntos, conexiones)
     try:
-        ruta, distancia = dijkstra(grafo, 'A', 'D')
-        mensaje = f"Ruta: {' -> '.join(ruta)}\nDistancia total: {distancia}"
+        camino, distancia = dijkstra(mapa, 'A', 'D')
+        message = f"Path: {' -> '.join(camino)}\nTotal distancia: {distancia}"
     except ValueError as ve:
-        mensaje = str(ve)
+        message = str(ve)
     except Exception:
-        mensaje = "Se produjo un error inesperado."
-
-    raiz = tk.Tk()
-    raiz.title("Demo de Dijkstra")
-    tk.Label(raiz, text=mensaje).pack(pady=20)
-    tk.Button(raiz, text="Salir", command=raiz.destroy).pack(pady=10)
-    raiz.mainloop()
-
-if __name__ == "__main__":
-    ejecutar_demo()
+        message = "An unexpected error occurred."

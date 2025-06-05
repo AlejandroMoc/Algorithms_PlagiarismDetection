@@ -4,41 +4,52 @@ from typing import List
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def salto_busqueda(lista: List[int], objetivo: int) -> int:
-    logging.info("Comenzando búsqueda por salto")
-    if not lista:
-        logging.error("Se proporcionó una lista vacía para la búsqueda.")
+    
+    Args:
+        arr (List[int]): Sorted list of elements to search through.
+        target (int): The element to search for.
+    
+    Returns:
+        int: The index of the target if found, else -1.
+    """
+    logging.info("Starting jump search")
+    if not arr:
+        logging.error("Empty array provided for search.")
         return -1
     
-    n = len(lista)
-    salto = int(math.sqrt(n))  # El tamaño del salto es la raíz cuadrada de la longitud de la lista
-    previo = 0
+    n = len(arr)
+    step = int(math.sqrt(n))  # Step size is the square root of the array length
+    prev = 0
 
-    # Saltar al bloque correcto
-    while previo < n and lista[min(salto, n) - 1] < objetivo:
-        logging.debug(f"Saltando desde el índice {previo} al índice {salto}")
-        previo = salto
-        salto += int(math.sqrt(n))
-        if previo >= n:
-            logging.warning(f"El elemento {objetivo} no está presente en la lista")
+    # Jump to the right block
+    while prev < n and arr[min(step, n) - 1] < target:
+        logging.debug(f"Jumping from index {prev} to index {step}")
+        prev = step
+        step += int(math.sqrt(n))
+        if prev >= n:
+            logging.warning(f"Element {target} is not present in array")
             return -1
     
-    # Realizar una búsqueda lineal dentro del bloque encontrado
-    for i in range(previo, min(salto, n)):
-        logging.debug(f"Revisando índice {i}, valor={lista[i]}")
-        if lista[i] == objetivo:
-            logging.info(f"Objetivo {objetivo} encontrado en el índice {i}")
+    # Perform a linear search within the found block
+    for i in range(prev, min(step, n)):
+        logging.debug(f"Checking index {i}, value={arr[i]}")
+        if arr[i] == target:
+            logging.info(f"Target {target} found at index {i}")
             return i
 
-    logging.warning(f"El elemento {objetivo} no está presente en la lista")
+    logging.warning(f"Element {target} is not present in array")
     return -1
 
-# Código de ejecución
+# Driver Code
 if __name__ == "__main__":
-    lista = [2, 3, 4, 10, 40]
-    objetivo = 10
-    resultado = salto_busqueda(lista, objetivo)
-    if resultado == -1:
-        logging.info("El elemento no está presente en la lista")
+    arr = [2, 3, 4, 10, 40]
+    target = 10
+    result = jump_search(arr, target)
+    if result == -1:
+        logging.info("Element is not present in array")
     else:
-        logging.info(f"El elemento está presente en el índice {resultado}")
+        logging.info(f"Element is present at index {result}")
+
+def jump_search(arr: List[int], target: int) -> int:
+    """
+    Jump search algorithm.

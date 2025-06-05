@@ -2,43 +2,26 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 
-from utilities import monitor_execution_time
-from ingest import load_data_to_database
-from clean import filter_imported_df, retrieve_target_df
-from clean import remove_zero_variance_missing
-from clean import generate_dummies_df
-from clean import adjust_categorical_values
-from backup import create_backup
+from utils import time_my_func
+from obtain import load_file_to_db # type: ignore
+from scrub import import_filter_df, get_target_df # type: ignore
+from scrub import remove_zv_missings # type: ignore
+from scrub import create_dummified_df # type: ignore
+from scrub import clip_categorical # type: ignore
+from backup import backup_df # type: ignore
 
 path_raw = "data/raw/gravity_contact_20180406.csv"
 path_clean = "data/raw/clean_contact.csv"
 path_clean_db = "data/interim/clean.db"
 
-# --- Define Auxiliary Objects ---
+# --- Declare Helper Objects ---
 
 dict_replace_1 = {}
-def replace_whitespaces(i):
-    return "_".join([x.lower().strip() for x in i.split()])
 
-def obtain_x_from_y():
-    """
-    """
-    pass
 
-# --- Define Data Processing Functions ---
+# --- Declare Data Processing Functions ---
 
-@monitor_execution_time
-def process_features(df):
-    """
-    """
-    print("Cleaning Cell Description")
-    num_items_cellDescr = df['CELL_DESCRIPTION'].map(lambda i: len(str(i).split("|")))
-    indexes_to_drop = \
-    (num_items_cellDescr
-     .where(lambda i: i != 9)
-     .dropna()
-     .index
-     .tolist())
+@time_my_func
 
     df.drop(indexes_to_drop, inplace=True)
 
@@ -101,7 +84,7 @@ def process_features(df):
      .fillna('_missing_')
      .map(lambda i: str(i).zfill(2))
      .replace(dict_replace_CampaignType)
-     .pipe(adjust_categorical_values, COVERAGE=0.99)
+     .pipe(clip_categorical, COVERAGE=0.99)
      .values
     )
 
@@ -126,18 +109,18 @@ def process_features(df):
     df.loc[:, 'CAMPAIGN_CONTENT'] = \
     (df_cellDescr['CAMPAIGN_CONTENT_1_CDS']
      .map(lambda i: i.strip().lower())
-     .pipe(adjust_categorical_values, COVERAGE=0.88)
+     .pipe(clip_categorical, COVERAGE=0.88)
      .replace(dict_replace_campaign_content)
      .values
     )
 
     del df_cellDescr
 
-    print("Cleaning Channel")
+    print("Scrubbing Channel")
     df.loc[:, 'CHANNEL'] = \
     (df['CHANNEL']
-     .map(replace_whitespaces)
-     .pipe(adjust_categorical_values)
+     .map(replace_spaces)
+     .pipe(clip_categorical)
      .values
     )
 
@@ -145,14 +128,6 @@ def process_features(df):
     df.drop(['CONTACT_HISTORY_ID'], axis=1, inplace=True)
     return df
 
-def merge_df(df, df_y, cols_flags):
-    """
-    """
-    ckey = df.CONSUMER_KEY.sample(1).iloc[0]
-    try:
-        _, conversion_measure, date_survey = df_y.query("CONSUMER_KEY == {}".format(ckey)).values[0]
-        dfrp = df.query("CONSUMER_KEY == {}".format(ckey))
-        dfrp = dfrp[dfrp.SELECTION_DATE <= date_survey]
 
         s1 = dfrp[cols_flags].mean()
 
@@ -178,38 +153,72 @@ def merge_df(df, df_y, cols_flags):
         })
         return pd.concat([s1, s2])
     except:
-        errors_merge_df.append(ckey)
+        errors_aggregate_df.append(ckey)
         pass
 
-@monitor_execution_time
-def generate_merged_df(df, mergefunc):
-    """
-    """
-    df_y = retrieve_target_df()
-    cols_flags = [x for x in df.columns if x.startswith('flag_')]
+@time_my_func
 
-    df_merged = \
+    df_aggregated = \
     (df
      .groupby("CONSUMER_KEY")
-     .apply(mergefunc, df_y=df_y, cols_flags=cols_flags)
+     .apply(aggfunc, df_y=df_y, cols_flags=cols_flags)
     )
 
-    return df_merged
+    return df_aggregated
 
 
 if __name__ == '__main__':
-    errors_merge_df = []
-    df_merged = (filter_imported_df(path_raw)
-                 .pipe(remove_zero_variance_missing)
-                 .pipe(process_features)
-                 .pipe(generate_dummies_df)
-                 .pipe(generate_merged_df, mergefunc=merge_df)
-                )
+    errors_aggregate_df = []
+    df_aggregated = (import_filter_df(path_raw)
+                     .pipe(remove_zv_missings)
+                     .pipe(engineer_features)
+                     .pipe(create_dummified_df)
+                     .pipe(get_aggregated_df, aggfunc=aggregate_df)
+                    )
 
-    create_backup(df=df_merged, path_clean=path_clean)
+    backup_df(df=df_aggregated, path_clean=path_clean)
 
     tbl_ = path_clean.split('/')[-1].replace('clean_', '').replace('.csv', '').strip()
-    load_data_to_database(path_to_file=path_clean,
+    load_file_to_db(path_to_file=path_clean,
             path_to_db=path_clean_db,
             table_name=tbl_,
             delim=',')
+
+def get_aggregated_df(df, aggfunc):
+    """
+    """
+    df_y = get_target_df()
+    cols_flags = [x for x in df.columns if x.startswith('flag_')]
+
+
+def aggregate_df(df, df_y, cols_flags):
+    """
+    """
+    ckey = df.CONSUMER_KEY.sample(1).iloc[0]
+    try:
+        _, conversion_measure, date_survey = df_y.query("CONSUMER_KEY == {}".format(ckey)).values[0]
+        dfrp = df.query("CONSUMER_KEY == {}".format(ckey))
+        dfrp = dfrp[dfrp.SELECTION_DATE <= date_survey]
+
+
+def engineer_features(df):
+    """
+    """
+    print("Scrubbing Cell Description")
+    num_items_cellDescr = df['CELL_DESCRIPTION'].map(lambda i: len(str(i).split("|")))
+    indexes_to_drop = \
+    (num_items_cellDescr
+     .where(lambda i: i != 9)
+     .dropna()
+     .index
+     .tolist())
+
+
+def get_x_from_y():
+    """
+    """
+    pass
+
+
+def replace_spaces(i):
+    return "_".join([x.lower().strip() for x in i.split()])

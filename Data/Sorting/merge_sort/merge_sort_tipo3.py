@@ -12,17 +12,12 @@ class SortItem:
     key: Any
     value: Dict[str, Any]
 
-def sort_dict_list(dict_list: List[Dict[str, Any]], sort_key: str) -> List[Dict[str, Any]]:
-    try:
-        if not isinstance(dict_list, list) or not all(isinstance(d, dict) for d in dict_list):
-            logging.error("Input must be a list of dictionaries.")
-            raise TypeError("dict_list must be a list of dictionaries.")
     
-        if not all(sort_key in d for d in dict_list):
-            logging.error(f"The key '{sort_key}' is not present in all dictionaries.")
-            raise KeyError(f"The key '{sort_key}' is not present in all dictionaries.")
+        if not all(key in item for item in dict_list):
+            logging.error(f"The key '{key}' is not present in all dictionaries.")
+            raise KeyError(f"The key '{key}' is not present in all dictionaries.")
         
-        logging.debug(f"Starting Merge Sort with n={len(dict_list)}, sort_key='{sort_key}'")
+        logging.debug(f"Starting Merge Sort with n={len(dict_list)}, key='{key}'")
     
         if len(dict_list) > 1:
             mid = len(dict_list) // 2
@@ -31,13 +26,13 @@ def sort_dict_list(dict_list: List[Dict[str, Any]], sort_key: str) -> List[Dict[
     
             logging.debug(f"Dividing list into left_half={left_half} and right_half={right_half}")
             
-            sort_dict_list(left_half, sort_key)
-            sort_dict_list(right_half, sort_key)
+            merge_sort(left_half, key)
+            merge_sort(right_half, key)
     
             i = j = k = 0
     
             while i < len(left_half) and j < len(right_half):
-                if left_half[i][sort_key] < right_half[j][sort_key]:
+                if left_half[i][key] < right_half[j][key]:
                     dict_list[k] = left_half[i]
                     i += 1
                 else:
@@ -58,6 +53,16 @@ def sort_dict_list(dict_list: List[Dict[str, Any]], sort_key: str) -> List[Dict[
         logging.info("Merge Sort completed.")
         return dict_list
     
-    except Exception as ex:
-        logging.error(f"An error occurred during Merge Sort: {ex}")
+    except Exception as e:
+        logging.error(f"An error occurred during Merge Sort: {e}")
         raise
+
+
+def merge_sort(dict_list: List[Dict[str, Any]], key: str) -> List[Dict[str, Any]]:
+    """
+    Sorts a list of dictionaries using the Merge Sort algorithm based on a specified key.
+    """
+    try:
+        if not isinstance(dict_list, list) or not all(isinstance(item, dict) for item in dict_list):
+            logging.error("Input must be a list of dictionaries.")
+            raise TypeError("dict_list must be a list of dictionaries.")

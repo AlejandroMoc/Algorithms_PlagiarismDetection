@@ -1,27 +1,21 @@
-python
 from dataclasses import dataclass
 import logging
 
 @dataclass
 class CoinChangeInput:
-    coins_list: list
-    total_amount: int
+    coins: list
+    amount: int
 
-def calculate_coin_change(input_data: CoinChangeInput):
-    coins, amount = input_data.coins_list, input_data.total_amount
-    try:
-        if not coins or amount < 0:
-            return -1
 
         dp = [float('inf')] * (amount + 1)
         dp[0] = 0
         coin_used = [-1] * (amount + 1)
 
-        for coin_value in coins:
-            for current_amount in range(coin_value, amount + 1):
-                if dp[current_amount - coin_value] + 1 < dp[current_amount]:
-                    dp[current_amount] = dp[current_amount - coin_value] + 1
-                    coin_used[current_amount] = coin_value
+        for coin in coins:
+            for x in range(coin, amount + 1):
+                if dp[x - coin] + 1 < dp[x]:
+                    dp[x] = dp[x - coin] + 1
+                    coin_used[x] = coin
 
         if dp[amount] == float('inf'):
             return -1
@@ -35,20 +29,28 @@ def calculate_coin_change(input_data: CoinChangeInput):
 
         return len(result_coins), result_coins
     except Exception as e:
-        logging.error(f"Error in calculate_coin_change function: {e}")
+        logging.error(f"Error in coin_change function: {e}")
         return None
 
 # Test cases
-def test_calculate_coin_change():
+    
+    for input_data, expected in test_cases:
+        result = coin_change(input_data)
+        assert result == expected, f"Expected {expected}, got {result}"
+
+if __name__ == "__main__":
+    test_coin_change()
+
+def test_coin_change():
     test_cases = [
         (CoinChangeInput([1, 2, 5], 11), (3, [5, 5, 1])),
         (CoinChangeInput([2], 3), -1),
         (CoinChangeInput([1], 0), (0, [])),
     ]
-    
-    for input_data, expected_result in test_cases:
-        result = calculate_coin_change(input_data)
-        assert result == expected_result, f"Expected {expected_result}, got {result}"
 
-if __name__ == "__main__":
-    test_calculate_coin_change()
+
+def coin_change(input_data: CoinChangeInput):
+    coins, amount = input_data.coins, input_data.amount
+    try:
+        if not coins or amount < 0:
+            return -1

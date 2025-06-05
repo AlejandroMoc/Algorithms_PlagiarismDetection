@@ -4,22 +4,25 @@ from dataclasses import dataclass
 logging.basicConfig(level=logging.INFO)
 
 @dataclass
-class FibonacciSequence:
-    number: int
+class Fibonacci:
+    n: int
 
-    def calculate(self) -> int:
-        if self.number < 0:
-            raise ValueError("Input must be a non-negative integer")
-        return self._calculate_fibonacci(self.number)
+    
+    
+# Sample usage
+if __name__ == "__main__":
+    fib_instance = Fibonacci(10)
+    print(f"Fibonacci of 10 is {fib_instance.calculate()}")  # Output: 55 
 
-    def _calculate_fibonacci(self, current: int) -> int:
+def _fibonacci_recursive(self, current: int) -> int:
         if current in (0, 1):
             return current
-        result = self._calculate_fibonacci(current - 1) + self._calculate_fibonacci(current - 2)
+        result = self._fibonacci_recursive(current - 1) + self._fibonacci_recursive(current - 2)
         logging.info(f"Fibonacci({current}) = {result}")
         return result
 
-# Sample usage
-if __name__ == "__main__":
-    fibonacci_sequence = FibonacciSequence(10)
-    print(f"Fibonacci of 10 is {fibonacci_sequence.calculate()}")  # Output: 55
+
+def calculate(self) -> int:
+        if self.n < 0:
+            raise ValueError("Input must be a non-negative integer")
+        return self._fibonacci_recursive(self.n)

@@ -43,10 +43,10 @@ def list_files():
 @app.route('/compare-all', methods=['GET'])
 def compare_all():
     archivos = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.py')]
-    rutas = [os.path.join(UPLOAD_FOLDER, f) for f in archivos]
+    #rutas = [os.path.join(UPLOAD_FOLDER, f) for f in archivos]
 
     from plagiarism_detector import compare_all_pairs
-    matriz = compare_all_pairs(rutas)
+    matriz = compare_all_pairs()
 
     # Función recursiva robusta para convertir todo a tipos JSON-safe
     def convert(val):

@@ -2,26 +2,41 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
 
-def encrypt_data(data, key):
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(data) + encryptor.finalize()
-    return iv + ciphertext
+# Function to encrypt data
 
-def decrypt_data(ciphertext, key):
-    iv = ciphertext[:16]
-    actual_ciphertext = ciphertext[16:]
-    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
-    decryptor = cipher.decryptor()
-    return decryptor.update(actual_ciphertext) + decryptor.finalize()
+# Function to decrypt data
 
+# Example usage
 if __name__ == "__main__":
-    key = os.urandom(32)
+    key = os.urandom(32)  # AES-256 key (32 bytes)
     data = b"Symmetric encryption example"
     
-    encrypted_data = encrypt_data(data, key)
+    # Encrypt the data
+    encrypted_data = encrypt(data, key)
     print("Encrypted:", encrypted_data)
     
-    decrypted_data = decrypt_data(encrypted_data, key)
+    # Decrypt the data
+    decrypted_data = decrypt(encrypted_data, key)
     print("Decrypted:", decrypted_data.decode('utf-8'))
+
+
+def decrypt(ciphertext, key):
+    # Extract the IV from the beginning of the ciphertext
+    iv = ciphertext[:16]
+    actual_ciphertext = ciphertext[16:]
+    # Create an AES Cipher object with the key and IV
+    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    # Decrypt the data
+    return decryptor.update(actual_ciphertext) + decryptor.finalize()
+
+
+def encrypt(data, key):
+    # Generate a random initialization vector (IV)
+    iv = os.urandom(16)
+    # Create an AES Cipher object with the key and IV
+    cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    # Encrypt the data
+    ciphertext = encryptor.update(data) + encryptor.finalize()
+    return iv + ciphertext  # Return IV and ciphertext

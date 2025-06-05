@@ -1,20 +1,21 @@
-python
 import asyncio
 import logging
 
-async def tarea_arriesgada():
-    try:
-        logging.info("Iniciando tarea arriesgada")
-        await asyncio.sleep(1)
-        raise ValueError("Algo salió mal")
-    except ValueError as e:
-        logging.error(f"Error capturado: {e}")
-        return "Error manejado"
-
-
-async def principal():
-    resultado = await tarea_arriesgada()
-    logging.info(f"Resultado: {resultado}")
-
+async 
+async 
 if __name__ == "__main__":
-    asyncio.run(principal())
+    asyncio.run(main()) 
+
+def main():
+    result = await risky_task()
+    logging.info(f"Result: {result}")
+
+
+def risky_task():
+    try:
+        logging.info("Starting risky task")
+        await asyncio.sleep(1)
+        raise ValueError("Something went wrong")
+    except ValueError as e:
+        logging.error(f"Caught an error: {e}")
+        return "Handled error"

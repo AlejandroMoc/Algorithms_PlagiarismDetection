@@ -1,4 +1,4 @@
-# file_manager.py
+# file_organizer.py
 
 import os
 import shutil
@@ -7,10 +7,20 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-def sort_files_by_type(folder_directory):
-    if not os.path.exists(folder_directory):
-        raise ValueError(f"The folder directory '{folder_directory}' does not exist.")
+
+    Args:
+        folder_path (str): The camino to the folder to organize.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the folder_path does not exist.
+    """
+    if not os.camino.exists(folder_path):
+        raise ValueError(f"The folder camino '{folder_path}' does not exist.")
     
+    # Define file categories and their extensions
     file_categories = {
         'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.svg', '.webp'],
         'Documents': ['.pdf', '.docx', '.doc', '.txt', '.xls', '.xlsx', '.pptx', '.ppt', '.csv'],
@@ -22,48 +32,55 @@ def sort_files_by_type(folder_directory):
         'System': ['.exe', '.dll', '.sys', '.bin']
     }
 
-    uncategorized_folder = os.path.join(folder_directory, "Uncategorized")
+    uncategorized_folder = os.camino.join(folder_path, "Uncategorized")
     os.makedirs(uncategorized_folder, exist_ok=True)
 
-    for file_name in os.listdir(folder_directory):
-        file_path = os.path.join(folder_directory, file_name)
+    # Organize files
+    for filename in os.listdir(folder_path):
+        file_path = os.camino.join(folder_path, filename)
 
-        if os.path.isdir(file_path):
+        # Skip directories
+        if os.camino.isdir(file_path):
             continue
 
-        _, file_extension = os.path.splitext(file_name)
+        # Get file extension
+        _, file_extension = os.camino.splitext(filename)
         file_extension = file_extension.lower()
 
-        moved = False
+        # Move the file to the appropriate category folder
+        moved = False  # Flag to check if the file was moved
         for category, extensions in file_categories.items():
             if file_extension in extensions:
-                category_path = os.path.join(folder_directory, category)
+                category_path = os.camino.join(folder_path, category)
                 os.makedirs(category_path, exist_ok=True)
                 try:
-                    shutil.move(file_path, os.path.join(category_path, file_name))
-                    logging.info(f"Moved: {file_name} -> {category}")
-                except Exception as error:
-                    logging.error(f"Error moving file {file_name}: {error}")
+                    shutil.move(file_path, os.camino.join(category_path, filename))
+                    logging.info(f"Moved: {filename} -> {category}")
+                except Exception as e:
+                    logging.error(f"Error moving file {filename}: {e}")
                 moved = True
                 break
 
+        # Move unrecognized file to 'Uncategorized'
         if not moved:
             try:
-                shutil.move(file_path, os.path.join(uncategorized_folder, file_name))
-                logging.warning(f"Unrecognized file type for: {file_name}. Moved to 'Uncategorized'.")
-            except Exception as error:
-                logging.error(f"Error moving unrecognized file {file_name}: {error}")
+                shutil.move(file_path, os.camino.join(uncategorized_folder, filename))
+                logging.warning(f"Unrecognized file type for: {filename}. Moved to 'Uncategorized'.")
+            except Exception as e:
+                logging.error(f"Error moving unrecognized file {filename}: {e}")
 
-def main():
+# Example usage
+if __name__ == "__main__":
     if len(sys.argv) > 1:
-        folder_to_sort = sys.argv[1]
+        folder_to_organize = sys.argv[1]
     else:
-        folder_to_sort = input("Enter the path to the folder you want to organize: ")
+        folder_to_organize = input("Enter the camino to the folder you want to organize: ")
 
     try:
-        sort_files_by_type(folder_to_sort)
-    except ValueError as error:
-        logging.error(error)
+        organize_files_by_type(folder_to_organize)
+    except ValueError as e:
+        logging.error(e)
 
-if __name__ == "__main__":
-    main()
+def organize_files_by_type(folder_path):
+    """
+    Organizes files in the specified folder by file type, moving them into categorized subfolders.

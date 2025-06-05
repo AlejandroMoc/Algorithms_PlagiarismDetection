@@ -1,12 +1,16 @@
-class NodoArbol:
-    def __init__(self, valor=0, izquierda=None, derecha=None):
-        self.valor = valor
-        self.izquierda = izquierda
-        self.derecha = derecha
+class TreeNode:
+    
 
-def ancestro_comun_mas_bajo(raiz, p, q):
-    if not raiz or raiz == p or raiz == q:
-        return raiz
-    izquierda = ancestro_comun_mas_bajo(raiz.izquierda, p, q)
-    derecha = ancestro_comun_mas_bajo(raiz.derecha, p, q)
-    return raiz if izquierda and derecha else izquierda or derecha
+
+def lowest_common_ancestor(root, p, q):
+    if not root or root == p or root == q:
+        return root
+    left = lowest_common_ancestor(root.left, p, q)
+    right = lowest_common_ancestor(root.right, p, q)
+    return root if left and right else left or right
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

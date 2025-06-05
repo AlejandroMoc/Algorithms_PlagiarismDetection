@@ -1,29 +1,40 @@
-python
 import logging
 from typing import List
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def search_linear(array: List[int], obj: int) -> int:
-    if not array:
+
+    Args:
+        arr (List[int]): The list of elements to search through.
+        target (int): The element to search for within the list.
+
+    Returns:
+        int: The index of the target element if found; otherwise, -1.
+    """
+    if not arr:  # Check for empty array
         logging.error("The provided list is empty.")
         return -1
 
-    for idx, value in enumerate(array):
-        logging.debug(f"Checking index {idx}, value {value}")
-        if value == obj:
-            logging.info(f"Target {obj} found at index {idx}")
-            return idx
+    for index, element in enumerate(arr):
+        logging.debug(f"Checking index {index}, value {element}")
+        if element == target:
+            logging.info(f"Target {target} found at index {index}")
+            return index
 
-    logging.warning(f"Target {obj} not found in the list.")
+    logging.warning(f"Target {target} not found in the list.")
     return -1
 
+# Driver Code
 if __name__ == "__main__":
-    array = [2, 3, 4, 10, 40]
-    target_obj = 10
+    arr = [2, 3, 4, 10, 40]
+    target = 10
 
-    result = search_linear(array, target_obj)
+    result = linear_search(arr, target)
     if result == -1:
         print("Element is not present in array")
     else:
         print(f"Element is present at index {result}")
+
+def linear_search(arr: List[int], target: int) -> int:
+    """
+    Executes a linear search on a list to find a target element.

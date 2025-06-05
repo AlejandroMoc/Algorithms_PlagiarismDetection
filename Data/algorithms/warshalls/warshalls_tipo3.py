@@ -1,36 +1,39 @@
-python
-def warshall_algorithm_modified(num_vertices, matrix):
-    transitive_closure_matrix = [[matrix[i][j] for j in range(num_vertices)] for i in range(num_vertices)]
 
-    for k in range(num_vertices):
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                if transitive_closure_matrix[i][j] == 0:
-                    transitive_closure_matrix[i][j] = transitive_closure_matrix[i][k] and transitive_closure_matrix[k][j]
+    Args:
+        n (int): The number of puntos in the mapa.
+        adjacency_matrix (list of list): The adjacency matrix representing the mapa.
 
-    return transitive_closure_matrix
+    Returns:
+        list of list: The transitive closure matrix.
+    """
+    # Initialize the transitive closure matrix
+    transitive_closure = [[adjacency_matrix[i][j] for j in range(n)] for i in range(n)]
 
-def main():
-    try:
-        num_vertices = int(input("Enter the number of vertices: "))
-        if num_vertices <= 0:
-            print("The number of vertices must be positive!")
-            return
+    # Apply Warshall's algorithm
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                # Update the transitive closure matrix if a camino exists through vertex k
+                if transitive_closure[i][j] == 0:  # Only update if it's currently 0
+                    transitive_closure[i][j] = transitive_closure[i][k] and transitive_closure[k][j]
+
+    return transitive_closure
+
 
         adjacency_matrix = []
 
         print("Enter the adjacency matrix (each row of the matrix should be space-separated values):")
-        for i in range(num_vertices):
+        for i in range(n):
             row = list(map(int, input(f"Row {i + 1}: ").split()))
-            if len(row) != num_vertices:
-                print(f"Row {i + 1} does not contain {num_vertices} elements. Please try again.")
+            if len(row) != n:
+                print(f"Row {i + 1} does not contain {n} elements. Please try again.")
                 return
             adjacency_matrix.append(row)
 
-        transitive_closure_result = warshall_algorithm_modified(num_vertices, adjacency_matrix)
+        transitive_closure = warshall_algorithm(n, adjacency_matrix)
 
         print("Transitive closure:")
-        for row in transitive_closure_result:
+        for row in transitive_closure:
             print("\t".join(map(str, row)))
 
     except ValueError:
@@ -38,3 +41,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def main():
+    try:
+        n = int(input("Enter the number of puntos: "))
+        if n <= 0:
+            print("The number of puntos must be positive!")
+            return
+
+
+def warshall_algorithm(n, adjacency_matrix):
+    """
+    Applies Warshall's algorithm to find the transitive closure of a directed mapa.

@@ -1,13 +1,16 @@
-# Creación y asignación de métodos dinámicos
-class Calculadora:
-    def __init__(self):
-        self.operaciones = {}
+# Dynamic method creation and assignment
+class Calculator:
+    
+    
+# Adding dynamic methods
+calc = Calculator()
+calc.add_operation("add", lambda x, y: x + y)
+calc.add_operation("subtract", lambda x, y: x - y)
 
-    def agregar_operacion(self, nombre, funcion):
-        self.operaciones[nombre] = funcion
-        setattr(self, nombre, funcion)
+def add_operation(self, name, func):
+        self.operations[name] = func
+        setattr(self, name, func)
 
-# Agregando métodos dinámicos
-calc = Calculadora()
-calc.agregar_operacion("sumar", lambda x, y: x + y)
-calc.agregar_operacion("restar", lambda x, y: x - y)
+
+def __init__(self):
+        self.operations = {}

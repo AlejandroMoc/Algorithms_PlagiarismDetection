@@ -1,4 +1,3 @@
-python
 import tkinter as tk
 from tkinter import ttk
 from gui_logic import handle_input
@@ -6,35 +5,42 @@ from components import create_slider, create_checkbox, create_radiobuttons, crea
 from menus import create_menu
 from dialogs import show_info, show_warning
 
-def process_input():
-    user_text = entry.get()
-    feedback = handle_input(user_text)
-    if user_text:
-        show_info("Your Text", feedback)
-    else:
-        show_warning("Input Error", feedback)
+# Function to handle button click
 
-root_window = tk.Tk()
-root_window.title("Modern Python GUI")
-root_window.geometry("500x300")
-root_window.configure(bg="#f7f7f7")
+# Setup the main GUI window
+root = tk.Tk()
+root.title("Modern Python GUI")
+root.geometry("500x300")
+root.configure(bg="#f7f7f7")
 
-main_frame = tk.Frame(root_window, bg="#ffffff", bd=10, relief=tk.RAISED)
-main_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+frame = tk.Frame(root, bg="#ffffff", bd=10, relief=tk.RAISED)
+frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
 
-slider_widget = create_slider(main_frame)
-checkbox_widget = create_checkbox(main_frame)
-radiobuttons_widget = create_radiobuttons(main_frame)
-textbox_widget = create_textbox(main_frame)
-spinbox_widget = create_spinbox(main_frame)
-listbox_widget = create_listbox(main_frame)
-canvas_widget = create_canvas(main_frame)
+# Adding components
+slider = create_slider(frame)
+checkbox = create_checkbox(frame)
+radiobuttons = create_radiobuttons(frame)
+textbox = create_textbox(frame)
+spinbox = create_spinbox(frame)
+listbox = create_listbox(frame)
+canvas = create_canvas(frame)
 
-menu_bar = create_menu(root_window)
+# Menu
+menu = create_menu(root)
 
-entry = ttk.Entry(main_frame, font=("Arial", 12), width=40)
+# Entry and button
+entry = ttk.Entry(frame, font=("Arial", 12), width=40)
 entry.pack(pady=(0, 20))
-submit_button = ttk.Button(main_frame, text="Submit", command=process_input)
-submit_button.pack(pady=(0, 10))
+button = ttk.Button(frame, text="Submit", command=show_input)
+button.pack(pady=(0, 10))
 
-root_window.mainloop()
+root.mainloop()
+
+
+def show_input():
+    user_input = entry.get()
+    message = handle_input(user_input)
+    if user_input:
+        show_info("Your Input", message)
+    else:
+        show_warning("Input Error", message)

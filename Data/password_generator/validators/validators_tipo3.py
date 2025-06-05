@@ -1,23 +1,26 @@
 import re
 
-class ValidadorContrasena:
-    def __init__(self, longitud_minima=8, longitud_maxima=64, requerir_mayuscula=True, requerir_minuscula=True, requerir_digitos=True, requerir_simbolos=True):
-        self.longitud_minima = longitud_minima
-        self.longitud_maxima = longitud_maxima
-        self.requerir_mayuscula = requerir_mayuscula
-        self.requerir_minuscula = requerir_minuscula
-        self.requerir_digitos = requerir_digitos
-        self.requerir_simbolos = requerir_simbolos
+class PasswordValidator:
+    
+            return True 
 
-    def validar(self, contrasena):
-        if not (self.longitud_minima <= len(contrasena) <= self.longitud_maxima):
+def validate(self, password):
+        if not (self.min_length <= len(password) <= self.max_length):
             return False
-        if self.requerir_mayuscula and not re.search(r'[A-Z]', contrasena):
+        if self.require_upper and not re.search(r'[A-Z]', password):
             return False
-        if self.requerir_minuscula and not re.search(r'[a-z]', contrasena):
+        if self.require_lower and not re.search(r'[a-z]', password):
             return False
-        if self.requerir_digitos and not re.search(r'\d', contrasena):
+        if self.require_digits and not re.search(r'\d', password):
             return False
-        if self.requerir_simbolos and not re.search(r'[!@#$%^&*(),.?":{}|<>]', contrasena):
+        if self.require_symbols and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
             return False
-        return True
+
+
+def __init__(self, min_length=8, max_length=64, require_upper=True, require_lower=True, require_digits=True, require_symbols=True):
+        self.min_length = min_length
+        self.max_length = max_length
+        self.require_upper = require_upper
+        self.require_lower = require_lower
+        self.require_digits = require_digits
+        self.require_symbols = require_symbols

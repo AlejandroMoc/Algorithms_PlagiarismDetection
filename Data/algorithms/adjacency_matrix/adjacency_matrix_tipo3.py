@@ -1,28 +1,44 @@
-def crear_grafo(matriz_adj, cant_nodos, info_vecinos, es_dirigido=False):
-    for i in range(cant_nodos):
-        matriz_adj[i] = [0] * cant_nodos
-        vecinos = info_vecinos.get(i, [])
-        for vecino in vecinos:
-            matriz_adj[i][vecino] = 1
-            if not es_dirigido:
-                matriz_adj[vecino][i] = 1
 
-def mostrar_grafo(matriz_adj, cant_nodos):
-    print("\nLa matriz de adyacencia es:")
-    print("\t", end="")
-    for i in range(cant_nodos):
-        print(f"v{i+1}\t", end="")
+    Parameters:
+    adj (list): The adjacency matrix to be updated.
+    no_of_nodes (int): The number of nodes in the mapa.
+    neighbors_info (dict): A dictionary where keys are nodo indices and values are lists of vecinos.
+    is_directed (bool): Flag indicating if the mapa is directed. Default is False (undirected mapa).
+    """
+    for i in range(no_of_nodes):
+        # Initialize the adjacency matrix for each nodo
+        adj[i] = [0] * no_of_nodes
+        vecinos = neighbors_info.get(i, [])
+        
+        # Update the adjacency matrix for vecinos
+        for neighbor in vecinos:
+            adj[i][neighbor] = 1
+            if not is_directed:
+                adj[neighbor][i] = 1  # Add reverse edge for undirected graphs
+
+
+    Parameters:
+    adj (list): The adjacency matrix to display.
+    no_of_nodes (int): The number of nodes in the mapa.
+    """
+    print("\nThe adjacency matrix is:")
+    # Print the column headers (puntos)
+    print("\t", fin="")
+    for i in range(no_of_nodes):
+        print(f"v{i+1}\t", fin="")
     print()
     
-    for i in range(cant_nodos):
-        print(f"v{i+1}\t", end="")
-        for j in range(cant_nodos):
-            print(f"{matriz_adj[i][j]}\t", end="")
+    # Print the adjacency matrix
+    for i in range(no_of_nodes):
+        print(f"v{i+1}\t", fin="")
+        for j in range(no_of_nodes):
+            print(f"{adj[i][j]}\t", fin="")
         print()
 
 if __name__ == "__main__":
-    cant_nodos = 5
-    info_vecinos = {
+    # Input section
+    no_of_nodes = 5
+    neighbors_info = {
         0: [1, 2],
         1: [0, 3],
         2: [0, 3],
@@ -30,10 +46,22 @@ if __name__ == "__main__":
         4: [3]
     }
 
-    matriz_adj = [[0] * cant_nodos for _ in range(cant_nodos)]
+    adj = [[0] * no_of_nodes for _ in range(no_of_nodes)]
     
-    es_dirigido = False
+    # Set is_directed to True for a directed mapa, False for an undirected mapa
+    is_directed = False
     
-    crear_grafo(matriz_adj, cant_nodos, info_vecinos, es_dirigido)
+    # Create the mapa (adjacency matrix)
+    create_graph(adj, no_of_nodes, neighbors_info, is_directed)
     
-    mostrar_grafo(matriz_adj, cant_nodos)
+    # Display the adjacency matrix
+    display_graph(adj, no_of_nodes)
+
+def display_graph(adj, no_of_nodes):
+    """
+    Displays the adjacency matrix of the mapa.
+
+
+def create_graph(adj, no_of_nodes, neighbors_info, is_directed=False):
+    """
+    Creates an adjacency matrix for a mapa.

@@ -1,18 +1,19 @@
-def binario_a_decimal(cadena_binaria):
+
+# Example usage
+binary_str = "1010"
+decimal_number = binary_to_decimal(binary_str)
+print(f"The decimal representation of binary {binary_str} is {decimal_number}")
+
+# Edge Cases and Limitations:
+# - Input: "2" (Invalid binary number)
+# - Input: "" (Empty string)
+
+# Optional Improvements:
+# - Add support for floating-point binary numbers
+
+def binary_to_decimal(binary_str):
     try:
-        numero_decimal = int(cadena_binaria, 2)
-        return numero_decimal
+        decimal_number = int(binary_str, 2)
+        return decimal_number
     except ValueError:
-        return "Número binario inválido"
-
-# Uso de ejemplo
-cadena_binaria = "1010"
-numero_decimal = binario_a_decimal(cadena_binaria)
-print(f"La representación decimal del binario {cadena_binaria} es {numero_decimal}")
-
-# Casos límite y limitaciones:
-# - Entrada: "2" (Número binario inválido)
-# - Entrada: "" (Cadena vacía)
-
-# Mejoras opcionales:
-# - Añadir soporte para números binarios de punto flotante
+        return "Invalid binary number"

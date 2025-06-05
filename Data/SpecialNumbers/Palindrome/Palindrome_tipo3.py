@@ -5,25 +5,37 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def es_palindromo(numero: int) -> bool:
-    if numero < 0:
-        logging.error("El número debe ser un entero no negativo.")
-        raise ValueError("El número debe ser un entero no negativo.")
 
-    str_numero = str(numero)
-    es_palin = str_numero == str_numero[::-1]
-    logging.debug(f"Número original: {str_numero}, Invertido: {str_numero[::-1]}")
+    A palindrome number is a number that remains the same when its digits are reversed.
 
-    if es_palin:
-        logging.info(f"{numero} es un palíndromo.")
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is a palindrome, False otherwise.
+    """
+    if number < 0:
+        logging.error("Number must be a non-negative integer.")
+        raise ValueError("Number must be a non-negative integer.")
+
+    str_num = str(number)
+    is_palin = str_num == str_num[::-1]
+    logging.debug(f"Original number: {str_num}, Reversed: {str_num[::-1]}")
+
+    if is_palin:
+        logging.info(f"{number} is a palindrome.")
         return True
     else:
-        logging.info(f"{numero} no es un palíndromo.")
+        logging.info(f"{number} is not a palindrome.")
         return False
 
 if __name__ == "__main__":
     try:
-        es_palindromo(101)
-        es_palindromo(10)
+        is_palindrome(101)
+        is_palindrome(10)
     except ValueError as ve:
         logging.error(f"Error: {ve}")
+
+def is_palindrome(number: int) -> bool:
+    """
+    Determine if a number is a palindrome.

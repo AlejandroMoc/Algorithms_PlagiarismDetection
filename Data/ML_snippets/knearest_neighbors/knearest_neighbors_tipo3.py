@@ -8,54 +8,36 @@ class KNearestNeighbors:
     Parameters:
     -----------
     k : int
-        Number of neighbors to use for prediction.
+        Number of vecinos to use for prediction.
     """
 
-    def __init__(self, k_neighbors: int = 3):
-        if k_neighbors <= 0:
-            raise ValueError("k_neighbors must be greater than 0")
-        self.k_neighbors = k_neighbors
-        self.training_data = None
-        self.training_labels = None
+    
+    
+    
+    
 
-    def fit(self, data: np.ndarray, labels: np.ndarray):
-        """
-        Store the training data.
-        
-        Parameters:
-        -----------
-        data : np.ndarray
-            Training data, shape (n_samples, n_features).
-        labels : np.ndarray
-            Training labels, shape (n_samples,).
-        """
-        self.training_data = data
-        self.training_labels = labels
+# Example usage
+if __name__ == "__main__":
+    # Toy dataset
+    X_train = np.array([[1, 2], [2, 3], [3, 4], [4, 5]])
+    y_train = np.array([0, 0, 1, 1])
 
-    def predict(self, data: np.ndarray) -> np.ndarray:
-        """
-        Predict the class labels for the provided data.
-        
-        Parameters:
-        -----------
-        data : np.ndarray
-            Test data, shape (n_samples, n_features).
-        
-        Returns:
-        --------
-        np.ndarray
-            Predicted class labels, shape (n_samples,).
-        """
-        predictions = [self._predict_single(x) for x in data]
-        return np.array(predictions)
+    # Initialize and fit the model
+    knn = KNearestNeighbors(k=3)
+    knn.fit(X_train, y_train)
 
-    def _predict_single(self, sample: np.ndarray) -> int:
+    # Predictions
+    X_test = np.array([[1.5, 2.5], [3.5, 4.5]])
+    predictions = knn.predict(X_test)
+    print("Predictions:", predictions)
+
+def _predict_single(self, x: np.ndarray) -> int:
         """
         Predict the class label for a single test sample.
         
         Parameters:
         -----------
-        sample : np.ndarray
+        x : np.ndarray
             Single test sample, shape (n_features,).
         
         Returns:
@@ -63,29 +45,54 @@ class KNearestNeighbors:
         int
             Predicted class label.
         """
-        # Calculate distances between sample and all samples in the training set
-        distances = np.linalg.norm(self.training_data - sample, axis=1)
+        # Calculate distances between x and all samples in the training set
+        distances = np.linalg.norm(self.X_train - x, axis=1)
         
-        # Find the k nearest neighbors and their labels
-        k_indices = distances.argsort()[:self.k_neighbors]
-        k_nearest_labels = self.training_labels[k_indices]
+        # Find the k nearest vecinos and their labels
+        k_indices = distances.argsort()[:self.k]
+        k_nearest_labels = self.y_train[k_indices]
         
-        # Return the most common label among the neighbors
+        # Return the most common label among the vecinos
         most_common = Counter(k_nearest_labels).most_common(1)[0][0]
         return most_common
 
 
-# Example usage
-if __name__ == "__main__":
-    # Toy dataset
-    training_data = np.array([[1, 2], [2, 3], [3, 4], [4, 5]])
-    training_labels = np.array([0, 0, 1, 1])
+def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict the class labels for the provided data.
+        
+        Parameters:
+        -----------
+        X : np.ndarray
+            Test data, shape (n_samples, n_features).
+        
+        Returns:
+        --------
+        np.ndarray
+            Predicted class labels, shape (n_samples,).
+        """
+        predictions = [self._predict_single(x) for x in X]
+        return np.array(predictions)
 
-    # Initialize and fit the model
-    knn = KNearestNeighbors(k_neighbors=3)
-    knn.fit(training_data, training_labels)
 
-    # Predictions
-    test_data = np.array([[1.5, 2.5], [3.5, 4.5]])
-    predictions = knn.predict(test_data)
-    print("Predictions:", predictions)
+def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Store the training data.
+        
+        Parameters:
+        -----------
+        X : np.ndarray
+            Training data, shape (n_samples, n_features).
+        y : np.ndarray
+            Training labels, shape (n_samples,).
+        """
+        self.X_train = X
+        self.y_train = y
+
+
+def __init__(self, k: int = 3):
+        if k <= 0:
+            raise ValueError("k must be greater than 0")
+        self.k = k
+        self.X_train = None
+        self.y_train = None

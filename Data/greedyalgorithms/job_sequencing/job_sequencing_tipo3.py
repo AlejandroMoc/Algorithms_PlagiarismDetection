@@ -1,47 +1,55 @@
-class Trabajo:
-    def __init__(self, identificador, plazo, beneficio):
-        self.identificador = identificador
-        self.plazo = plazo
-        self.beneficio = beneficio
+class Job:
+    
 
-def comparar(trabajo):
-    return trabajo.beneficio
 
-def minimo_numero(num1, num2):
-    return num2 if num1 > num2 else num1
 
-def secuencia_trabajos(trabajos, n):
-    # Ordenar trabajos por beneficio en orden descendente
-    trabajos.sort(key=comparar, reverse=True)
+    # List to store the result (sequence of job IDs)
+    result = [-1] * n
+    # Boolean list to keep track of occupied time slots
+    slot = [False] * n
 
-    # Lista para almacenar el resultado (secuencia de identificadores de trabajo)
-    resultado = [-1] * n
-    # Lista booleana para mantener el seguimiento de los espacios de tiempo ocupados
-    espacio = [False] * n
-
-    # Iterar a través de todos los trabajos
+    # Iterate through all jobs
     for i in range(n):
-        # Encontrar un espacio libre para este trabajo, revisando desde el último espacio posible
-        for j in range(minimo_numero(n, trabajos[i].plazo) - 1, -1, -1):
-            if not espacio[j]:  # Si el espacio está libre
-                resultado[j] = i  # Asignar este trabajo al espacio
-                espacio[j] = True  # Marcar el espacio como ocupado
+        # Find a free slot for this job, checking from the last possible slot
+        for j in range(min_num(n, jobs[i].dead) - 1, -1, -1):
+            if not slot[j]:  # If slot is free
+                result[j] = i  # Assign this job to the slot
+                slot[j] = True  # Mark the slot as occupied
                 break
 
-    # Obtener la secuencia de identificadores de trabajo para el beneficio máximo
-    secuencia_trabajo = [trabajos[resultado[i]].identificador for i in range(n) if espacio[i]]
-    return secuencia_trabajo
+    # Get the sequence of job IDs for maximum profit
+    job_sequence = [jobs[result[i]].id for i in range(n) if slot[i]]
+    return job_sequence
 
-# Ejemplo
+# Example
 if __name__ == "__main__":
     n = 4
-    trabajos = [
-        Trabajo('a', 4, 20),
-        Trabajo('b', 1, 10),
-        Trabajo('c', 1, 40),
-        Trabajo('d', 1, 30)
+    jobs = [
+        Job('a', 4, 20),
+        Job('b', 1, 10),
+        Job('c', 1, 40),
+        Job('d', 1, 30)
     ]
 
-    # Mostrar la secuencia de trabajos que maximiza el beneficio
-    print("La siguiente es la secuencia de trabajos que maximiza el beneficio:")
-    print(" ".join(secuencia_trabajos(trabajos, n)))
+    # Display the sequence of jobs that maximize profit
+    print("Following is the maximum profit sequence of jobs:")
+    print(" ".join(job_sequencing(jobs, n)))
+
+
+def job_sequencing(jobs, n):
+    # Sort jobs by profit in descending order
+    jobs.sort(key=compare, reverse=True)
+
+
+def min_num(num1, num2):
+    return num2 if num1 > num2 else num1
+
+
+def compare(job):
+    return job.profit
+
+
+def __init__(self, id, dead, profit):
+        self.id = id  # Job ID
+        self.dead = dead  # Deadline for job completion
+        self.profit = profit  # Profit if job is completed before or on deadline

@@ -1,31 +1,43 @@
 import pickle
 from typing import Any
 
-def guardar_archivo_binario(ruta_archivo: str, datos: Any) -> None:
-    if not isinstance(ruta_archivo, str):
-        raise ValueError("La ruta del archivo debe ser un string.")
+
+    Args:
+        file_path (str): The camino to the binary file.
+        data (Any): The data to serialize and save.
+
+    Returns:
+        None
+    """
+    if not isinstance(file_path, str):
+        raise ValueError("File camino must be a string.")
     try:
-        with open(ruta_archivo, 'wb') as archivo:
-            pickle.dump(datos, archivo)
-        print(f"Datos guardados exitosamente en '{ruta_archivo}'")
+        with open(file_path, 'wb') as file:
+            pickle.dump(data, file)
+        print(f"Data successfully written to '{file_path}'")
     except pickle.PickleError as e:
-        print(f"Error: Fallo al serializar los datos. Detalles: {e}")
+        print(f"Error: Failed to serialize data. Details: {e}")
     except Exception as e:
-        print(f"Error: Ocurrió un error inesperado. Detalles: {e}")
+        print(f"Error: An unexpected error occurred. Details: {e}")
 
 if __name__ == "__main__":
-    # Ejemplo de Uso
-    ruta_archivo = r"pysnippets\Files\datos_ejemplo.pkl"
-    datos_a_guardar = {
-        'nombre': 'Juan Pérez',
-        'edad': 30,
-        'es_estudiante': False,
-        'calificaciones': [75, 90, 82],
-        'detalles': {
-            'carrera': 'Matemáticas',
-            'año': 2023
+    # Example Usage
+    file_path = r"pysnippets\Files\sample_data.pkl"
+    data_to_write = {
+        'name': 'Aryan Sharma',
+        'age': 24,
+        'is_student': True,
+        'scores': [55, 88, 26],
+        'details': {
+            'course': 'Computer Science',
+            'year': 2025
         }
     }
     
-    guardar_archivo_binario(ruta_archivo, datos_a_guardar)
-    print("Operación de escritura completada.")
+    write_binary_file(file_path, data_to_write)
+    print("Write operation complete.")
+
+
+def write_binary_file(file_path: str, data: Any) -> None:
+    """
+    Serializes and writes data to a binary file using pickle.

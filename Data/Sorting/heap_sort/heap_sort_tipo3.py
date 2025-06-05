@@ -9,11 +9,6 @@ class SortItem:
     key: Any
     value: Dict[str, Any]
 
-def heap_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
-    try:
-        if not dict_list:
-            logging.info("Empty list provided. Returning empty list.")
-            return []
     
         if not isinstance(dict_list, list) or not all(isinstance(item, dict) for item in dict_list):
             logging.error("Input must be a list of dictionaries.")
@@ -23,13 +18,7 @@ def heap_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) 
             logging.error(f"The key '{key}' is not present in all dictionaries.")
             raise KeyError(f"The key '{key}' is not present in all dictionaries.")
         
-        def heapify(lst, n, i):
-            largest = i
-            left = 2 * i + 1
-            right = 2 * i + 2
             
-            compare = (lambda x, y: x > y) if not reverse else (lambda x, y: x < y)
-    
             if left < n and compare(lst[left][key], lst[largest][key]):
                 largest = left
     
@@ -66,3 +55,21 @@ if __name__ == "__main__":
     dict_list = [{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}, {"name": "Charlie", "age": 35}]
     sorted_list = heap_sort(dict_list, key="age", reverse=True)
     print("Sorted List:", sorted_list)
+
+
+def heapify(lst, n, i):
+            largest = i
+            left = 2 * i + 1
+            right = 2 * i + 2
+            
+            compare = (lambda x, y: x > y) if not reverse else (lambda x, y: x < y)
+
+
+def heap_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
+    """
+    Sorts a list of dictionaries using the Heap Sort algorithm based on a specified key.
+    """
+    try:
+        if not dict_list:
+            logging.info("Empty list provided. Returning empty list.")
+            return []

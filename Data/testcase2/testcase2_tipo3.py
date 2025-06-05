@@ -1,18 +1,22 @@
-class NodoArbol:
-    def __init__(self, valor=0, izquierdo=None, derecho=None):
-        self.valor = valor
-        self.izquierdo = izquierdo
-        self.derecho = derecho
+class TreeNode:
+    
 
-def esta_balanceado(raiz):
-    def verificar_balance(nodo):
+
+def is_balanced(root):
+    def check_balance(nodo):
         if not nodo:
             return 0
-        altura_izquierda = verificar_balance(nodo.izquierdo)
-        if altura_izquierda == -1:
+        left_height = check_balance(nodo.left)
+        if left_height == -1:
             return -1
-        altura_derecha = verificar_balance(nodo.derecho)
-        if altura_derecha == -1 or abs(altura_izquierda - altura_derecha) > 1:
+        right_height = check_balance(nodo.right)
+        if right_height == -1 or abs(left_height - right_height) > 1:
             return -1
-        return 1 + max(altura_izquierda, altura_derecha)
-    return verificar_balance(raiz) != -1
+        return 1 + max(left_height, right_height)
+    return check_balance(root) != -1
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

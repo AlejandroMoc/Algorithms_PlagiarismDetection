@@ -8,20 +8,17 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def cuantil(data: List[float], q: float, interpolar: bool = False) -> float:
-    """
-    Calculate the q-th quantile of a list of numbers. Optionally, interpolate the result if the index isn't an integer.
 
     Args:
         data (List[float]): A list of numbers.
         q (float): The quantile to calculate (between 0 and 1).
-        interpolar (bool): Whether to interpolate between values if necessary (default is False).
+        interpolate (bool): Whether to interpolate between values if necessary (default is False).
 
     Returns:
         float: The q-th quantile of the numbers.
 
     Example:
-        >>> cuantil([1, 2, 3, 4, 5], 0.5)
+        >>> quantile([1, 2, 3, 4, 5], 0.5)
         3
     """
     if not data:
@@ -36,35 +33,41 @@ def cuantil(data: List[float], q: float, interpolar: bool = False) -> float:
         logging.error("Non-numeric value found in data list.")
         raise ValueError("All elements in the data list must be numeric")
     
-    datos_ordenados = sorted(data)
-    n = len(datos_ordenados)
-    indice = q * (n - 1)
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+    index = q * (n - 1)
     
-    if interpolar:
+    if interpolate:
         # Linear interpolation if the index is not an integer
-        inferior = int(math.floor(indice))
-        superior = int(math.ceil(indice))
-        if inferior == superior:
-            valor_cuantil = datos_ordenados[inferior]
+        lower = int(math.floor(index))
+        upper = int(math.ceil(index))
+        if lower == upper:
+            quantile_value = sorted_data[lower]
         else:
-            valor_cuantil = datos_ordenados[inferior] + (indice - inferior) * (datos_ordenados[superior] - datos_ordenados[inferior])
+            quantile_value = sorted_data[lower] + (index - lower) * (sorted_data[upper] - sorted_data[lower])
     else:
         # Regular method, just use the integer index
-        valor_cuantil = datos_ordenados[int(math.floor(indice))]
+        quantile_value = sorted_data[int(math.floor(index))]
     
-    logging.debug(f"Calculated quantile (q={q}): {valor_cuantil}")
-    return valor_cuantil
+    logging.debug(f"Calculated quantile (q={q}): {quantile_value}")
+    return quantile_value
 
-def calcular_multiples_cuantiles(data: List[float], cuantiles: List[float], interpolar: bool = False) -> List[float]:
-    """
-    Calculate multiple quantiles at once.
 
     Args:
         data (List[float]): A list of numbers.
-        cuantiles (List[float]): A list of quantiles (values between 0 and 1).
-        interpolar (bool): Whether to interpolate between values if necessary (default is False).
+        quantiles (List[float]): A list of quantiles (values between 0 and 1).
+        interpolate (bool): Whether to interpolate between values if necessary (default is False).
 
     Returns:
         List[float]: A list of quantiles.
     """
-    return [cuantil(data, q, interpolar) for q in cuantiles]
+    return [quantile(data, q, interpolate) for q in quantiles]
+
+def calculate_multiple_quantiles(data: List[float], quantiles: List[float], interpolate: bool = False) -> List[float]:
+    """
+    Calculate multiple quantiles at once.
+
+
+def quantile(data: List[float], q: float, interpolate: bool = False) -> float:
+    """
+    Calculate the q-th quantile of a list of numbers. Optionally, interpolate the result if the index isn't an integer.

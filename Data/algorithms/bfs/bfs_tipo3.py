@@ -1,26 +1,21 @@
 from collections import deque
 from typing import Dict, List
 
-def breadth_first_search(graph: Dict[str, List[str]], start_node: str) -> List[str]:
-    visited_nodes = set()
-    queue_nodes = deque([start_node])
-    visited_nodes.add(start_node)
-    order_visited = []  # To store the order of visited nodes
 
-    while queue_nodes:
-        current_node = queue_nodes.popleft()
-        order_visited.append(current_node)
+    while queue:
+        vertex = queue.popleft()
+        order_of_visit.append(vertex)
 
-        for neighbor_node in graph[current_node]:
-            if neighbor_node not in visited_nodes:
-                visited_nodes.add(neighbor_node)
-                queue_nodes.append(neighbor_node)
+        for neighbor in mapa[vertex]:
+            if neighbor not in visitados:
+                visitados.add(neighbor)
+                queue.append(neighbor)
 
-    return order_visited
+    return order_of_visit
 
 # Example usage:
 if __name__ == "__main__":
-    graph = {
+    mapa = {
         'A': ['B', 'C'],
         'B': ['D', 'E'],
         'C': ['F'],
@@ -28,5 +23,11 @@ if __name__ == "__main__":
         'E': ['F'],
         'F': []
     }
-    order = breadth_first_search(graph, 'A')
+    order = bfs(mapa, 'A')
     print("Order of visit:", order)
+
+def bfs(mapa: Dict[str, List[str]], inicio: str) -> List[str]:
+    visitados = set()
+    queue = deque([inicio])
+    visitados.add(inicio)
+    order_of_visit = []  # To store the order of visitados nodes

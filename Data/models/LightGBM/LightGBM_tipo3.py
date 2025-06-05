@@ -4,32 +4,39 @@ import logging
 
 class LightGBMModel:
     """LightGBM regression model."""
-    def __init__(self):
-        self.modelo = lgb.LGBMRegressor()
-        self.registro = logging.getLogger(__name__)
-        self.registro.info("Inicializado LGBMRegressor.")
+    
+    
+    
+                raise
 
-    def ajustar(self, X: np.ndarray, y: np.ndarray) -> None:
-        """Ajusta el modelo LightGBM a los datos."""
+def score(self, X: np.ndarray, y: np.ndarray) -> float:
+        """Score the LightGBM model."""
         try:
-            self.modelo.fit(X, y)
-            self.registro.info("Ajuste del modelo exitoso.")
+            return self.model.score(X, y)
         except Exception as e:
-            self.registro.error(f"Error durante el ajuste del modelo: {e}")
+            self.logger.error(f"Error during scoring: {e}")
+
+
+def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict using the LightGBM model."""
+        try:
+            return self.model.predict(X)
+        except Exception as e:
+            self.logger.error(f"Error during prediction: {e}")
             raise
 
-    def predecir(self, X: np.ndarray) -> np.ndarray:
-        """Predice usando el modelo LightGBM."""
+
+def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Fit the LightGBM model to the data."""
         try:
-            return self.modelo.predict(X)
+            self.model.fit(X, y)
+            self.logger.info("Model fitting successful.")
         except Exception as e:
-            self.registro.error(f"Error durante la predicción: {e}")
+            self.logger.error(f"Error during model fitting: {e}")
             raise
 
-    def puntuacion(self, X: np.ndarray, y: np.ndarray) -> float:
-        """Puntuación del modelo LightGBM."""
-        try:
-            return self.modelo.score(X, y)
-        except Exception as e:
-            self.registro.error(f"Error durante la puntuación: {e}")
-            raise
+
+def __init__(self):
+        self.model = lgb.LGBMRegressor()
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Initialized LGBMRegressor.")

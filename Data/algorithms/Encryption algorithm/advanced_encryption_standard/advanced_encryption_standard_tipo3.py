@@ -3,43 +3,62 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 import os
 
-def add_padding(data):
-    padder = padding.PKCS7(128).padder()
-    padded_data = padder.update(data) + padder.finalize()
-    return padded_data
+# Function to pad data to fit AES block size (16 bytes)
 
-def remove_padding(data):
-    unpadder = padding.PKCS7(128).unpadder()
-    unpadded_data = unpadder.update(data) + unpadder.finalize()
-    return unpadded_data
+# Function to remove padding after decryption
 
-def encrypt_data(data, key):
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
+# Function to encrypt data
     
-    padded_data = add_padding(data)
+    # Pad the data to make it a multiple of the block size (16 bytes)
+    padded_data = pad(data)
     
+    # Encrypt the data
     ciphertext = encryptor.update(padded_data) + encryptor.finalize()
-    return iv + ciphertext
+    return iv + ciphertext  # Return the IV concatenated with the ciphertext
 
-def decrypt_data(ciphertext, key):
-    iv = ciphertext[:16]
-    actual_ciphertext = ciphertext[16:]
+# Function to decrypt data
     
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
     
+    # Decrypt the data
     padded_data = decryptor.update(actual_ciphertext) + decryptor.finalize()
     
-    return remove_padding(padded_data)
+    # Remove padding
+    return unpad(padded_data)
 
+# Example usage
 if __name__ == "__main__":
-    key = os.urandom(32)
+    key = os.urandom(32)  # AES-256 key (32 bytes)
     data = b"Advanced Encryption Standard (AES) example"
     
-    encrypted_data = encrypt_data(data, key)
+    # Encrypt the data
+    encrypted_data = aes_encrypt(data, key)
     print("Encrypted:", encrypted_data)
     
-    decrypted_data = decrypt_data(encrypted_data, key)
+    # Decrypt the data
+    decrypted_data = aes_decrypt(encrypted_data, key)
     print("Decrypted:", decrypted_data.decode('utf-8'))
+
+
+def aes_decrypt(ciphertext, key):
+    iv = ciphertext[:16]  # Extract the IV from the beginning
+    actual_ciphertext = ciphertext[16:]
+
+
+def aes_encrypt(data, key):
+    iv = os.urandom(16)  # Generate a random 16-byte IV (Initialization Vector)
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+
+
+def unpad(data):
+    unpadder = padding.PKCS7(128).unpadder()
+    unpadded_data = unpadder.update(data) + unpadder.finalize()
+    return unpadded_data
+
+
+def pad(data):
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(data) + padder.finalize()
+    return padded_data

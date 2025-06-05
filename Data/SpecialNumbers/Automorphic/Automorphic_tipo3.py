@@ -5,25 +5,37 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def verificar_automorfico(numero: int) -> bool:
-    if numero < 0:
-        logging.error("El número debe ser un entero no negativo.")
-        raise ValueError("El número debe ser un entero no negativo.")
 
-    cuadrado = numero ** 2
-    es_automorfico = str(cuadrado).endswith(str(numero))
-    logging.debug(f"Cuadrado de {numero}: {cuadrado}")
+    An Automorphic number is a number whose square ends with the number itself.
 
-    if es_automorfico:
-        logging.info(f"{numero} es un número automórfico.")
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is an Automorphic number, False otherwise.
+    """
+    if number < 0:
+        logging.error("Number must be a non-negative integer.")
+        raise ValueError("Number must be a non-negative integer.")
+
+    square = number ** 2
+    is_auto = str(square).endswith(str(number))
+    logging.debug(f"Square of {number}: {square}")
+
+    if is_auto:
+        logging.info(f"{number} is an Automorphic number.")
         return True
     else:
-        logging.info(f"{numero} no es un número automórfico.")
+        logging.info(f"{number} is not an Automorphic number.")
         return False
 
 if __name__ == "__main__":
     try:
-        verificar_automorfico(25)
-        verificar_automorfico(16)
+        is_automorphic(25)
+        is_automorphic(16)
     except ValueError as ve:
         logging.error(f"Error: {ve}")
+
+def is_automorphic(number: int) -> bool:
+    """
+    Determine if a number is an Automorphic number.

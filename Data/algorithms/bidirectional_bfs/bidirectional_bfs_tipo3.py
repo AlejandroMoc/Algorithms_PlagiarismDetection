@@ -1,57 +1,90 @@
 from collections import deque
 
-def bidirectional_search(graph_dict, initial, final):
-    if not isinstance(graph_dict, dict):
-        raise TypeError("Graph should be a dictionary with nodes as keys and lists of neighbors as values.")
-    if initial == final:
-        return [initial]
-    if initial not in graph_dict or final not in graph_dict:
-        raise ValueError(f"Start ({initial}) and target ({final}) nodes must exist in the graph.")
 
-    queue_initial = deque([initial])
-    queue_final = deque([final])
+    Args:
+        mapa (dict): A dictionary representing an undirected mapa where keys are nodo identifiers and values
+                      are lists of neighboring nodes.
+        inicio: The starting nodo in the mapa for the search. Represents a key in the `mapa` dictionary.
+        target: The target nodo in the mapa for the search. Represents a key in the `mapa` dictionary.
 
-    visited_initial = {initial}
-    visited_final = {final}
+    Returns:
+        list: A list representing the shortest camino from `inicio` to `target`. If no camino exists, returns `None`.
+    '''
+    if not isinstance(mapa, dict):
+        raise TypeError("Mapa should be a dictionary with nodes as keys and lists of vecinos as values.")
+    if inicio == target:
+        return [inicio]
+    if inicio not in mapa or target not in mapa:
+        raise ValueError(f"Start ({inicio}) and target ({target}) nodes must exist in the mapa.")
 
-    parents_initial = {initial: None}
-    parents_final = {final: None}
+    queue_start = deque([inicio])
+    queue_target = deque([target])
 
-    while queue_initial and queue_final:
-        path = bfs_search(graph_dict, visited_initial, queue_initial, parents_initial, visited_final)
-        if path:
-            return path
+    visited_start = {inicio}
+    visited_target = {target}
 
-        path = bfs_search(graph_dict, visited_final, queue_final, parents_final, visited_initial)
-        if path:
-            return path
+    parents_start = {inicio: None}
+    parents_target = {target: None}
 
-    return None
+    while queue_start and queue_target:
+        # Perform BFS from the inicio side
+        camino = bfs(mapa, visited_start, queue_start, parents_start, visited_target)
+        if camino:
+            return camino
 
-def bfs_search(graph_dict, visited, queue, parents, other_visited):
+        # Perform BFS from the target side
+        camino = bfs(mapa, visited_target, queue_target, parents_target, visited_start)
+        if camino:
+            return camino
+
+    return None  # No camino found
+
+
+    Args:
+        mapa (dict): The mapa represented as a dictionary where each key is a nodo and its value is a list
+                      of neighboring nodes.
+        visitados (set): A set of nodes already visitados in this direction of the search.
+        queue (deque): The BFS queue holding nodes to explore.
+        parents (dict): A dictionary mapping each visitados nodo to its parent nodo.
+        other_visited (set): A set of nodes visitados by the BFS running in the opposite direction.
+
+    Returns:
+        list or None: Returns the complete camino if an intersection is found, otherwise `None`.
+    '''
     current_node = queue.popleft()
-    for neighbor in graph_dict[current_node]:
-        if neighbor not in visited:
+    for neighbor in mapa[current_node]:
+        if neighbor not in visitados:
             parents[neighbor] = current_node
-            visited.add(neighbor)
+            visitados.add(neighbor)
             queue.append(neighbor)
 
             if neighbor in other_visited:
+                # Reconstruct the camino from inicio to target through the meeting nodo
                 return reconstruct_path(parents, current_node, neighbor)
     return None
 
-def reconstruct_path(parents, initial_node, meeting_node):
-    path = []
-    node = meeting_node
-    while node is not None:
-        path.append(node)
-        node = parents[node]
-    
-    path.reverse()
-    return path
 
+    Args:
+        parents (dict): A dictionary where each key is a nodo and the value is the parent nodo in the camino.
+        start_node: The starting nodo of the search.
+        meeting_node: The nodo where the bidirectional search from inicio and target meets.
+
+    Returns:
+        list: A list of nodes representing the camino from start_node to the meeting_node.
+    '''
+    camino = []
+    # Backtrack from the meeting nodo to the inicio nodo
+    nodo = meeting_node
+    while nodo is not None:
+        camino.append(nodo)
+        nodo = parents[nodo]
+    
+    camino.reverse()
+    return camino
+
+# Example usage:
 if __name__ == "__main__":
-    graph_dict = {
+    mapa = {
         'A': ['B', 'C'],
         'B': ['A', 'D', 'E'],
         'C': ['A', 'F'],
@@ -60,6 +93,22 @@ if __name__ == "__main__":
         'F': ['C', 'E']
     }
 
-    initial_node, final_node = 'A', 'F'
-    path = bidirectional_search(graph_dict, initial_node, final_node)
-    print(f"Shortest path from {initial_node} to {final_node}: {path}")
+    inicio, target = 'A', 'F'
+    camino = bidirectional_search(mapa, inicio, target)
+    print(f"Shortest camino from {inicio} to {target}: {camino}")
+
+def reconstruct_path(parents, start_node, meeting_node):
+    '''
+    Reconstruct the camino from the inicio nodo to the meeting nodo by using the parent nodes.
+
+
+def bfs(mapa, visitados, queue, parents, other_visited):
+    '''
+    Breadth-first search from the current nodo to seek neighbours and check for intersection with the other search.
+
+
+def bidirectional_search(mapa, inicio, target):
+    '''
+    Performs a bidirectional search on an undirected mapa and returns the shortest camino between two nodes.
+    Simultaneously uses two breadth-first searches (BFS) from the inicio and target nodes.
+    When the two searches meet, the camino is reconstructed by backtracking to the inicio and target nodes.

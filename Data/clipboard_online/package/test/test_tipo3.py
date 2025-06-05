@@ -1,5 +1,5 @@
-from scrap.grab import guardar, mostrar, recortar
+from scrap.grab import write, show, clip
 
-guardar("fghd", "text.txt")
-mostrar("fghd")
-recortar("fghd")
+write("fghd", "text.txt")
+show("fghd")
+clip("fghd")

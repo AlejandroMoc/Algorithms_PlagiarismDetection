@@ -2,63 +2,71 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import logging
 
-class ModeloLineal:
+class LinearModel:
     """
-    Modelo de regresión lineal.
+    Linear Regression model.
     """
 
-    def __init__(self):
-        """
-        Inicializa el ModeloLineal con un modelo de regresión lineal.
-        """
-        self.modelo = LinearRegression()
-        self.registrador = logging.getLogger(__name__)
-        self.registrador.info("Modelo de regresión lineal inicializado.")
-
-    def ajustar(self, X: np.ndarray, y: np.ndarray) -> None:
-        """
-        Ajusta el modelo de regresión lineal a los datos.
-
-        Parámetros:
-        X (np.ndarray): La matriz de características.
-        y (np.ndarray): El vector objetivo.
+    
+    
+        Parameters:
+        X (np.ndarray): The feature matrix.
+        y (np.ndarray): The target vector.
         """
         try:
-            self.modelo.fit(X, y)
-            self.registrador.info("Ajuste del modelo exitoso.")
+            self.model.fit(X, y)
+            self.logger.info("Model fitting successful.")
         except Exception as e:
-            self.registrador.error(f"Error durante el ajuste del modelo: {e}")
+            self.logger.error(f"Error during model fitting: {e}")
             raise
 
-    def predecir(self, X: np.ndarray) -> np.ndarray:
-        """
-        Predice usando el modelo de regresión lineal.
+    
+        Parameters:
+        X (np.ndarray): The feature matrix.
 
-        Parámetros:
-        X (np.ndarray): La matriz de características.
-
-        Retorna:
-        np.ndarray: Los valores predichos.
+        Returns:
+        np.ndarray: The predicted values.
         """
         try:
-            return self.modelo.predict(X)
+            return self.model.predict(X)
         except Exception as e:
-            self.registrador.error(f"Error durante la predicción: {e}")
+            self.logger.error(f"Error during prediction: {e}")
             raise
 
-    def puntuacion(self, X: np.ndarray, y: np.ndarray) -> float:
-        """
-        Calcula la puntuación del modelo de regresión lineal.
+    
+        Parameters:
+        X (np.ndarray): The feature matrix.
+        y (np.ndarray): The target vector.
 
-        Parámetros:
-        X (np.ndarray): La matriz de características.
-        y (np.ndarray): El vector objetivo.
-
-        Retorna:
-        float: La puntuación del modelo.
+        Returns:
+        float: The model's score.
         """
         try:
-            return self.modelo.score(X, y)
+            return self.model.score(X, y)
         except Exception as e:
-            self.registrador.error(f"Error durante el cálculo de la puntuación: {e}")
+            self.logger.error(f"Error during scoring: {e}")
             raise
+
+
+def score(self, X: np.ndarray, y: np.ndarray) -> float:
+        """
+        Score the Linear Regression model.
+
+
+def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict using the Linear Regression model.
+
+
+def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """
+        Fit the Linear Regression model to the data.
+
+
+def __init__(self):
+        """
+        Initialize the LinearModel with a LinearRegression model.
+        """
+        self.model = LinearRegression()
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Initialized LinearRegression model.")

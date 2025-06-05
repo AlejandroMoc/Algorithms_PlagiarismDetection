@@ -1,70 +1,79 @@
-class CifradoAfín:
+class AffineCipher:
     """
-    Una clase para implementar el Cifrado Afín para encriptación y desencriptación.
+    A class to implement the Affine Cipher for encryption and decryption.
     """
     
-    LONGITUD_ALFABETO = 26  # Longitud del alfabeto
+    ALPHABET_LENGTH = 26  # Length of the alphabet
 
-    def __init__(self, a, b):
+    
+        Parameters:
+        - a (int): The multiplicative key (must be coprime with ALPHABET_LENGTH).
+        - b (int): The additive key.
         """
-        Inicializa el Cifrado Afín con coeficientes especificados.
-
-        Parámetros:
-        - a (int): La clave multiplicativa (debe ser coprimo con LONGITUD_ALFABETO).
-        - b (int): La clave aditiva.
-        """
-        self.m = self.LONGITUD_ALFABETO  # Inicializa m aquí
-        if not self.es_clave_valida(a):
-            raise ValueError(f"El valor de 'a' ({a}) debe ser coprimo con {self.m}.")
+        self.m = self.ALPHABET_LENGTH  # Initialize m here
+        if not self.is_valid_key(a):
+            raise ValueError(f"The value of 'a' ({a}) must be coprime with {self.m}.")
         
         self.a = a
         self.b = b
 
-    def es_clave_valida(self, a):
+    
+        Parameters:
+        - a (int): The multiplicative key.
+
+        Returns:
+        - bool: True if 'a' is coprime with ALPHABET_LENGTH, False otherwise.
         """
-        Comprueba si 'a' es coprimo con la longitud del alfabeto.
+        return self.gcd(a, self.m) == 1
 
-        Parámetros:
-        - a (int): La clave multiplicativa.
+    
+    
+        Parameters:
+        - plaintext (str): The text to encrypt.
 
-        Devuelve:
-        - bool: True si 'a' es coprimo con LONGITUD_ALFABETO, False en caso contrario.
+        Returns:
+        - str: The encrypted ciphertext.
         """
-        return self.mcd(a, self.m) == 1
+        return ''.join(
+            chr(((self.a * (ord(char) - ord('A')) + self.b) % self.m) + ord('A'))
+            if char.isalpha() else char for char in plaintext.upper()
+        )
 
-    def mcd(self, x, y):
-        """Calcula el máximo común divisor de x e y."""
+    
+        Parameters:
+        - ciphertext (str): The text to decrypt.
+
+        Returns:
+        - str: The decrypted plaintext.
+        """
+        a_inv = pow(self.a, -1, self.m)  # Modular multiplicative inverse of a
+        return ''.join(
+            chr(((a_inv * ((ord(char) - ord('A')) - self.b)) % self.m) + ord('A'))
+            if char.isalpha() else char for char in ciphertext.upper()
+        )
+
+def decrypt(self, ciphertext):
+        """
+        Decrypts the ciphertext using the affine cipher.
+
+
+def encrypt(self, plaintext):
+        """
+        Encrypts the plaintext using the affine cipher.
+
+
+def gcd(self, x, y):
+        """Compute the greatest common divisor of x and y."""
         while y:
             x, y = y, x % y
         return x
 
-    def encriptar(self, texto_plano):
+
+def is_valid_key(self, a):
         """
-        Encripta el texto plano usando el cifrado afín.
+        Checks if 'a' is coprime with the alphabet length.
 
-        Parámetros:
-        - texto_plano (str): El texto a encriptar.
 
-        Devuelve:
-        - str: El texto cifrado encriptado.
+def __init__(self, a, b):
         """
-        return ''.join(
-            chr(((self.a * (ord(caracter) - ord('A')) + self.b) % self.m) + ord('A'))
-            if caracter.isalpha() else caracter for caracter in texto_plano.upper()
-        )
-
-    def desencriptar(self, texto_cifrado):
-        """
-        Desencripta el texto cifrado usando el cifrado afín.
-
-        Parámetros:
-        - texto_cifrado (str): El texto a desencriptar.
-
-        Devuelve:
-        - str: El texto plano desencriptado.
-        """
-        a_inv = pow(self.a, -1, self.m)  # Inverso multiplicativo modular de a
-        return ''.join(
-            chr(((a_inv * ((ord(caracter) - ord('A')) - self.b)) % self.m) + ord('A'))
-            if caracter.isalpha() else caracter for caracter in texto_cifrado.upper()
-        )
+        Initializes the Affine Cipher with specified coefficients.

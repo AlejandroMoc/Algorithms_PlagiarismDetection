@@ -6,25 +6,41 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def es_fuerte(numero: int) -> bool:
-    if numero < 0:
-        logging.error("El número debe ser un entero no negativo.")
-        raise ValueError("El número debe ser un entero no negativo.")
 
-    num_str = str(numero)
-    suma_fuerte = sum(math.factorial(int(digito)) for digito in num_str)
-    logging.debug(f"Suma de factoriales para {numero}: {suma_fuerte}")
+    A Strong number is a number in which the sum of the factorial of its digits is equal
+    to the number itself.
 
-    if suma_fuerte == numero:
-        logging.info(f"{numero} es un número fuerte.")
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is a Strong number, False otherwise.
+    """
+    if number < 0:
+        logging.error("Number must be a non-negative integer.")
+        raise ValueError("Number must be a non-negative integer.")
+
+    num_str = str(number)
+    strong_sum = sum(math.factorial(int(digit)) for digit in num_str)
+    logging.debug(f"Sum of factorials for {number}: {strong_sum}")
+
+    if strong_sum == number:
+        logging.info(f"{number} is a Strong number.")
         return True
     else:
-        logging.info(f"{numero} no es un número fuerte.")
+        logging.info(f"{number} is not a Strong number.")
         return False
 
 if __name__ == "__main__":
     try:
-        es_fuerte(145)
-        es_fuerte(134)
+        is_strong(145)
+        is_strong(134)
     except ValueError as ve:
         logging.error(f"Error: {ve}")
+
+       
+
+
+def is_strong(number: int) -> bool:
+    """
+    Determine if a number is a Strong number.

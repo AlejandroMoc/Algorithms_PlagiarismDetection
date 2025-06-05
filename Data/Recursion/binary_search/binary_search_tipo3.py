@@ -4,28 +4,31 @@ from dataclasses import dataclass
 logging.basicConfig(level=logging.INFO)
 
 @dataclass
-class BusquedaBinaria:
-    lista: list
-    objetivo: int
+class BinarySearch:
+    array: list
+    target: int
 
-    def buscar(self) -> int:
-        return self._busqueda_binaria_recursiva(self.lista, self.objetivo, 0, len(self.lista) - 1)
+    
+    
+# Sample usage
+if __name__ == "__main__":
+    bs_instance = BinarySearch([1, 2, 3, 4, 5], 3)
+    print(f"Index of 3 is {bs_instance.search()}")  # Output: 2 
 
-    def _busqueda_binaria_recursiva(self, lista, objetivo, izquierda, derecha):
-        if derecha >= izquierda:
-            medio = izquierda + (derecha - izquierda) // 2
-            if lista[medio] == objetivo:
-                logging.info(f"Objetivo {objetivo} encontrado en el índice {medio}")
-                return medio
-            elif lista[medio] > objetivo:
-                return self._busqueda_binaria_recursiva(lista, objetivo, izquierda, medio - 1)
+def _binary_search_recursive(self, array, target, left, right):
+        if right >= left:
+            mid = left + (right - left) // 2
+            if array[mid] == target:
+                logging.info(f"Target {target} found at index {mid}")
+                return mid
+            elif array[mid] > target:
+                return self._binary_search_recursive(array, target, left, mid - 1)
             else:
-                return self._busqueda_binaria_recursiva(lista, objetivo, medio + 1, derecha)
+                return self._binary_search_recursive(array, target, mid + 1, right)
         else:
-            logging.info(f"Objetivo {objetivo} no encontrado")
+            logging.info(f"Target {target} not found")
             return -1
 
-# Uso de ejemplo
-if __name__ == "__main__":
-    bb_instancia = BusquedaBinaria([1, 2, 3, 4, 5], 3)
-    print(f"Índice de 3 es {bb_instancia.buscar()}")  # Salida: 2 
+
+def search(self) -> int:
+        return self._binary_search_recursive(self.array, self.target, 0, len(self.array) - 1)

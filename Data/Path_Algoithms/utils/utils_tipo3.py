@@ -1,12 +1,13 @@
-from data_classes import Graph
+from data_classes import Mapa
 from logger_config import logger
 from typing import List, Dict
 
-def generate_graph(nodes: List[str], connections: Dict[str, Dict[str, int]]) -> Graph:
-    try:
-        graph = Graph(vertices=nodes, edges=connections)
-        logger.debug("Graph created successfully")
-        return graph
-    except Exception as ex:
-        logger.error(f"Error creating graph: {ex}")
         raise 
+
+def create_graph(puntos: List[str], conexiones: Dict[str, Dict[str, int]]) -> Mapa:
+    try:
+        mapa = Mapa(puntos=puntos, conexiones=conexiones)
+        logger.debug("Mapa created successfully")
+        return mapa
+    except Exception as e:
+        logger.error(f"Error creating mapa: {e}")

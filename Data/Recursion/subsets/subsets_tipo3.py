@@ -5,18 +5,21 @@ logging.basicConfig(level=logging.INFO)
 
 @dataclass
 class Subsets:
-    conjunto: list
+    set: list
 
-    def generar(self):
-        return self._subconjuntos_recursivo([], sorted(self.conjunto))
-
-    def _subconjuntos_recursivo(self, actual, conjunto):
-        if not conjunto:
-            logging.info(f"Subconjunto: {actual}")
-            return [actual]
-        return self._subconjuntos_recursivo(actual + [conjunto[0]], conjunto[1:]) + self._subconjuntos_recursivo(actual, conjunto[1:])
-
-# Uso de ejemplo
+    
+    
+# Sample usage
 if __name__ == "__main__":
-    generador_subconjuntos = Subsets([1, 2, 3])
-    print(generador_subconjuntos.generar())  # Salida: Todos los subconjuntos de [1, 2, 3] 
+    subset_gen = Subsets([1, 2, 3])
+    print(subset_gen.generate())  # Output: All subsets of [1, 2, 3] 
+
+def _subsets_recursive(self, current, set):
+        if not set:
+            logging.info(f"Subset: {current}")
+            return [current]
+        return self._subsets_recursive(current + [set[0]], set[1:]) + self._subsets_recursive(current, set[1:])
+
+
+def generate(self):
+        return self._subsets_recursive([], sorted(self.set))

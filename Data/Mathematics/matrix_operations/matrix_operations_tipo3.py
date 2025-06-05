@@ -2,101 +2,206 @@ import logging
 from typing import List
 import numpy as np
 
+# Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-def add_matrices(matrix1: List[List[float]], matrix2: List[List[float]]) -> List[List[float]]:
-    if len(matrix1) != len(matrix2) or len(matrix1[0]) != len(matrix2[0]):
+
+    Args:
+        A (list of list of float): First matrix.
+        B (list of list of float): Second matrix.
+
+    Returns:
+        list of list of float: The resulting matrix after addition.
+
+    Raises:
+        ValueError: If the dimensions of the two matrices are not the same.
+    """
+    if len(A) != len(B) or len(A[0]) != len(B[0]):
         raise ValueError("The dimensions of the two matrices must be the same.")
 
-    result = [[matrix1[i][j] + matrix2[i][j] for j in range(len(matrix1[0]))] for i in range(len(matrix1))]
-    logging.debug(f"Added matrices {matrix1} and {matrix2} to get {result}")
+    result = [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+    logging.debug(f"Added matrices {A} and {B} to get {result}")
     return result
 
-def multiply_matrices(matrix1: List[List[float]], matrix2: List[List[float]]) -> List[List[float]]:
-    if len(matrix1[0]) != len(matrix2):
-        raise ValueError("Number of columns in first matrix must match number of rows in second matrix.")
 
-    result = [[sum(matrix1[i][k] * matrix2[k][j] for k in range(len(matrix2))) for j in range(len(matrix2[0]))] for i in range(len(matrix1))]
-    logging.debug(f"Multiplied matrices {matrix1} and {matrix2} to get {result}")
+    Args:
+        A (list of list of float): First matrix.
+        B (list of list of float): Second matrix.
+
+    Returns:
+        list of list of float: The resulting matrix after multiplication.
+
+    Raises:
+        ValueError: If the number of columns in A does not match the number of rows in B.
+    """
+    if len(A[0]) != len(B):
+        raise ValueError("Number of columns in A must match number of rows in B.")
+
+    result = [[sum(A[i][k] * B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
+    logging.debug(f"Multiplied matrices {A} and {B} to get {result}")
     return result
 
-def transpose_matrix(matrix):
-    result = [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]
-    logging.debug(f"Transposed matrix {matrix} to get {result}")
+
+
+    Args:
+        A (list of list of float): The matrix to be transposed.
+
+    Returns:
+        list of list of float: The transposed matrix.
+    """
+    result = [[A[j][i] for j in range(len(A))] for i in range(len(A[0]))]
+    logging.debug(f"Transposed matrix {A} to get {result}")
     return result
 
-def scalar_multiply_matrix(matrix, scalar):
-    result = [[matrix[i][j] * scalar for j in range(len(matrix[0]))] for i in range(len(matrix))]
-    logging.debug(f"Multiplied matrix {matrix} by scalar {scalar} to get {result}")
+
+    Args:
+        A (list of list of float): The matrix to be multiplied.
+        scalar (float): The scalar to multiply the matrix by.
+
+    Returns:
+        list of list of float: The resulting matrix after scalar multiplication.
+    """
+    result = [[A[i][j] * scalar for j in range(len(A[0]))] for i in range(len(A))]
+    logging.debug(f"Multiplied matrix {A} by scalar {scalar} to get {result}")
     return result
 
-def calculate_determinant(matrix):
-    if len(matrix) != len(matrix[0]):
+
+    Args:
+        A (list of list of float): The matrix to compute the determinant of.
+
+    Returns:
+        float: The determinant of the matrix.
+    """
+    if len(A) != len(A[0]):
         raise ValueError("Matrix must be square to compute determinant.")
 
-    if len(matrix) == 1:
-        return matrix[0][0]
-    elif len(matrix) == 2:
-        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    if len(A) == 1:
+        return A[0][0]
+    elif len(A) == 2:
+        return A[0][0] * A[1][1] - A[0][1] * A[1][0]
     else:
         det = 0
-        for i in range(len(matrix)):
-            minor = [row[:i] + row[i+1:] for row in matrix[1:]]
-            det += ((-1) ** i) * matrix[0][i] * calculate_determinant(minor)
+        for i in range(len(A)):
+            minor = [row[:i] + row[i+1:] for row in A[1:]]
+            det += ((-1) ** i) * A[0][i] * determinant(minor)
         return det
+    
 
-def calculate_inverse(matrix):
-    if len(matrix) != len(matrix[0]):
+    Args:
+        A (list of list of float): The matrix to compute the inverse of.
+
+    Returns:
+        list of list of float: The inverse of the matrix.
+
+    Raises:
+        ValueError: If the matrix is not square or is singular (i.e., its determinant is zero).
+    """
+    if len(A) != len(A[0]):
         raise ValueError("Matrix must be square to compute inverse.")
 
-    det = calculate_determinant(matrix)
+    det = determinant(A)
     if det == 0:
         raise ValueError("Matrix is singular and does not have an inverse.")
 
-    adjugate = [[((-1) ** (i + j)) * calculate_determinant([row[:j] + row[j+1:] for row in matrix[:i] + matrix[i+1:]]) for j in range(len(matrix))] for i in range(len(matrix))]
-    inverse = scalar_multiply_matrix(transpose_matrix(adjugate), 1 / det)
+    adjugate = [[((-1) ** (i + j)) * determinant([row[:j] + row[j+1:] for row in A[:i] + A[i+1:]]) for j in range(len(A))] for i in range(len(A))]
+    inverse = matrix_scalar_multiplication(matrix_transpose(adjugate), 1 / det)
     
     return inverse
 
-def calculate_trace(matrix):
-    if len(matrix) != len(matrix[0]):
+
+    Args:
+        A (list of list of float): The matrix to compute the trace of.
+
+    Returns:
+        float: The trace of the matrix.
+    """
+    if len(A) != len(A[0]):
         raise ValueError("Matrix must be square to compute trace.")
 
-    return sum(matrix[i][i] for i in range(len(matrix)))
+    return sum(A[i][i] for i in range(len(A)))
 
-def calculate_eigenvalues_and_eigenvectors(matrix):
-    if len(matrix) != len(matrix[0]):
+
+    Args:
+        A (list of list of float): The matrix to compute the eigenvalues and eigenvectors of.
+
+    Returns:
+        tuple: A tuple containing:
+            - list of float: The eigenvalues of the matrix.
+            - list of list of float: The eigenvectors of the matrix.
+    """
+    if len(A) != len(A[0]):
         raise ValueError("Matrix must be square to compute eigenvalues and eigenvectors.")
 
-    eigenvalues, eigenvectors = np.linalg.eig(matrix)
+    eigenvalues, eigenvectors = np.linalg.eig(A)
     return eigenvalues, eigenvectors
 
+# Example usage
 if __name__ == "__main__":
-    matrix_A = [[1, 2], [3, 4]]
-    matrix_B = [[5, 6], [7, 8]]
+    A = [[1, 2], [3, 4]]
+    B = [[5, 6], [7, 8]]
 
     print("Matrix Addition:")
-    print(add_matrices(matrix_A, matrix_B))
+    print(matrix_addition(A, B))
 
     print("\nMatrix Multiplication:")
-    print(multiply_matrices(matrix_A, matrix_B))
+    print(matrix_multiplication(A, B))
 
     print("\nMatrix Transpose:")
-    print(transpose_matrix(matrix_A))
+    print(matrix_transpose(A))
 
     print("\nMatrix Scalar Multiplication:")
-    print(scalar_multiply_matrix(matrix_A, 2))
+    print(matrix_scalar_multiplication(A, 2))
 
     print("\nDeterminant:")
-    print(calculate_determinant(matrix_A))
+    print(determinant(A))
 
     print("\nMatrix Inverse:")
-    print(calculate_inverse(matrix_A))
+    print(matrix_inverse(A))
 
     print("\nMatrix Trace:")
-    print(calculate_trace(matrix_A))
+    print(matrix_trace(A))
 
     print("\nEigenvalues and Eigenvectors:")
-    eigenvalues, eigenvectors = calculate_eigenvalues_and_eigenvectors(matrix_A)
+    eigenvalues, eigenvectors = eigenvalues_and_eigenvectors(A)
     print("Eigenvalues:", eigenvalues)
     print("Eigenvectors:", eigenvectors)
+
+
+def eigenvalues_and_eigenvectors(A):
+    """
+    Compute the eigenvalues and eigenvectors of a square matrix A.
+
+
+def matrix_trace(A):
+    """
+    Compute the trace of a square matrix A.
+
+
+def matrix_inverse(A):
+    """
+    Compute the inverse of a square matrix A.
+
+
+def determinant(A):
+    """
+    Compute the determinant of a square matrix A.
+
+
+def matrix_scalar_multiplication(A, scalar):
+    """
+    Multiply a matrix A by a scalar.
+
+
+def matrix_transpose(A):
+    """
+    Transpose a matrix A.
+
+
+def matrix_multiplication(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:
+    """
+    Multiply two matrices A and B.
+
+
+def matrix_addition(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:
+    """
+    Add two matrices A and B.

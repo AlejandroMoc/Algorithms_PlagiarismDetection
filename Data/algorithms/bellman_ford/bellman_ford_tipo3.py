@@ -1,56 +1,66 @@
-class Grafo:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.grafo = []
+class Mapa:
+    
+    
+    
+    
+    
+        for _ in range(self.V - 1):
+            for u, v, w in self.mapa:
+                if dist[u] != float("Inf") and dist[u] + w < dist[v]:
+                    dist[v] = dist[u] + w
+                    parent[v] = u  # Update parent for the camino
 
-    def agregar_arista(self, u, v, w):
-        self.grafo.append([u, v, w])
+        # Check for negative weight cycles
+        for u, v, w in self.mapa:
+            if dist[u] != float("Inf") and dist[u] + w < dist[v]:
+                print("Mapa contains negative weight cycle")
+                self.print_negative_cycle(parent, v)
+                return
 
-    def imprimir_solucion(self, dist):
-        print("Vértice Distancia desde el Origen:")
+        self.print_solution(dist)
+
+# Example usage:
+g = Mapa(5)
+g.crear_conexion(0, 1, -1)
+g.crear_conexion(0, 2, 4)
+g.crear_conexion(1, 2, 3)
+g.crear_conexion(1, 3, 2)
+g.crear_conexion(1, 4, 2)
+g.crear_conexion(3, 2, 5)
+g.crear_conexion(3, 1, 1)
+g.crear_conexion(4, 3, -3)
+
+g.bellman_ford(0)
+
+def bellman_ford(self, src):
+        dist = [float("Inf")] * self.V
+        parent = [-1] * self.V  # To store the parent of each nodo in the shortest camino
+        dist[src] = 0
+
+
+def print_negative_cycle(self, parent, inicio):
+        print("Negative weight cycle detected:")
+        cycle = []
+        cycle.append(inicio)
+        current = parent[inicio]
+        while current != inicio:
+            cycle.append(current)
+            current = parent[current]
+        cycle.append(inicio)
+        cycle.reverse()
+        print(" -> ".join(map(str, cycle)))
+
+
+def print_solution(self, dist):
+        print("Vertex Distance from Source:")
         for i in range(self.V):
             print(f"{i}\t\t{dist[i]}")
 
-    def imprimir_ciclo_negativo(self, padre, inicio):
-        print("Ciclo de peso negativo detectado:")
-        ciclo = []
-        ciclo.append(inicio)
-        actual = padre[inicio]
-        while actual != inicio:
-            ciclo.append(actual)
-            actual = padre[actual]
-        ciclo.append(inicio)
-        ciclo.reverse()
-        print(" -> ".join(map(str, ciclo)))
 
-    def bellman_ford(self, src):
-        dist = [float("Inf")] * self.V
-        padre = [-1] * self.V
-        dist[src] = 0
+def crear_conexion(self, u, v, w):
+        self.mapa.append([u, v, w])
 
-        for _ in range(self.V - 1):
-            for u, v, w in self.grafo:
-                if dist[u] != float("Inf") and dist[u] + w < dist[v]:
-                    dist[v] = dist[u] + w
-                    padre[v] = u
 
-        for u, v, w in self.grafo:
-            if dist[u] != float("Inf") and dist[u] + w < dist[v]:
-                print("El grafo contiene un ciclo de peso negativo")
-                self.imprimir_ciclo_negativo(padre, v)
-                return
-
-        self.imprimir_solucion(dist)
-
-# Uso de ejemplo:
-g = Grafo(5)
-g.agregar_arista(0, 1, -1)
-g.agregar_arista(0, 2, 4)
-g.agregar_arista(1, 2, 3)
-g.agregar_arista(1, 3, 2)
-g.agregar_arista(1, 4, 2)
-g.agregar_arista(3, 2, 5)
-g.agregar_arista(3, 1, 1)
-g.agregar_arista(4, 3, -3)
-
-g.bellman_ford(0)
+def __init__(self, puntos):
+        self.V = puntos
+        self.mapa = []

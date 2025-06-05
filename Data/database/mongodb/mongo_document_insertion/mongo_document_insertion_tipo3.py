@@ -1,3 +1,15 @@
-def agregar_documento(coleccion, documento):
-    resultado = coleccion.insert_one(documento)
-    return resultado.inserted_id
+
+    Args:
+        collection: The MongoDB collection object.
+        document (dict): The document to insert.
+
+    Returns:
+        ObjectId: The ID of the inserted document.
+    """
+    result = collection.insert_one(document)
+    return result.inserted_id
+
+
+def insert_document(collection, document):
+    """
+    Inserts a document into a MongoDB collection.

@@ -9,9 +9,10 @@ logger = logging.getLogger(__name__)
 class FibonacciCalculator:
     @staticmethod
     @memoize
-    def calculate_fibonacci(number: int) -> int:
-        if number <= 0:
+            return FibonacciCalculator.fibonacci(n-1) + FibonacciCalculator.fibonacci(n-2) 
+
+def fibonacci(n: int) -> int:
+        if n <= 0:
             raise ValueError("Input must be a positive integer.")
-        elif number == 1 or number == 2:
+        elif n == 1 or n == 2:
             return 1
-        return FibonacciCalculator.calculate_fibonacci(number-1) + FibonacciCalculator.calculate_fibonacci(number-2)

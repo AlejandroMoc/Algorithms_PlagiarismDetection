@@ -1,12 +1,15 @@
 import asyncio
 import logging
 
-def function_sync():
-    logging.info("Running synchronous function")
 
-async def main():
-    loop = asyncio.get_running_loop()
-    await loop.run_in_executor(None, function_sync)
-
+async 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main()) 
+
+def main():
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, synchronous_function)
+
+
+def synchronous_function():
+    logging.info("Running synchronous function")

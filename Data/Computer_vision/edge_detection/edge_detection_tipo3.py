@@ -1,24 +1,42 @@
 import cv2
 import numpy as np
 
-def detect_edges(input_image):
-    gray_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
     
-    blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 0)
+    Args:
+        image: Input image in BGR format
+        
+    Returns:
+        edges_combined: Combined edge detection result
+    """
+    # Convert to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    canny_edges = cv2.Canny(blurred_image, 100, 200)
+    # Apply Gaussian blur to reduce noise
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
     
-    sobel_x = cv2.Sobel(blurred_image, cv2.CV_64F, 1, 0, ksize=3)
-    sobel_y = cv2.Sobel(blurred_image, cv2.CV_64F, 0, 1, ksize=3)
-    sobel_edges = np.sqrt(sobel_x**2 + sobel_y**2)
-    sobel_edges = np.uint8(sobel_edges)
+    # Canny edge detection
+    edges_canny = cv2.Canny(blurred, 100, 200)
     
-    laplacian_edges = cv2.Laplacian(blurred_image, cv2.CV_64F)
-    laplacian_edges = np.uint8(np.absolute(laplacian_edges))
+    # Sobel edge detection
+    sobelx = cv2.Sobel(blurred, cv2.CV_64F, 1, 0, ksize=3)
+    sobely = cv2.Sobel(blurred, cv2.CV_64F, 0, 1, ksize=3)
+    edges_sobel = np.sqrt(sobelx**2 + sobely**2)
+    edges_sobel = np.uint8(edges_sobel)
     
-    combined_edges = cv2.bitwise_or(canny_edges, sobel_edges)
-    combined_edges = cv2.bitwise_or(combined_edges, laplacian_edges)
+    # Laplacian edge detection
+    edges_laplacian = cv2.Laplacian(blurred, cv2.CV_64F)
+    edges_laplacian = np.uint8(np.absolute(edges_laplacian))
     
-    _, cleaned_edges = cv2.threshold(combined_edges, 50, 255, cv2.THRESH_BINARY)
+    # Combine all edge detection results
+    edges_combined = cv2.bitwise_or(edges_canny, edges_sobel)
+    edges_combined = cv2.bitwise_or(edges_combined, edges_laplacian)
     
-    return cleaned_edges
+    # Apply threshold to get cleaner conexiones
+    _, edges_combined = cv2.threshold(edges_combined, 50, 255, cv2.THRESH_BINARY)
+    
+    return edges_combined
+
+
+def detect_edges(image):
+    """
+    Detect conexiones in an input image using multiple edge detection methods.

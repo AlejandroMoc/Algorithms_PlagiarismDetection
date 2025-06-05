@@ -4,87 +4,99 @@ import subprocess
 import platform
 
 
-def obtener_contenido_portapapeles() -> str:
-    sistema_operativo_actual = platform.system()
 
     try:
-        if sistema_operativo_actual == "Linux":
-            resultado = subprocess.run(
+        if current_os == "Linux":
+            # Use xclip to get clipboard content
+            result = subprocess.run(
                 ["xclip", "-selection", "clipboard", "-o"], stdout=subprocess.PIPE
             )
-            return resultado.stdout.decode("utf-8")
-        elif sistema_operativo_actual == "Darwin":
-            resultado = subprocess.run(["pbpaste"], stdout=subprocess.PIPE)
-            return resultado.stdout.decode("utf-8")
-        elif sistema_operativo_actual == "Windows":
-            resultado = subprocess.run(
+            return result.stdout.decode("utf-8")
+        elif current_os == "Darwin":  # macOS
+            # Use pbpaste to get clipboard content
+            result = subprocess.run(["pbpaste"], stdout=subprocess.PIPE)
+            return result.stdout.decode("utf-8")
+        elif current_os == "Windows":
+            # Use PowerShell to get clipboard content on Windows
+            result = subprocess.run(
                 ["powershell", "-command", "Get-Clipboard"], stdout=subprocess.PIPE
             )
-            return resultado.stdout.decode("utf-8")
+            return result.stdout.decode("utf-8")
         else:
-            print(f"Sistema operativo no compatible: {sistema_operativo_actual}")
+            print(f"Unsupported OS: {current_os}")
             return ""
     except subprocess.CalledProcessError:
-        print("Error al obtener el contenido del portapapeles.")
+        print("Failed to get clipboard content.")
         return ""
 
 
-async def crear(url_id, tiempo_vida="60s"):
-    texto = obtener_contenido_portapapeles()
-    base_url = "https://cl1p.net"
-    convertir_tiempo_a_segundos(tiempo_vida)
-
-    async def crear_clip():
-        url = f"{base_url}/{url_id}"
-        datos = {"contenido": texto}
-        try:
-            respuesta = await asyncio.to_thread(requests.post, url, data=datos)
-            if respuesta.status_code == 200:
-                return True
-            else:
-                print(f"Fallo al crear el clip: Código de estado {respuesta.status_code}")
-                return False
-        except requests.exceptions.RequestException as e:
-            print(f"Fallo al crear el clip: {e}")
-            return False
-
-    exito_creacion = await crear_clip()
-    if exito_creacion:
-        print(f"Clip creado exitosamente: https://cl1p.net/{url_id}")
+async 
+    async 
+    create_success = await create_clip()
+    if create_success:
+        print(f"Clip created successfully: https://cl1p.net/{url_id}")
     else:
-        print("Fallo al crear el clip.")
+        print("Failed to create the clip.")
 
 
-def convertir_tiempo_a_segundos(tiempo_vida):
-    partes = tiempo_vida.split()
-    if len(partes) != 2:
-        raise ValueError(
-            "El tiempo de vida debe estar en el formato '<número> <unidad>' (por ejemplo, '1 día')."
-        )
 
-    valor, unidad = partes
+    value, unit = parts
     try:
-        valor = int(valor)
+        value = int(value)
     except ValueError:
-        raise ValueError("La primera parte del tiempo de vida debe ser un entero.")
+        raise ValueError("The first part of lifetime must be an integer.")
 
-    if "segundo" in unidad or "segundos" in unidad:
-        return valor
-    elif "minuto" in unidad or "minutos" in unidad:
-        return valor * 60
-    elif "hora" in unidad or "horas" in unidad:
-        return valor * 3600
-    elif "día" in unidad or "días" in unidad:
-        return valor * 86400
-    elif "semana" in unidad or "semanas" in unidad:
-        return valor * 604800
+    if "second" in unit or "seconds" in unit:
+        return value
+    elif "minute" in unit or "minutes" in unit:
+        return value * 60
+    elif "hour" in unit or "hours" in unit:
+        return value * 3600
+    elif "day" in unit or "days" in unit:
+        return value * 86400
+    elif "week" in unit or "weeks" in unit:
+        return value * 604800
     else:
         raise ValueError(
-            "Unidad de tiempo inválida. Utiliza segundos, minutos, horas, días o semanas."
+            "Invalid time unit provided. Use seconds, minutes, hours, days, or weeks."
         )
 
 
 if __name__ == "__main__":
     asyncio.run(
-        crear("yash1", "Este clip se autodestruirá en", "1 día")
-    )
+        create("yash1", "This clip will self-destruct!", "1 day")
+    )  # Example usage
+
+
+def convert_lifetime_to_seconds(lifetime):
+    parts = lifetime.split()
+    if len(parts) != 2:
+        raise ValueError(
+            "Lifetime must be in the format '<number> <unit>' (e.g., '1 day')."
+        )
+
+
+def create_clip():
+        url = f"{base_url}/{url_id}"
+        data = {"content": text}
+        try:
+            response = await asyncio.to_thread(requests.post, url, data=data)
+            if response.status_code == 200:
+                return True
+            else:
+                print(f"Failed to create clip: Status code {response.status_code}")
+                return False
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to create clip: {e}")
+            return False
+
+
+def create(url_id, lifetime="60s"):
+    text = get_clipboard_content()
+    base_url = "https://cl1p.net"
+    convert_lifetime_to_seconds(lifetime)
+
+
+def get_clipboard_content() -> str:
+    # Detect the operating system
+    current_os = platform.system()

@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from typing import List, Optional
 import numpy as np
+    return vectorizer.fit_transform(documents).toarray() 
 
-def vectorize_tfidf_docs(docs: List[str]) -> Optional[np.ndarray]:
+def tfidf_vectorize(documents: List[str]) -> Optional[np.ndarray]:
     vectorizer = TfidfVectorizer()
-    return vectorizer.fit_transform(docs).toarray()

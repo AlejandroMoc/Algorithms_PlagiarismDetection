@@ -2,44 +2,57 @@ import tkinter as tk
 from tkinter import ttk, Checkbutton, Radiobutton, IntVar, Scale, HORIZONTAL, Text, Spinbox, Listbox, Canvas
 
 # Define complex components here
-def generar_control_deslizante(contenedor):
-    control_deslizante = Scale(contenedor, from_=0, to=100, orient=HORIZONTAL, bg="#ffffff")
-    control_deslizante.pack(pady=(10, 0))
-    return control_deslizante
 
-def generar_casilla_verificacion(contenedor):
-    chk_var = IntVar()
-    casilla_verif = Checkbutton(contenedor, text="Habilitar Función", variable=chk_var, bg="#ffffff")
-    casilla_verif.pack(pady=(10, 0))
-    return casilla_verif
 
-def generar_radiobotones(contenedor):
+
+
+
+
+    return canvas 
+
+def create_canvas(frame):
+    canvas = Canvas(frame, width=100, height=100, bg="grey")
+    canvas.pack(pady=(10, 0))
+    canvas.create_oval(25, 25, 75, 75, fill="blue")
+
+
+def create_listbox(frame):
+    listbox = Listbox(frame)
+    listbox.insert(1, "Item 1")
+    listbox.insert(2, "Item 2")
+    listbox.pack(pady=(10, 0))
+    return listbox
+
+
+def create_spinbox(frame):
+    spinbox = Spinbox(frame, from_=0, to=10)
+    spinbox.pack(pady=(10, 0))
+    return spinbox
+
+
+def create_textbox(frame):
+    text_box = Text(frame, height=5, width=30)
+    text_box.pack(pady=(10, 0))
+    return text_box
+
+
+def create_radiobuttons(frame):
     r_var = IntVar()
-    rb1 = Radiobutton(contenedor, text="Opción 1", variable=r_var, value=1, bg="#ffffff")
-    rb1.pack()
-    rb2 = Radiobutton(contenedor, text="Opción 2", variable=r_var, value=2, bg="#ffffff")
-    rb2.pack()
-    return rb1, rb2
+    r1 = Radiobutton(frame, text="Option 1", variable=r_var, value=1, bg="#ffffff")
+    r1.pack()
+    r2 = Radiobutton(frame, text="Option 2", variable=r_var, value=2, bg="#ffffff")
+    r2.pack()
+    return r1, r2
 
-def generar_caja_texto(contenedor):
-    caja_texto = Text(contenedor, height=5, width=30)
-    caja_texto.pack(pady=(10, 0))
-    return caja_texto
 
-def generar_caja_numerica(contenedor):
-    caja_numerica = Spinbox(contenedor, from_=0, to=10)
-    caja_numerica.pack(pady=(10, 0))
-    return caja_numerica
+def create_checkbox(frame):
+    chk_var = IntVar()
+    chk = Checkbutton(frame, text="Enable Feature", variable=chk_var, bg="#ffffff")
+    chk.pack(pady=(10, 0))
+    return chk
 
-def generar_lista(contenedor):
-    lista = Listbox(contenedor)
-    lista.insert(1, "Elemento 1")
-    lista.insert(2, "Elemento 2")
-    lista.pack(pady=(10, 0))
-    return lista
 
-def generar_lienzo(contenedor):
-    lienzo = Canvas(contenedor, width=100, height=100, bg="gris")
-    lienzo.pack(pady=(10, 0))
-    lienzo.create_oval(25, 25, 75, 75, fill="azul")
-    return lienzo
+def create_slider(frame):
+    slider = Scale(frame, from_=0, to=100, orient=HORIZONTAL, bg="#ffffff")
+    slider.pack(pady=(10, 0))
+    return slider

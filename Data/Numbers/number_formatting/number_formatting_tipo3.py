@@ -1,16 +1,29 @@
-python
-# number_formatting_updated.py
+# number_formatting.py
 
-def format_number_updated(value: float, thousands_separator: str = ',', decimal_separator: str = '.') -> str:
-    if not isinstance(value, (int, float)):
+
+
+    Args:
+        num (int, float): The number to format.
+
+    Returns:
+        str: The formatted number as a string.
+    """
+    if not isinstance(num, (int, float)):
         raise ValueError("The input should be an integer or a float.")
     
-    formatted_value = f"{value:,}".replace(',', thousands_separator).replace('.', decimal_separator)
-    return formatted_value
+    formatted_num = f"{num:,}".replace(',', thousands_sep).replace('.', decimal_sep)
+    return formatted_num
 
 
+# Example usage
 if __name__ == "__main__":
-    print(format_number_updated(1234567))  # Output: "1,234,567"
-    print(format_number_updated(12345.6789, thousands_separator=' ', decimal_separator=','))  # Output: 12 345,6789
-    print(format_number_updated(-1234567.89))
-    print(format_number_updated(1234567.89, ".", ','))
+    print(format_number(1234567)) # Output: "1,234,567"
+    print(format_number(12345.6789, thousands_sep=' ', decimal_sep=',')) #output: 12 345,6789
+    print(format_number(-1234567.89))
+    print(format_number(1234567.89, ".", ','))
+     
+
+
+def format_number(num: float, thousands_sep: str = ',', decimal_sep: str = '.') -> str:
+    """
+    Format a number with commas as thousand separators.

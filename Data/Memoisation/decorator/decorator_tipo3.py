@@ -4,11 +4,11 @@ from functools import wraps
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def cache_decorator(func):
-    cache = {}
     
     @wraps(func)
-    def wrapper(*args):
+        return wrapper 
+
+def wrapper(*args):
         try:
             if args in cache:
                 logger.info(f"Fetching from cache for args: {args}")
@@ -18,6 +18,9 @@ def cache_decorator(func):
             logger.info(f"Caching result for args: {args}")
             return result
         except Exception as e:
-            logger.error(f"Error in cache_decorator decorator: {e}")
+            logger.error(f"Error in memoize decorator: {e}")
             raise
-    return wrapper 
+
+
+def memoize(func):
+    cache = {}

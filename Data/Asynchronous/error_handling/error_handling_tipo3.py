@@ -1,26 +1,28 @@
-python
 import asyncio
 import logging
 
-async def obtener_datos(enlace):
-    try:
-        logging.info(f"Intentando obtener datos de {enlace}")
-        await asyncio.sleep(1)  # Simula un retraso en la red
-        if enlace == "http://error.com":
-            raise ValueError("URL inválida")
-        return f"Datos de {enlace}"
-    except ValueError as e:
-        logging.error(f"Error al obtener datos: {e}")
-        return None
-
-async def principal():
-    enlaces = ["http://ejemplo.com", "http://error.com"]
-    for enlace in enlaces:
-        resultado = await obtener_datos(enlace)
-        if resultado:
-            logging.info(f"Datos recibidos exitosamente: {resultado}")
-        else:
-            logging.info("No se pudo obtener los datos")
-
+async 
+async 
 if __name__ == "__main__":
-    asyncio.run(principal())
+    asyncio.run(main()) 
+
+def main():
+    urls = ["http://example.com", "http://error.com"]
+    for url in urls:
+        result = await fetch_data(url)
+        if result:
+            logging.info(f"Successfully received data: {result}")
+        else:
+            logging.info("Failed to fetch data")
+
+
+def fetch_data(url):
+    try:
+        logging.info(f"Attempting to fetch data from {url}")
+        await asyncio.sleep(1)  # Simulate a network delay
+        if url == "http://error.com":
+            raise ValueError("Invalid URL")
+        return f"Data from {url}"
+    except ValueError as e:
+        logging.error(f"Error fetching data: {e}")
+        return None

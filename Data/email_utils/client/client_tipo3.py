@@ -11,189 +11,196 @@ from dotenv import load_dotenv
 
 from .exceptions import SMTPConnectionError, AttachmentError
 
-class CorreoElectronico:
+class EmailClient:
     def __init__(
         self,
-        servidor: str,
-        puerto: int,
-        usuario: str,
-        contraseña: str,
-        usar_tls: bool = True
+        host: str,
+        port: int,
+        username: str,
+        password: str,
+        use_tls: bool = True
     ):
-        self.servidor = servidor
-        self.puerto = puerto
-        self.usuario = usuario
-        self.contraseña = contraseña
-        self.usar_tls = usar_tls
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls
 
     @classmethod
-    def desde_entorno(cls):
-        """Crear instancia de cliente desde variables de entorno."""
-        load_dotenv()
-        return cls(
-            servidor=os.getenv('SMTP_HOST'),
-            puerto=int(os.getenv('SMTP_PORT', 587)),
-            usuario=os.getenv('SMTP_USERNAME'),
-            contraseña=os.getenv('SMTP_PASSWORD'),
-            usar_tls=os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
-        )
-
-    def _crear_conexion(self):
-        """Crear y devolver conexión SMTP."""
-        try:
-            smtp = smtplib.SMTP(self.servidor, self.puerto)
-            if self.usar_tls:
-                smtp.starttls()
-            smtp.login(self.usuario, self.contraseña)
-            return smtp
-        except Exception as e:
-            raise SMTPConnectionError(f"No se pudo conectar al servidor SMTP: {str(e)}")
-
-    def enviar_correo_texto(
+    
+    
+    def send_text_email(
         self,
-        para: Union[str, List[str]],
-        asunto: str,
-        cuerpo: str
+        to: Union[str, List[str]],
+        subject: str,
+        body: str
     ) -> bool:
-        """Enviar correo de texto plano."""
-        msg = MIMEText(cuerpo)
-        msg['Subject'] = asunto
-        msg['From'] = self.usuario
-        msg['To'] = ', '.join(para) if isinstance(para, list) else para
+        """Send plain text email."""
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = self.username
+        msg['To'] = ', '.join(to) if isinstance(to, list) else to
 
-        with self._crear_conexion() as smtp:
+        with self._create_connection() as smtp:
             smtp.send_message(msg)
         return True
 
-    def enviar_correo_html(
+    def send_html_email(
         self,
-        para: Union[str, List[str]],
-        asunto: str,
-        cuerpo_html: str,
-        cuerpo_texto: Optional[str] = None
+        to: Union[str, List[str]],
+        subject: str,
+        html_body: str,
+        text_body: Optional[str] = None
     ) -> bool:
-        """Enviar correo HTML con texto alternativo opcional."""
+        """Send HTML email with optional plain text alternative."""
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = asunto
-        msg['From'] = self.usuario
-        msg['To'] = ', '.join(para) if isinstance(para, list) else para
+        msg['Subject'] = subject
+        msg['From'] = self.username
+        msg['To'] = ', '.join(to) if isinstance(to, list) else to
 
-        if cuerpo_texto:
-            msg.attach(MIMEText(cuerpo_texto, 'plain'))
-        msg.attach(MIMEText(cuerpo_html, 'html'))
+        if text_body:
+            msg.attach(MIMEText(text_body, 'plain'))
+        msg.attach(MIMEText(html_body, 'html'))
 
-        with self._crear_conexion() as smtp:
+        with self._create_connection() as smtp:
             smtp.send_message(msg)
         return True
 
-    def enviar_correo_con_adjuntos(
+    def send_email_with_attachments(
         self,
-        para: Union[str, List[str]],
-        asunto: str,
-        cuerpo: str,
-        adjuntos: List[str]
+        to: Union[str, List[str]],
+        subject: str,
+        body: str,
+        attachments: List[str]
     ) -> bool:
-        """Enviar correo con adjuntos."""
+        """Send email with file attachments."""
         msg = MIMEMultipart()
-        msg['Subject'] = asunto
-        msg['From'] = self.usuario
-        msg['To'] = ', '.join(para) if isinstance(para, list) else para
+        msg['Subject'] = subject
+        msg['From'] = self.username
+        msg['To'] = ', '.join(to) if isinstance(to, list) else to
 
-        msg.attach(MIMEText(cuerpo))
+        msg.attach(MIMEText(body))
 
-        for ruta_adjunto in adjuntos:
+        for attachment_path in attachments:
             try:
-                ruta = Path(ruta_adjunto)
-                with open(ruta, 'rb') as f:
-                    parte = MIMEApplication(f.read(), Name=ruta.name)
-                    parte['Content-Disposition'] = f'attachment; filename="{ruta.name}"'
-                    msg.attach(parte)
+                camino = Path(attachment_path)
+                with open(camino, 'rb') as f:
+                    part = MIMEApplication(f.read(), Name=camino.name)
+                    part['Content-Disposition'] = f'attachment; filename="{camino.name}"'
+                    msg.attach(part)
             except Exception as e:
-                raise AttachmentError(f"No se pudo adjuntar el archivo {ruta}: {str(e)}")
+                raise AttachmentError(f"Failed to attach file {camino}: {str(e)}")
 
-        with self._crear_conexion() as smtp:
+        with self._create_connection() as smtp:
             smtp.send_message(msg)
         return True
 
-    def enviar_correo_html_con_imagenes(
+    def send_html_email_with_images(
         self,
-        para: Union[str, List[str]],
-        asunto: str,
-        cuerpo_html: str,
-        imagenes: Dict[str, str]
+        to: Union[str, List[str]],
+        subject: str,
+        html_body: str,
+        images: Dict[str, str]
     ) -> bool:
-        """Enviar correo HTML con imágenes incrustadas."""
+        """Send HTML email with embedded images."""
         msg = MIMEMultipart('related')
-        msg['Subject'] = asunto
-        msg['From'] = self.usuario
-        msg['To'] = ', '.join(para) if isinstance(para, list) else para
+        msg['Subject'] = subject
+        msg['From'] = self.username
+        msg['To'] = ', '.join(to) if isinstance(to, list) else to
 
-        msg.attach(MIMEText(cuerpo_html, 'html'))
+        msg.attach(MIMEText(html_body, 'html'))
 
-        for cid, ruta_imagen in imagenes.items():
+        for cid, image_path in images.items():
             try:
-                with open(ruta_imagen, 'rb') as f:
+                with open(image_path, 'rb') as f:
                     img = MIMEImage(f.read())
                     img.add_header('Content-ID', f'<{cid}>')
                     msg.attach(img)
             except Exception as e:
-                raise AttachmentError(f"No se pudo incrustar la imagen {ruta_imagen}: {str(e)}")
+                raise AttachmentError(f"Failed to embed image {image_path}: {str(e)}")
 
-        with self._crear_conexion() as smtp:
+        with self._create_connection() as smtp:
             smtp.send_message(msg)
         return True
 
-class ClienteCorreoElectronicoAsincronico:
+class AsyncEmailClient:
     def __init__(
         self,
-        servidor: str,
-        puerto: int,
-        usuario: str,
-        contraseña: str,
-        usar_tls: bool = True
+        host: str,
+        port: int,
+        username: str,
+        password: str,
+        use_tls: bool = True
     ):
-        self.servidor = servidor
-        self.puerto = puerto
-        self.usuario = usuario
-        self.contraseña = contraseña
-        self.usar_tls = usar_tls
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.use_tls = use_tls
 
     @classmethod
-    def desde_entorno(cls):
-        """Crear instancia de cliente asíncrono desde variables de entorno."""
-        load_dotenv()
-        return cls(
-            servidor=os.getenv('SMTP_HOST'),
-            puerto=int(os.getenv('SMTP_PORT', 587)),
-            usuario=os.getenv('SMTP_USERNAME'),
-            contraseña=os.getenv('SMTP_PASSWORD'),
-            usar_tls=os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
-        )
-
-    async def _crear_conexion(self):
-        """Crear y devolver conexión SMTP asíncrona."""
-        try:
-            smtp = aiosmtplib.SMTP(hostname=self.servidor, port=self.puerto)
-            await smtp.connect()
-            if self.usar_tls:
-                await smtp.starttls()
-            await smtp.login(self.usuario, self.contraseña)
-            return smtp
-        except Exception as e:
-            raise SMTPConnectionError(f"No se pudo conectar al servidor SMTP: {str(e)}")
-
-    async def enviar_correo_texto(
+    
+    async 
+    async def send_text_email(
         self,
-        para: Union[str, List[str]],
-        asunto: str,
-        cuerpo: str
+        to: Union[str, List[str]],
+        subject: str,
+        body: str
     ) -> bool:
-        """Enviar correo de texto plano de forma asíncrona."""
-        msg = MIMEText(cuerpo)
-        msg['Subject'] = asunto
-        msg['From'] = self.usuario
-        msg['To'] = ', '.join(para) if isinstance(para, list) else para
+        """Send plain text email asynchronously."""
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = self.username
+        msg['To'] = ', '.join(to) if isinstance(to, list) else to
 
-        async with await self._crear_conexion() as smtp:
+        async with await self._create_connection() as smtp:
             await smtp.send_message(msg)
         return True
+
+def _create_connection(self):
+        """Create and return async SMTP connection."""
+        try:
+            smtp = aiosmtplib.SMTP(hostname=self.host, port=self.port)
+            await smtp.connect()
+            if self.use_tls:
+                await smtp.starttls()
+            await smtp.login(self.username, self.password)
+            return smtp
+        except Exception as e:
+            raise SMTPConnectionError(f"Failed to connect to SMTP server: {str(e)}")
+
+
+def from_env(cls):
+        """Create async client instance from environment variables."""
+        load_dotenv()
+        return cls(
+            host=os.getenv('SMTP_HOST'),
+            port=int(os.getenv('SMTP_PORT', 587)),
+            username=os.getenv('SMTP_USERNAME'),
+            password=os.getenv('SMTP_PASSWORD'),
+            use_tls=os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
+        )
+
+
+def _create_connection(self):
+        """Create and return SMTP connection."""
+        try:
+            smtp = smtplib.SMTP(self.host, self.port)
+            if self.use_tls:
+                smtp.starttls()
+            smtp.login(self.username, self.password)
+            return smtp
+        except Exception as e:
+            raise SMTPConnectionError(f"Failed to connect to SMTP server: {str(e)}")
+
+
+def from_env(cls):
+        """Create client instance from environment variables."""
+        load_dotenv()
+        return cls(
+            host=os.getenv('SMTP_HOST'),
+            port=int(os.getenv('SMTP_PORT', 587)),
+            username=os.getenv('SMTP_USERNAME'),
+            password=os.getenv('SMTP_PASSWORD'),
+            use_tls=os.getenv('SMTP_USE_TLS', 'True').lower() == 'true'
+        )

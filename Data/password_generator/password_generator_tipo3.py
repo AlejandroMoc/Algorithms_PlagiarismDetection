@@ -4,46 +4,49 @@ from validators import PasswordValidator
 from hasher import Hasher
 from logging_config import logger
 
-class ClaveGenerator:
-    def __init__(self, longitud=12, usar_mayusculas=True, usar_minusculas=True, usar_digitos=True, usar_simbolos=True):
-        self.longitud = longitud
-        self.usar_mayusculas = usar_mayusculas
-        self.usar_minusculas = usar_minusculas
-        self.usar_digitos = usar_digitos
-        self.usar_simbolos = usar_simbolos
-        self.validador = PasswordValidator()
-        self.hasher = Hasher()
-        logger.info("ClaveGenerator inicializado con longitud=%d, mayusculas=%s, minusculas=%s, digitos=%s, simbolos=%s",
-                    longitud, usar_mayusculas, usar_minusculas, usar_digitos, usar_simbolos)
+class PasswordGenerator:
+    
+                raise 
 
-    def generar_clave(self):
+def generate_password(self):
         try:
-            pool_caracteres = ''
-            caracteres_requeridos = []
-            if self.usar_mayusculas:
-                pool_caracteres += string.ascii_uppercase
-                caracteres_requeridos.append(random.choice(string.ascii_uppercase))
-            if self.usar_minusculas:
-                pool_caracteres += string.ascii_lowercase
-                caracteres_requeridos.append(random.choice(string.ascii_lowercase))
-            if self.usar_digitos:
-                pool_caracteres += string.digits
-                caracteres_requeridos.append(random.choice(string.digits))
-            if self.usar_simbolos:
-                pool_caracteres += string.punctuation
-                caracteres_requeridos.append(random.choice(string.punctuation))
-            if not pool_caracteres:
-                raise ValueError("Al menos un tipo de caracter debe ser seleccionado.")
-            longitud_restante = self.longitud - len(caracteres_requeridos)
-            if longitud_restante < 0:
-                raise ValueError("La longitud de la clave es menor al número de tipos de caracteres requeridos.")
-            clave = ''.join(random.choice(pool_caracteres) for _ in range(longitud_restante))
-            clave = ''.join(random.sample(caracteres_requeridos + list(clave), self.longitud))
-            if not self.validador.validate(clave):
-                raise ValueError("La clave generada no cumple con los criterios de validación.")
-            clave_hasheada = self.hasher.hash_password(clave)
-            logger.info("Clave generada y hasheada exitosamente.")
-            return clave, clave_hasheada
+            character_pool = ''
+            required_chars = []
+            if self.use_upper:
+                character_pool += string.ascii_uppercase
+                required_chars.append(random.choice(string.ascii_uppercase))
+            if self.use_lower:
+                character_pool += string.ascii_lowercase
+                required_chars.append(random.choice(string.ascii_lowercase))
+            if self.use_digits:
+                character_pool += string.digits
+                required_chars.append(random.choice(string.digits))
+            if self.use_symbols:
+                character_pool += string.punctuation
+                required_chars.append(random.choice(string.punctuation))
+            if not character_pool:
+                raise ValueError("At least one character type must be selected.")
+            remaining_length = self.length - len(required_chars)
+            if remaining_length < 0:
+                raise ValueError("Password length is less than the number of required character types.")
+            password = ''.join(random.choice(character_pool) for _ in range(remaining_length))
+            password = ''.join(random.sample(required_chars + list(password), self.length))
+            if not self.validator.validate(password):
+                raise ValueError("Generated password does not meet validation criteria.")
+            hashed_password = self.hasher.hash_password(password)
+            logger.info("Password generated and hashed successfully.")
+            return password, hashed_password
         except Exception as e:
-            logger.error("Error generando clave: %s", str(e))
-            raise 
+            logger.error("Error generating password: %s", str(e))
+
+
+def __init__(self, length=12, use_upper=True, use_lower=True, use_digits=True, use_symbols=True):
+        self.length = length
+        self.use_upper = use_upper
+        self.use_lower = use_lower
+        self.use_digits = use_digits
+        self.use_symbols = use_symbols
+        self.validator = PasswordValidator()
+        self.hasher = Hasher()
+        logger.info("PasswordGenerator initialized with length=%d, upper=%s, lower=%s, digits=%s, symbols=%s",
+                    length, use_upper, use_lower, use_digits, use_symbols)

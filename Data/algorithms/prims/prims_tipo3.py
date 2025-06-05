@@ -1,44 +1,47 @@
-def minimum_spanning_tree(cost_matrix):
-    num_vertices = len(cost_matrix)
-    if num_vertices == 0:
-        print("Empty graph, no edges to process.")
-        return
 
-    visited_vertices = [False] * num_vertices
-    visited_vertices[0] = True
-    total_cost = 0
-    edges_processed = 0
+    visitados = [False] * n
+    visitados[0] = True  # Start with vertex 0
+    mincost = 0
+    edges_in_mst = 0
 
-    while edges_processed < num_vertices - 1:
-        min_edge_cost = float('inf')
-        vertex_a = vertex_b = -1
+    while edges_in_mst < n - 1:
+        min_edge = float('inf')
+        a = b = -1
 
-        for i in range(num_vertices):
-            if visited_vertices[i]:
-                for j in range(num_vertices):
-                    if not visited_vertices[j] and cost_matrix[i][j] < min_edge_cost:
-                        min_edge_cost = cost_matrix[i][j]
-                        vertex_a, vertex_b = i, j
+        for i in range(n):
+            if visitados[i]:
+                for j in range(n):
+                    if not visitados[j] and cost_matrix[i][j] < min_edge:
+                        min_edge = cost_matrix[i][j]
+                        a, b = i, j
 
-        if vertex_a != -1 and vertex_b != -1:
-            print(f"Edge from vertex {vertex_a} to {vertex_b} with cost = {min_edge_cost}")
-            visited_vertices[vertex_b] = True
-            total_cost += min_edge_cost
-            cost_matrix[vertex_a][vertex_b] = cost_matrix[vertex_b][vertex_a] = float('inf')
-            edges_processed += 1
+        if a != -1 and b != -1:  # Valid edge found
+            print(f"Edge from vertex {a} to {b} with cost = {min_edge}")
+            visitados[b] = True
+            mincost += min_edge
+            cost_matrix[a][b] = cost_matrix[b][a] = float('inf')  # Avoid reusing this edge
+            edges_in_mst += 1
 
-    print(f"Cost of MST: {total_cost}")
+    print(f"Cost of MST: {mincost}")
 
-def main():
-    num_vertices = int(input("Enter the number of vertices: "))
-    cost_matrix = []
 
     print("Enter the cost matrix:")
-    for i in range(num_vertices):
+    for i in range(n):
         row = list(map(int, input().split()))
         cost_matrix.append(row)
 
-    minimum_spanning_tree(cost_matrix)
+    prims(cost_matrix)
 
 if __name__ == "__main__":
     main()
+
+def main():
+    n = int(input("Enter the number of puntos: "))
+    cost_matrix = []
+
+
+def prims(cost_matrix):
+    n = len(cost_matrix)
+    if n == 0:
+        print("Empty mapa, no conexiones to process.")
+        return

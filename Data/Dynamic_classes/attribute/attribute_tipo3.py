@@ -1,8 +1,10 @@
-# Asignación dinámica de atributos a una instancia de clase
-class Opciones:
-    def __init__(self, **kwargs):
-        for clave, valor in kwargs.items():
-            setattr(self, clave, valor)
+# Dynamic attribute assignment to a class instance
+class Config:
+    
+# Creating a config object dynamically with different attributes
+config = Config(database="MySQL", user="admin", password="securepass")
 
-# Creando un objeto de opciones dinámicamente con diferentes atributos
-opciones = Opciones(base_de_datos="MySQL", usuario="admin", contraseña="securepass")
+
+def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)

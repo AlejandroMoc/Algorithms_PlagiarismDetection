@@ -1,12 +1,25 @@
-def ejecutar_consulta(conexion, consulta, parametros=None):
-    cursor = conexion.cursor()
-    cursor.execute(consulta, parametros)
+
+    Args:
+        connection: The database connection object.
+        query (str): The SQL query to execute.
+        params (tuple, optional): The parameters for the query.
+
+    Returns:
+        list: The result of a SELECT query, or None for other queries.
+    """
+    cursor = connection.cursor()
+    cursor.execute(query, params)
     
-    if consulta.strip().upper().startswith('SELECT'):
-        resultado = cursor.fetchall()
+    if query.strip().upper().startswith('SELECT'):
+        result = cursor.fetchall()
     else:
-        conexion.commit()
-        resultado = None
+        connection.commit()
+        result = None
     
     cursor.close()
-    return resultado
+    return result
+
+
+def execute_query(connection, query, params=None):
+    """
+    Executes a SQL query (SELECT, INSERT, UPDATE, DELETE).

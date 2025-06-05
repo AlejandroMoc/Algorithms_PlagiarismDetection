@@ -1,12 +1,8 @@
-def convert_decimal_to_hex(decimal_val):
-    if isinstance(decimal_val, int):
-        return hex(decimal_val)[2:].upper()
-    return "Invalid decimal number"
 
 # Example usage
-decimal_val = 26
-hex_string = convert_decimal_to_hex(decimal_val)
-print(f"The hexadecimal representation of decimal {decimal_val} is {hex_string}")
+decimal_number = 26
+hex_str = decimal_to_hex(decimal_number)
+print(f"The hexadecimal representation of decimal {decimal_number} is {hex_str}")
 
 # Edge Cases and Limitations:
 # - Input: -26 (Negative numbers)
@@ -14,3 +10,8 @@ print(f"The hexadecimal representation of decimal {decimal_val} is {hex_string}"
 
 # Optional Improvements:
 # - Add support for floating-point decimal numbers
+
+def decimal_to_hex(decimal_number):
+    if isinstance(decimal_number, int):
+        return hex(decimal_number)[2:].upper()
+    return "Invalid decimal number"

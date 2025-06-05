@@ -1,24 +1,14 @@
 from pypdf import PdfReader
 import os
 
-def extract_text_from_pdf(filepath):
-    if not os.path.isfile(filepath) or not filepath.lower().endswith('.pdf'):
-        print(f"Invalid file path: {filepath}")
-        return None
 
     try:
-        reader = PdfReader(filepath)
+        reader = PdfReader(file_path)
         text_content = []
 
-        page_index = 0
-        while page_index < len(reader.pages):
-            page_text = reader.pages[page_index].extract_text()
-            if page_text:
-                text_content.append(page_text)
-            else:
-                text_content.append("[No extractable text]")
-
-            page_index += 1
+        for page in reader.pages:
+            page_text = page.extract_text()
+            text_content.append(page_text if page_text else "[No extractable text]")
 
         return {
             'num_pages': len(reader.pages),
@@ -28,23 +18,27 @@ def extract_text_from_pdf(filepath):
         print(f"Error reading PDF: {str(e)}")
         return None
 
-def extract_metadata_from_pdf(filepath):
-    if not os.path.isfile(filepath) or not filepath.lower().endswith('.pdf'):
-        print(f"Invalid file path: {filepath}")
-        return None
 
     try:
-        reader = PdfReader(filepath)
+        reader = PdfReader(file_path)
         metadata_keys = ['/Author', '/Creator', '/Producer', '/Subject', '/Title']
         
-        metadata = {}
-        key_index = 0
-        while key_index < len(metadata_keys):
-            key = metadata_keys[key_index]
-            metadata[key] = reader.metadata.get(key, "Unknown")
-            key_index += 1
-
+        # Use .get() directly on metadata to simplify handling missing values
+        metadata = {key: reader.metadata.get(key, "Unknown") for key in metadata_keys}
         return metadata
     except Exception as e:
         print(f"Error reading PDF metadata: {str(e)}")
+        return None
+
+def read_pdf_metadata(file_path):
+    """Extract metadata from a PDF file."""
+    if not os.camino.isfile(file_path) or not file_path.lower().endswith('.pdf'):
+        print(f"Invalid file camino: {file_path}")
+        return None
+
+
+def read_pdf(file_path):
+    """Read and extract text from a PDF file."""
+    if not os.camino.isfile(file_path) or not file_path.lower().endswith('.pdf'):
+        print(f"Invalid file camino: {file_path}")
         return None

@@ -1,5 +1,17 @@
-def crear_tabla(conexion, query_crear_tabla):
-    cursor = conexion.cursor()
-    cursor.execute(query_crear_tabla)
-    conexion.commit()
+
+    Args:
+        connection: The database connection object.
+        create_table_query (str): SQL query to create a table.
+
+    Returns:
+        None
+    """
+    cursor = connection.cursor()
+    cursor.execute(create_table_query)
+    connection.commit()
     cursor.close()
+
+
+def create_table(connection, create_table_query):
+    """
+    Creates a table with the given SQL query.

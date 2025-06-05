@@ -5,24 +5,36 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def check_abundance(num: int) -> bool:
-    if num < 1:
+
+    An abundant number is a number for which the sum of its proper divisors exceeds the number itself.
+
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is abundant, False otherwise.
+    """
+    if number < 1:
         logging.error("Number must be a positive integer.")
         raise ValueError("Number must be a positive integer.")
 
-    div_sum = sum(i for i in range(1, num) if num % i == 0)
-    logging.debug(f"Sum of divisors for {num}: {div_sum}")
+    divisors_sum = sum(i for i in range(1, number) if number % i == 0)
+    logging.debug(f"Sum of divisors for {number}: {divisors_sum}")
 
-    if div_sum > num:
-        logging.info(f"{num} is an Abundant number.")
+    if divisors_sum > number:
+        logging.info(f"{number} is an Abundant number.")
         return True
     else:
-        logging.info(f"{num} is not an Abundant number.")
+        logging.info(f"{number} is not an Abundant number.")
         return False
 
 if __name__ == "__main__":
     try:
-        check_abundance(12)  # Abundant
-        check_abundance(28)  # Not Abundant
-    except ValueError as error:
-        logging.error(f"Error: {error}")
+        is_abundant(12)  # Abundant
+        is_abundant(28)  # Not Abundant
+    except ValueError as ve:
+        logging.error(f"Error: {ve}")
+
+def is_abundant(number: int) -> bool:
+    """
+    Determine if a number is an abundant number.

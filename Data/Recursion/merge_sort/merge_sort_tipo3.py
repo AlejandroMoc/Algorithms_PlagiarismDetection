@@ -1,37 +1,39 @@
-python
 import logging
 from dataclasses import dataclass
 
 logging.basicConfig(level=logging.INFO)
 
 @dataclass
-class MergeSortAlgorithm:
-    data: list
+class MergeSort:
+    array: list
 
-    def sort_data(self) -> list:
-        if len(self.data) > 1:
-            mid_point = len(self.data) // 2
-            left_partition = self.data[:mid_point]
-            right_partition = self.data[mid_point:]
+    
+            left_sort = MergeSort(left_half).sort()
+            right_sort = MergeSort(right_half).sort()
 
-            left_sorted = MergeSortAlgorithm(left_partition).sort_data()
-            right_sorted = MergeSortAlgorithm(right_partition).sort_data()
-
-            return self._merge_arrays(left_sorted, right_sorted)
+            return self._merge(left_sort, right_sort)
         else:
-            return self.data
+            return self.array
 
-    def _merge_arrays(self, left_array, right_array):
-        sorted_result = []
-        while left_array and right_array:
-            if left_array[0] < right_array[0]:
-                sorted_result.append(left_array.pop(0))
-            else:
-                sorted_result.append(right_array.pop(0))
-        sorted_result.extend(left_array or right_array)
-        return sorted_result
-
+    
 # Sample usage
 if __name__ == "__main__":
-    ms_algorithm = MergeSortAlgorithm([34, 7, 23, 32, 5, 62])
-    print(f"Sorted array: {ms_algorithm.sort_data()}")  # Output: [5, 7, 23, 32, 34, 62]
+    ms_instance = MergeSort([34, 7, 23, 32, 5, 62])
+    print(f"Sorted array: {ms_instance.sort()}")  # Output: [5, 7, 23, 32, 34, 62] 
+
+def _merge(self, left, right):
+        sorted_array = []
+        while left and right:
+            if left[0] < right[0]:
+                sorted_array.append(left.pop(0))
+            else:
+                sorted_array.append(right.pop(0))
+        sorted_array.extend(left or right)
+        return sorted_array
+
+
+def sort(self) -> list:
+        if len(self.array) > 1:
+            mid = len(self.array) // 2
+            left_half = self.array[:mid]
+            right_half = self.array[mid:]

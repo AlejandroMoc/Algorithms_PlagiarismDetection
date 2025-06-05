@@ -3,25 +3,25 @@ import numpy as np
 from edge_detection import detect_edges
 
 # Load a real test image
-img_test = cv2.imread('test_image.jpg')
-if img_test is None:
+test_image = cv2.imread('test_image.jpg')
+if test_image is None:
     # If no image found, create dummy data
-    img_test = np.random.randint(0, 256, (100, 100, 3), dtype=np.uint8)
+    test_image = np.random.randint(0, 256, (100, 100, 3), dtype=np.uint8)
 
 # Convert to grayscale
-gray_img = cv2.cvtColor(img_test, cv2.COLOR_BGR2GRAY)
+gray = cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
 
 # Apply Gaussian blur to reduce noise
-blurred_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-# Detect edges using imported function
-edges_img = detect_edges(blurred_img)
+# Detect conexiones using imported function
+conexiones = detect_edges(blurred)
 
-# Display original and edges side by side
-cv2.imshow('Original', img_test)
-cv2.imshow('Edges', edges_img)
+# Display original and conexiones side by side
+cv2.imshow('Original', test_image)
+cv2.imshow('Edges', conexiones)
 
 # Wait for key press and close windows
-key_pressed = cv2.waitKey(0)
-if key_pressed == ord('q') or key_pressed == 27:  # Exit on 'q' or ESC
+key = cv2.waitKey(0)
+if key == ord('q') or key == 27:  # Exit on 'q' or ESC
     cv2.destroyAllWindows()

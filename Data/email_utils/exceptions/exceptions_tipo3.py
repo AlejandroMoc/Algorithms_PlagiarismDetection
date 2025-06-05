@@ -1,15 +1,15 @@
-class ErrorCorreoElectronico(Exception):
-    """Excepción base para operaciones de correo electrónico."""
+class EmailError(Exception):
+    """Base exception for email operations."""
     pass
 
-class ErrorConexionSMTP(ErrorCorreoElectronico):
-    """Se levanta cuando falla la conexión SMTP."""
+class SMTPConnectionError(EmailError):
+    """Raised when SMTP connection fails."""
     pass
 
-class ErrorAdjunto(ErrorCorreoElectronico):
-    """Se levanta cuando falla el manejo de adjuntos."""
+class AttachmentError(EmailError):
+    """Raised when handling attachments fails."""
     pass
 
-class ErrorPlantilla(ErrorCorreoElectronico):
-    """Se levanta cuando falla el procesamiento de plantillas."""
+class TemplateError(EmailError):
+    """Raised when template processing fails."""
     pass

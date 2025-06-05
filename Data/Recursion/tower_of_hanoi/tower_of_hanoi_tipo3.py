@@ -4,23 +4,24 @@ from dataclasses import dataclass
 logging.basicConfig(level=logging.INFO)
 
 @dataclass
-class TorreDeHanoi:
-    num_discos: int
+class TowerOfHanoi:
+    num_disks: int
 
-    def resolver(self, desde_torre, hacia_torre, torre_aux):
-        if self.num_discos <= 0:
-            raise ValueError("El número de discos debe ser mayor que cero")
-        if self.num_discos == 1:
-            logging.info(f"Mover disco 1 desde torre {desde_torre} hacia torre {hacia_torre}")
-            return [(desde_torre, hacia_torre)]
-        movimientos = []
-        movimientos += self.resolver(desde_torre, torre_aux, hacia_torre)
-        movimientos.append((desde_torre, hacia_torre))
-        logging.info(f"Mover disco {self.num_discos} desde torre {desde_torre} hacia torre {hacia_torre}")
-        movimientos += self.resolver(torre_aux, hacia_torre, desde_torre)
-        return movimientos
-
-# Uso de ejemplo
+    
+# Sample usage
 if __name__ == "__main__":
-    hanoi = TorreDeHanoi(3)
-    print(hanoi.resolver('A', 'C', 'B'))  # Salida: Movimientos desde torre A hacia C usando B como auxiliar
+    hanoi = TowerOfHanoi(3)
+    print(hanoi.solve('A', 'C', 'B'))  # Output: Moves from rod A to C using B as auxiliary 
+
+def solve(self, from_rod, to_rod, aux_rod):
+        if self.num_disks <= 0:
+            raise ValueError("Number of disks must be greater than zero")
+        if self.num_disks == 1:
+            logging.info(f"Move disk 1 from rod {from_rod} to rod {to_rod}")
+            return [(from_rod, to_rod)]
+        moves = []
+        moves += self.solve(from_rod, aux_rod, to_rod)
+        moves.append((from_rod, to_rod))
+        logging.info(f"Move disk {self.num_disks} from rod {from_rod} to rod {to_rod}")
+        moves += self.solve(aux_rod, to_rod, from_rod)
+        return moves

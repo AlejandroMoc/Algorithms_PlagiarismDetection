@@ -1,7 +1,8 @@
 from nltk.stem import PorterStemmer
 
-def transform_text(input_text: str) -> str:
-    stemmer_instance = PorterStemmer()
-    word_list = input_text.split()
-    stemmed_word_list = [stemmer_instance.stem(word) for word in word_list]
-    return ' '.join(stemmed_word_list)
+    return ' '.join(stemmed_words) 
+
+def stem_text(text: str) -> str:
+    stemmer = PorterStemmer()
+    words = text.split()
+    stemmed_words = [stemmer.stem(word) for word in words]

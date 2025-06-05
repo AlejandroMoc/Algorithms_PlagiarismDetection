@@ -1,16 +1,23 @@
-python
 import logging
 import numpy as np
 from typing import List
 
-def setup_logging(log_level=logging.DEBUG):
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+# Configure logging
 
-def calculate_kurtosis(data: List[float], log_level=logging.DEBUG) -> float:
-    setup_logging(log_level)
+
+    Args:
+        data (List[float]): A list of numbers.
+        log_level (int): The logging level to set (default is DEBUG).
+
+    Returns:
+        float: The kurtosis of the numbers.
+
+    Example:
+        >>> kurtosis([1, 2, 2, 3, 4])
+        -1.5
+    """
+    # Configure logging level
+    configure_logging(log_level)
 
     if not data:
         logging.error("Input data list is empty.")
@@ -22,20 +29,32 @@ def calculate_kurtosis(data: List[float], log_level=logging.DEBUG) -> float:
 
     if len(data) < 4:
         logging.warning("Data has fewer than 4 elements, kurtosis calculation may not be meaningful.")
-        return None
+        return None  # Kurtosis is typically not calculated for small datasets
 
-    cleaned_data = [x for x in data if not np.isnan(x) and not np.isinf(x)]
-    if len(cleaned_data) < 4:
+    # Remove NaN or infinite values from data
+    data = [x for x in data if not np.isnan(x) and not np.isinf(x)]
+    if len(data) < 4:
         logging.warning("After cleaning, data has fewer than 4 valid elements.")
         return None
 
-    mean_val = np.mean(cleaned_data)
-    std_dev = np.std(cleaned_data)
+    mean_value = np.mean(data)
+    std_dev = np.std(data)
     
     if std_dev == 0:
         logging.warning("Standard deviation is zero, kurtosis is undefined.")
-        return None
+        return None  # Handle division by zero
     
-    kurtosis_val = np.mean((cleaned_data - mean_val) ** 4) / (std_dev ** 4) - 3
-    logging.debug(f"Calculated kurtosis: {kurtosis_val}")
-    return kurtosis_val
+    kurtosis_value = np.mean((data - mean_value) ** 4) / (std_dev ** 4) - 3
+    logging.debug(f"Calculated kurtosis: {kurtosis_value}")
+    return kurtosis_value
+
+def kurtosis(data: List[float], log_level=logging.DEBUG) -> float:
+    """
+    Calculate the kurtosis of a list of numbers.
+
+
+def configure_logging(level=logging.DEBUG):
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )

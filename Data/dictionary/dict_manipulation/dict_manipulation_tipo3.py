@@ -1,88 +1,226 @@
 import json
 
-def agregar_elemento(diccionario: dict, clave, valor) -> dict:
-    diccionario[clave] = valor
-    return diccionario
 
-def actualizar_elemento(diccionario: dict, clave, valor) -> dict:
-    if clave in diccionario:
-        diccionario[clave] = valor
-    return diccionario
+    Example usage:
+    add_item({'a': 1}, 'b', 2) -> {'a': 1, 'b': 2}
+    """
+    d[key] = value
+    return d
 
-def eliminar_elemento(diccionario: dict, clave) -> dict:
-    diccionario.pop(clave, None)
-    return diccionario
 
-def verificar_clave(diccionario: dict, clave) -> bool:
-    return clave in diccionario
+    Example usage:
+    update_item({'a': 1}, 'a', 2) -> {'a': 2}
+    """
+    if key in d:
+        d[key] = value
+    return d
 
-def iterar_claves(diccionario: dict) -> list:
-    return list(diccionario.keys())
 
-def iterar_valores(diccionario: dict) -> list:
-    return list(diccionario.values())
+    Example usage:
+    remove_item({'a': 1, 'b': 2}, 'a') -> {'b': 2}
+    """
+    d.pop(key, None)
+    return d
 
-def combinar_diccionarios(dic1: dict, dic2: dict) -> dict:
-    dic1.update(dic2)
-    return dic1
 
-def copiar_diccionario(diccionario: dict) -> dict:
-    return diccionario.copy()
+    Example usage:
+    check_for_key({'a': 1}, 'a') -> True
+    """
+    return key in d
 
-def limpiar_diccionario(diccionario: dict) -> dict:
-    diccionario.clear()
-    return diccionario
 
-def encontrar_clave_por_valor(diccionario: dict, valor) -> list:
-    return [k for k, v in diccionario.items() if v == valor]
+    Example usage:
+    iterate_keys({'a': 1, 'b': 2}) -> ['a', 'b']
+    """
+    return list(d.keys())
 
-def invertir_diccionario(diccionario: dict) -> dict:
-    return {v: k for k, v in diccionario.items()}
 
-def contar_valores(diccionario: dict) -> dict:
-    conteos = {}
-    for valor in diccionario.values():
-        conteos[valor] = conteos.get(valor, 0) + 1
-    return conteos
+    Example usage:
+    iterate_values({'a': 1, 'b': 2}) -> [1, 2]
+    """
+    return list(d.values())
 
-def filtrar_por_valor(diccionario: dict, condicion) -> dict:
-    return {k: v for k, v in diccionario.items() if condicion(v)}
 
-def claves_valor_min_max(diccionario: dict) -> tuple:
-    if not diccionario:
+    Example usage:
+    merge_dictionaries({'a': 1}, {'b': 2}) -> {'a': 1, 'b': 2}
+    """
+    d1.update(d2)
+    return d1
+
+
+    Example usage:
+    copy_dictionary({'a': 1}) -> {'a': 1}
+    """
+    return d.copy()
+
+
+    Example usage:
+    clear_dictionary({'a': 1}) -> {}
+    """
+    d.clear()
+    return d
+
+
+    Example usage:
+    find_key_by_value({'a': 1, 'b': 2, 'c': 1}, 1) -> ['a', 'c']
+    """
+    return [k for k, v in d.items() if v == value]
+
+
+    Example usage:
+    invert_dictionary({'a': 1, 'b': 2}) -> {1: 'a', 2: 'b'}
+    """
+    return {v: k for k, v in d.items()}
+
+
+    Example usage:
+    count_values({'a': 1, 'b': 2, 'c': 1}) -> {1: 2, 2: 1}
+    """
+    counts = {}
+    for value in d.values():
+        counts[value] = counts.get(value, 0) + 1
+    return counts
+
+
+    Example usage:
+    filter_by_value({'a': 1, 'b': 2, 'c': 3}, lambda x: x > 1) -> {'b': 2, 'c': 3}
+    """
+    return {k: v for k, v in d.items() if condition(v)}
+
+
+    Example usage:
+    min_max_value_keys({'a': 1, 'b': 2, 'c': 3}) -> ('a', 'c')
+    """
+    if not d:
         return None, None
-    clave_min = min(diccionario, key=diccionario.get)
-    clave_max = max(diccionario, key=diccionario.get)
-    return clave_min, clave_max
+    min_key = min(d, key=d.get)
+    max_key = max(d, key=d.get)
+    return min_key, max_key
 
-def ordenar_por_valor(diccionario: dict, reverso=False) -> dict:
-    return dict(sorted(diccionario.items(), key=lambda item: item[1], reverse=reverso))
 
-def a_json(diccionario: dict) -> str:
-    return json.dumps(diccionario)
+    Example usage:
+    sort_by_value({'a': 3, 'b': 1, 'c': 2}) -> {'b': 1, 'c': 2, 'a': 3}
+    """
+    return dict(sorted(d.items(), key=lambda item: item[1], reverse=reverse))
 
-def sumar_valores_numericos(diccionario: dict) -> float:
-    return sum(v for v in diccionario.values() if isinstance(v, (int, float)))
 
+    Example usage:
+    to_json({'a': 1, 'b': 2}) -> '{"a": 1, "b": 2}'
+    """
+    return json.dumps(d)
+
+
+    Example usage:
+    sum_numeric_values({'a': 1, 'b': 2, 'c': 'x'}) -> 3
+    """
+    return sum(v for v in d.values() if isinstance(v, (int, float)))
+
+# Example usage of the functions in the script
 if __name__ == "__main__":
-    ejemplo_diccionario = {'nombre': 'Alice', 'edad': 30, 'salario': 50000, 'departamento': 'Ingeniería'}
+    sample_dict = {'name': 'Alice', 'age': 30, 'salary': 50000, 'department': 'Engineering'}
 
-    print("Diccionario Original:", ejemplo_diccionario)
-    print("Después de Agregar Puesto:", agregar_elemento(ejemplo_diccionario.copy(), 'puesto', 'Ingeniera'))
-    print("Después de Actualizar Edad:", actualizar_elemento(ejemplo_diccionario.copy(), 'edad', 31))
-    print("Después de Eliminar Nombre:", eliminar_elemento(ejemplo_diccionario.copy(), 'nombre'))
-    print("¿Existe la Edad?:", verificar_clave(ejemplo_diccionario, 'edad'))
-    print("Iterando Claves:", iterar_claves(ejemplo_diccionario))
-    print("Iterando Valores:", iterar_valores(ejemplo_diccionario))
-    print("Combinando con Otro Diccionario:", combinar_diccionarios(ejemplo_diccionario.copy(), {'ciudad': 'Nueva York'}))
-    print("Diccionario Copiado:", copiar_diccionario(ejemplo_diccionario))
-    print("Diccionario Limpiado:", limpiar_diccionario(ejemplo_diccionario.copy()))
+    print("Original Dictionary:", sample_dict)
+    print("After Adding Job:", add_item(sample_dict.copy(), 'job', 'Engineer'))
+    print("After Updating Age:", update_item(sample_dict.copy(), 'age', 31))
+    print("After Removing Name:", remove_item(sample_dict.copy(), 'name'))
+    print("Does Age Exist?:", check_for_key(sample_dict, 'age'))
+    print("Iterating Keys:", iterate_keys(sample_dict))
+    print("Iterating Values:", iterate_values(sample_dict))
+    print("Merging with Another Dictionary:", merge_dictionaries(sample_dict.copy(), {'city': 'New York'}))
+    print("Copied Dictionary:", copy_dictionary(sample_dict))
+    print("Cleared Dictionary:", clear_dictionary(sample_dict.copy()))
 
-    print("Encontrar Clave por Valor (50000):", encontrar_clave_por_valor(ejemplo_diccionario, 50000))
-    print("Diccionario Invertido:", invertir_diccionario(ejemplo_diccionario))
-    print("Contar Valores:", contar_valores(ejemplo_diccionario))
-    print("Filtrar por Valor (>10000):", filtrar_por_valor(ejemplo_diccionario, lambda x: isinstance(x, int) and x > 10000))
-    print("Claves con Valor Mínimo y Máximo:", claves_valor_min_max({'a': 1, 'b': 2, 'c': 3}))
-    print("Ordenado por Valor:", ordenar_por_valor({'a': 3, 'b': 1, 'c': 2}))
-    print("Diccionario como JSON:", a_json(ejemplo_diccionario))
-    print("Suma de Valores Numéricos:", sumar_valores_numericos(ejemplo_diccionario))
+    print("Find Key by Value (50000):", find_key_by_value(sample_dict, 50000))
+    print("Inverted Dictionary:", invert_dictionary(sample_dict))
+    print("Count Values:", count_values(sample_dict))
+    print("Filter by Value (>10000):", filter_by_value(sample_dict, lambda x: isinstance(x, int) and x > 10000))
+    print("Min and Max Value Keys:", min_max_value_keys({'a': 1, 'b': 2, 'c': 3}))
+    print("Sorted by Value:", sort_by_value({'a': 3, 'b': 1, 'c': 2}))
+    print("Dictionary as JSON:", to_json(sample_dict))
+    print("Sum of Numeric Values:", sum_numeric_values(sample_dict))
+
+
+
+def sum_numeric_values(d: dict) -> float:
+    """
+    Sums all numeric values in the dictionary.
+
+
+def to_json(d: dict) -> str:
+    """
+    Converts the dictionary to a JSON string.
+
+
+def sort_by_value(d: dict, reverse=False) -> dict:
+    """
+    Sorts dictionary entries by their values.
+
+
+def min_max_value_keys(d: dict) -> tuple:
+    """
+    Identifies keys with the lowest and highest values in the dictionary.
+
+
+def filter_by_value(d: dict, condition) -> dict:
+    """
+    Filters dictionary items based on a condition function.
+
+
+def count_values(d: dict) -> dict:
+    """
+    Counts occurrences of each unique value in the dictionary.
+
+
+def invert_dictionary(d: dict) -> dict:
+    """
+    Swaps keys and values in the dictionary.
+
+
+def find_key_by_value(d: dict, value) -> list:
+    """
+    Retrieves keys that match a specific value.
+
+
+def clear_dictionary(d: dict) -> dict:
+    """
+    Removes all items from the dictionary.
+
+
+def copy_dictionary(d: dict) -> dict:
+    """
+    Creates a shallow copy of the dictionary.
+
+
+def merge_dictionaries(d1: dict, d2: dict) -> dict:
+    """
+    Combines two dictionaries into one.
+
+
+def iterate_values(d: dict) -> list:
+    """
+    Loops through all the values in the dictionary.
+
+
+def iterate_keys(d: dict) -> list:
+    """
+    Loops through all the keys in the dictionary.
+
+
+def check_for_key(d: dict, key) -> bool:
+    """
+    Verifies if a specific key exists in the dictionary.
+
+
+def remove_item(d: dict, key) -> dict:
+    """
+    Removes a key-value pair from the dictionary.
+
+
+def update_item(d: dict, key, value) -> dict:
+    """
+    Updates the value for an existing key.
+
+
+def add_item(d: dict, key, value) -> dict:
+    """
+    Adds a new key-value pair to the dictionary.

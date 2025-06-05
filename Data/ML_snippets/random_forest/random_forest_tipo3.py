@@ -1,90 +1,94 @@
-python
 import numpy as np
 from collections import Counter
 from sklearn.tree import DecisionTreeClassifier
 
-class BosqueAleatorio:
+class RandomForest:
     """
-    Clasificador de Bosque Aleatorio.
+    Random Forest Classifier.
 
     Parameters:
     -----------
-    n_arboles : int
-        El número de árboles en el bosque.
-    max_profundidad : int, opcional
-        La máxima profundidad de los árboles individuales.
-    min_muestras_division : int, opcional
-        El número mínimo de muestras requeridas para dividir un nodo interno.
-    bootstrap : bool, opcional
-        Si se deben usar muestras de arranque para cada árbol (por defecto es True).
+    n_trees : int
+        The number of trees in the forest.
+    max_depth : int, optional
+        The maximum depth of the individual trees.
+    min_samples_split : int, optional
+        The minimum number of samples required to split an internal nodo.
+    bootstrap : bool, optional
+        Whether to use bootstrap samples for each tree (default is True).
     """
 
-    def __init__(self, n_arboles: int = 10, max_profundidad: int = None, min_muestras_division: int = 2, bootstrap: bool = True):
-        self.n_arboles = n_arboles
-        self.max_profundidad = max_profundidad
-        self.min_muestras_division = min_muestras_division
-        self.bootstrap = bootstrap
-        self.arboles = []
-
-    def ajustar(self, X: np.ndarray, y: np.ndarray):
-        """
-        Ajusta el bosque aleatorio a los datos de entrenamiento.
-
+    
+    
         Parameters:
         -----------
         X : np.ndarray
-            Datos de entrenamiento, forma (n_muestras, n_características).
+            Training data, shape (n_samples, n_features).
         y : np.ndarray
-            Valores objetivo, forma (n_muestras,).
+            Target values, shape (n_samples,).
         """
-        self.arboles = []
-        for _ in range(self.n_arboles):
-            # Generar muestra de arranque
+        self.trees = []
+        for _ in range(self.n_trees):
+            # Generate bootstrap sample
             if self.bootstrap:
                 indices = np.random.choice(len(X), len(X), replace=True)
             else:
                 indices = np.arange(len(X))
-            X_muestra = X[indices]
-            y_muestra = y[indices]
+            X_sample = X[indices]
+            y_sample = y[indices]
             
-            # Crear y entrenar un nuevo árbol de decisión
-            arbol = DecisionTreeClassifier(max_depth=self.max_profundidad, min_samples_split=self.min_muestras_division)
-            arbol.fit(X_muestra, y_muestra)
-            self.arboles.append(arbol)
+            # Create and train a new decision tree
+            tree = DecisionTreeClassifier(max_depth=self.max_depth, min_samples_split=self.min_samples_split)
+            tree.fit(X_sample, y_sample)
+            self.trees.append(tree)
 
-    def predecir(self, X: np.ndarray) -> np.ndarray:
-        """
-        Predice las etiquetas de clase para las muestras de entrada.
-
+    
         Parameters:
         -----------
         X : np.ndarray
-            Datos de entrada, forma (n_muestras, n_características).
+            Input data, shape (n_samples, n_features).
         
         Returns:
         --------
         np.ndarray
-            Etiquetas de clase predichas, forma (n_muestras,).
+            Predicted class labels, shape (n_samples,).
         """
-        # Recoger predicciones de cada árbol
-        predicciones_arbol = np.array([arbol.predict(X) for arbol in self.arboles])
+        # Collect predictions from each tree
+        tree_preds = np.array([tree.predict(X) for tree in self.trees])
         
-        # Votación mayoritaria
-        predicciones_finales = np.apply_along_axis(lambda x: Counter(x).most_common(1)[0][0], axis=0, arr=predicciones_arbol)
-        return predicciones_finales
+        # Majority vote
+        final_preds = np.apply_along_axis(lambda x: Counter(x).most_common(1)[0][0], axis=0, arr=tree_preds)
+        return final_preds
 
 
-# Uso de ejemplo
+# Example usage
 if __name__ == "__main__":
-    # Dataset de juguete
-    X_entrenamiento = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    y_entrenamiento = np.array([0, 1, 0, 1])
+    # Toy dataset
+    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+    y_train = np.array([0, 1, 0, 1])
 
-    # Inicializar y ajustar el modelo
-    modelo = BosqueAleatorio(n_arboles=5, max_profundidad=3, bootstrap=True)
-    modelo.ajustar(X_entrenamiento, y_entrenamiento)
+    # Initialize and fit the model
+    model = RandomForest(n_trees=5, max_depth=3, bootstrap=True)
+    model.fit(X_train, y_train)
 
-    # Predicciones
-    X_prueba = np.array([[2, 3], [6, 7]])
-    predicciones = modelo.predecir(X_prueba)
-    print("Predicciones:", predicciones)
+    # Predictions
+    X_test = np.array([[2, 3], [6, 7]])
+    predictions = model.predict(X_test)
+    print("Predictions:", predictions)
+
+def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict class labels for the input samples.
+
+
+def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Fit the random forest to the training data.
+
+
+def __init__(self, n_trees: int = 10, max_depth: int = None, min_samples_split: int = 2, bootstrap: bool = True):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.bootstrap = bootstrap
+        self.trees = []

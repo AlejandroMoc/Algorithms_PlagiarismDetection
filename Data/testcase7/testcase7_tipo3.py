@@ -1,38 +1,44 @@
 from collections import deque
 
-class NodoArbol:
-    def __init__(self, valor=0, izquierda=None, derecha=None):
-        self.valor = valor
-        self.izquierda = izquierda
-        self.derecha = derecha
+class TreeNode:
+    
 
-def serializar(raiz):
-    datos, cola = [], deque([raiz])
-    while cola:
-        nodo = cola.popleft()
-        if nodo:
-            datos.append(str(nodo.valor))
-            cola.append(nodo.izquierda)
-            cola.append(nodo.derecha)
-        else:
-            datos.append('#')
-    return ' '.join(datos)
 
-def deserializar(datos):
-    if datos == '#':
+
+def deserialize(data):
+    if data == '#':
         return None
-    nodos = datos.split()
-    raiz = NodoArbol(int(nodos[0]))
-    cola = deque([raiz])
-    indice = 1
-    while cola:
-        nodo = cola.popleft()
-        if nodos[indice] != '#':
-            nodo.izquierda = NodoArbol(int(nodos[indice]))
-            cola.append(nodo.izquierda)
-        indice += 1
-        if nodos[indice] != '#':
-            nodo.derecha = NodoArbol(int(nodos[indice]))
-            cola.append(nodo.derecha)
-        indice += 1
-    return raiz
+    nodes = data.split()
+    root = TreeNode(int(nodes[0]))
+    queue = deque([root])
+    index = 1
+    while queue:
+        nodo = queue.popleft()
+        if nodes[index] != '#':
+            nodo.left = TreeNode(int(nodes[index]))
+            queue.append(nodo.left)
+        index += 1
+        if nodes[index] != '#':
+            nodo.right = TreeNode(int(nodes[index]))
+            queue.append(nodo.right)
+        index += 1
+    return root
+
+
+def serialize(root):
+    data, queue = [], deque([root])
+    while queue:
+        nodo = queue.popleft()
+        if nodo:
+            data.append(str(nodo.value))
+            queue.append(nodo.left)
+            queue.append(nodo.right)
+        else:
+            data.append('#')
+    return ' '.join(data)
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

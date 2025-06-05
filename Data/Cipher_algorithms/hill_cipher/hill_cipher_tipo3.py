@@ -1,45 +1,53 @@
 import numpy as np
 
 class HillCipher:
-    def __init__(self, key):
-        self.key = np.array(key)
-        self.mod = 26
-        self.validate_key()
+    
+    
+    
+    
 
-    def validate_key(self):
-        if self.key.shape[0] != self.key.shape[1]:
-            raise ValueError("Key matrix must be square")
-        if np.linalg.det(self.key) == 0:
-            raise ValueError("Key matrix must be invertible")
+def decrypt(self, ciphertext):
+        ciphertext = ciphertext.upper().replace(" ", "")
+        if len(ciphertext) % self.key_matrix.shape[0] != 0:
+            raise ValueError("Ciphertext length must be a multiple of key matrix size")
+        
+        ciphertext_vector = [ord(char) - ord('A') for char in ciphertext]
+        ciphertext_matrix = np.array(ciphertext_vector).reshape(-1, self.key_matrix.shape[0])
+        
+        inverse_key_matrix = np.linalg.inv(self.key_matrix)
+        adjugate_matrix = np.round(inverse_key_matrix * np.linalg.det(self.key_matrix)).astype(int) % self.modulus
+        determinant = int(np.round(np.linalg.det(self.key_matrix))) % self.modulus
+        determinant_inv = pow(determinant, -1, self.modulus)
+        inverse_key_matrix_mod = (determinant_inv * adjugate_matrix) % self.modulus
+        
+        decrypted_matrix = np.dot(ciphertext_matrix, inverse_key_matrix_mod) % self.modulus
+        decrypted_text = ''.join(chr(int(num) + ord('A')) for num in decrypted_matrix.flatten())
+        
+        return decrypted_text
 
-    def encrypt(self, text):
-        text = text.upper().replace(" ", "")
-        if len(text) % self.key.shape[0] != 0:
-            raise ValueError("Text length must be a multiple of key matrix size")
+
+def encrypt(self, plaintext):
+        plaintext = plaintext.upper().replace(" ", "")
+        if len(plaintext) % self.key_matrix.shape[0] != 0:
+            raise ValueError("Plaintext length must be a multiple of key matrix size")
         
-        text_vector = [ord(char) - ord('A') for char in text]
-        text_matrix = np.array(text_vector).reshape(-1, self.key.shape[0])
+        plaintext_vector = [ord(char) - ord('A') for char in plaintext]
+        plaintext_matrix = np.array(plaintext_vector).reshape(-1, self.key_matrix.shape[0])
         
-        encrypted_matrix = np.dot(text_matrix, self.key) % self.mod
+        encrypted_matrix = np.dot(plaintext_matrix, self.key_matrix) % self.modulus
         encrypted_text = ''.join(chr(int(num) + ord('A')) for num in encrypted_matrix.flatten())
         
         return encrypted_text
 
-    def decrypt(self, text):
-        text = text.upper().replace(" ", "")
-        if len(text) % self.key.shape[0] != 0:
-            raise ValueError("Text length must be a multiple of key matrix size")
-        
-        text_vector = [ord(char) - ord('A') for char in text]
-        text_matrix = np.array(text_vector).reshape(-1, self.key.shape[0])
-        
-        inv_key = np.linalg.inv(self.key)
-        adj_matrix = np.round(inv_key * np.linalg.det(self.key)).astype(int) % self.mod
-        det = int(np.round(np.linalg.det(self.key))) % self.mod
-        det_inv = pow(det, -1, self.mod)
-        inv_key_mod = (det_inv * adj_matrix) % self.mod
-        
-        decrypted_matrix = np.dot(text_matrix, inv_key_mod) % self.mod
-        decrypted_text = ''.join(chr(int(num) + ord('A')) for num in decrypted_matrix.flatten())
-        
-        return decrypted_text
+
+def check_key_matrix(self):
+        if self.key_matrix.shape[0] != self.key_matrix.shape[1]:
+            raise ValueError("Key matrix must be square")
+        if np.linalg.det(self.key_matrix) == 0:
+            raise ValueError("Key matrix must be invertible")
+
+
+def __init__(self, key_matrix):
+        self.key_matrix = np.array(key_matrix)
+        self.modulus = 26
+        self.check_key_matrix()

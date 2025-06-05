@@ -3,12 +3,22 @@ from typing import List
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def recursive_binary_search(arr: List[int], low: int, high: int, target: int) -> int:
+
+    Args:
+        arr (List[int]): A sorted list of elements to search in.
+        low (int): The starting index of the subarray to search.
+        high (int): The ending index of the subarray to search.
+        target (int): The element to search for.
+
+    Returns:
+        int: The index of the target if found; otherwise, -1.
+    """
+    # Base case: if low is greater than high, the element is not found.
     if high < low:
         logging.warning(f"Element {target} is not present in array")
         return -1
     
-    logging.debug(f"Recursive binary search called with low={low}, high={high}")
+    logging.debug(f"Binary search recursive called with low={low}, high={high}")
 
     mid = low + (high - low) // 2
     logging.debug(f"Checking middle index {mid}, value={arr[mid]}")
@@ -17,17 +27,23 @@ def recursive_binary_search(arr: List[int], low: int, high: int, target: int) ->
         logging.info(f"Target {target} found at index {mid}")
         return mid
     elif arr[mid] > target:
-        return recursive_binary_search(arr, low, mid - 1, target)
+        return binary_search_recursive(arr, low, mid - 1, target)
     else:
-        return recursive_binary_search(arr, mid + 1, high, target)
+        return binary_search_recursive(arr, mid + 1, high, target)
 
+# Driver Code
 if __name__ == '__main__':
     arr = [2, 3, 4, 10, 40]
     target = 10
 
-    result = recursive_binary_search(arr, 0, len(arr) - 1, target)
+    # Function call
+    result = binary_search_recursive(arr, 0, len(arr) - 1, target)
 
     if result != -1:
         logging.info(f"Element is present at index {result}")
     else:
         logging.info("Element is not present in array")
+
+def binary_search_recursive(arr: List[int], low: int, high: int, target: int) -> int:
+    """
+    Perform a recursive binary search on a sorted array.

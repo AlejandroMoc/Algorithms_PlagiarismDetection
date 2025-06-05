@@ -1,4 +1,3 @@
-python
 import logging
 
 logging.basicConfig(
@@ -6,7 +5,15 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def is_perfect_number(number: int) -> bool:
+
+    A Perfect number is a number that is equal to the sum of its proper divisors.
+
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is perfect, False otherwise.
+    """
     if number < 1:
         logging.error("Number must be a positive integer.")
         raise ValueError("Number must be a positive integer.")
@@ -23,8 +30,12 @@ def is_perfect_number(number: int) -> bool:
 
 if __name__ == "__main__":
     try:
-        is_perfect_number(6)
-        is_perfect_number(20)
-    except ValueError as error:
-        logging.error(f"Error: {error}")
-    
+        is_perfect(6)
+        is_perfect(20)
+    except ValueError as ve:
+        logging.error(f"Error: {ve}")
+       
+
+def is_perfect(number: int) -> bool:
+    """
+    Determine if a number is a Perfect number.

@@ -5,18 +5,10 @@ from dataclasses import dataclass
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 @dataclass
-class SortedItem:
+class SortItem:
     key: int
     value: Dict[str, Any]
 
-def custom_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
-    """
-    Sorts a list of dictionaries using the Counting Sort algorithm based on a specified key.
-    """
-    try:
-        if not dict_list:
-            logging.info("Empty list provided. Returning empty list.")
-            return []
     
         if not isinstance(dict_list, list) or not all(isinstance(item, dict) for item in dict_list):
             logging.error("Input must be a list of dictionaries.")
@@ -30,7 +22,7 @@ def custom_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False
             logging.error("All key values must be non-negative integers for Counting Sort.")
             raise ValueError("All key values must be non-negative integers for Counting Sort.")
     
-        logging.debug(f"Starting Custom Sort with n={len(dict_list)}, key='{key}', reverse={reverse}")
+        logging.debug(f"Starting Counting Sort with n={len(dict_list)}, key='{key}', reverse={reverse}")
     
         max_val = max(item[key] for item in dict_list)
         count = [0] * (max_val + 1)
@@ -55,15 +47,25 @@ def custom_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False
             logging.debug("Reversing the sorted list for descending order.")
             output.reverse()
     
-        logging.info("Custom Sort completed.")
+        logging.info("Counting Sort completed.")
         return output
     
     except Exception as e:
-        logging.error(f"An error occurred during Custom Sort: {e}")
+        logging.error(f"An error occurred during Counting Sort: {e}")
         raise
 
 # Example usage:
 if __name__ == "__main__":
     dict_list = [{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}, {"name": "Charlie", "age": 35}]
-    sorted_list = custom_sort(dict_list, key="age", reverse=True)
+    sorted_list = counting_sort(dict_list, key="age", reverse=True)
     print("Sorted List:", sorted_list)
+
+
+def counting_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
+    """
+    Sorts a list of dictionaries using the Counting Sort algorithm based on a specified key.
+    """
+    try:
+        if not dict_list:
+            logging.info("Empty list provided. Returning empty list.")
+            return []

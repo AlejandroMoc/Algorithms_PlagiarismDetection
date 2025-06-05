@@ -8,44 +8,46 @@ logging.basicConfig(
 )
 
 @dataclass
-class ItemSort:
+class SortItem:
     key: Any
     value: Dict[str, Any]
 
-def sort_insertion(list_dict: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
-    try:
-        if not isinstance(list_dict, list) or not all(isinstance(element, dict) for element in list_dict):
-            logging.error("Input must be a list of dictionaries.")
-            raise TypeError("list_dict must be a list of dictionaries.")
-        
-        if not all(isinstance(element[key], (int, float, str)) for element in list_dict):
-            logging.error(f"Invalid type for key '{key}' in dictionaries. Must be int, float, or string.")
-            raise TypeError(f"Key '{key}' must have a valid comparable type (int, float, string).")
-        
-        if not all(key in element for element in list_dict):
-            logging.error(f"The key '{key}' is not present in all dictionaries.")
-            raise KeyError(f"The key '{key}' is not present in all dictionaries.")
-        
-        logging.debug(f"Starting Insertion Sort with n={len(list_dict)}, key='{key}', reverse={reverse}")
-        
-        if not list_dict:
-            logging.info("Empty list provided. Returning empty list.")
-            return []
     
-        for i in range(1, len(list_dict)):
-            key_element = list_dict[i]
+        for i in range(1, len(dict_list)):
+            key_item = dict_list[i]
             j = i - 1
             
-            while j >= 0 and (key_element[key] < list_dict[j][key]) != reverse:
-                logging.debug(f"Shifting index {j} to {j + 1}: {list_dict[j]} -> {key_element}")
-                list_dict[j + 1] = list_dict[j]
+            while j >= 0 and (key_item[key] < dict_list[j][key]) != reverse:
+                logging.debug(f"Shifting index {j} to {j + 1}: {dict_list[j]} -> {key_item}")
+                dict_list[j + 1] = dict_list[j]
                 j -= 1
                 
-            list_dict[j + 1] = key_element
+            dict_list[j + 1] = key_item
         
         logging.info("Insertion Sort completed.")
-        return list_dict
+        return dict_list
 
     except Exception as e:
         logging.error(f"An error occurred during Insertion Sort: {e}")
         raise
+
+
+def insertion_sort(dict_list: List[Dict[str, Any]], key: str, reverse: bool = False) -> List[Dict[str, Any]]:
+    try:
+        if not isinstance(dict_list, list) or not all(isinstance(item, dict) for item in dict_list):
+            logging.error("Input must be a list of dictionaries.")
+            raise TypeError("dict_list must be a list of dictionaries.")
+        
+        if not all(isinstance(item[key], (int, float, str)) for item in dict_list):
+            logging.error(f"Invalid type for key '{key}' in dictionaries. Must be int, float, or string.")
+            raise TypeError(f"Key '{key}' must have a valid comparable type (int, float, string).")
+        
+        if not all(key in item for item in dict_list):
+            logging.error(f"The key '{key}' is not present in all dictionaries.")
+            raise KeyError(f"The key '{key}' is not present in all dictionaries.")
+        
+        logging.debug(f"Starting Insertion Sort with n={len(dict_list)}, key='{key}', reverse={reverse}")
+        
+        if not dict_list:
+            logging.info("Empty list provided. Returning empty list.")
+            return []

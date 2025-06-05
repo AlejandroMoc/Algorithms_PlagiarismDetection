@@ -1,10 +1,14 @@
-class NodoArbol:
-    def __init__(self, valor=0, izquierda=None, derecha=None):
-        self.valor = valor
-        self.izquierda = izquierda
-        self.derecha = derecha
+class TreeNode:
+    
 
-def invertir_arbol(raiz):
-    if raiz:
-        raiz.izquierda, raiz.derecha = invertir_arbol(raiz.derecha), invertir_arbol(raiz.izquierda)
-    return raiz
+
+def invert_tree(root):
+    if root:
+        root.left, root.right = invert_tree(root.right), invert_tree(root.left)
+    return root
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

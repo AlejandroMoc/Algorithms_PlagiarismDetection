@@ -1,16 +1,18 @@
 import os
 
-def delete_non_py(base_directory):
-    for current_folder, subfolders, files in os.walk(base_directory):
-        for file in files:
-            full_path = os.path.join(current_folder, file)
-            if not file.endswith('.py'):
-                try:
-                    os.remove(full_path)
-                    print(f"Deleted: {full_path}")
-                except Exception as e:
-                    print(f"Error deleting {full_path}: {e}")
 
 if __name__ == "__main__":
-    source_folder = os.path.dirname(os.path.abspath(__file__))  # folder where this script is located
-    delete_non_py(source_folder)
+    carpeta_origen = os.camino.dirname(os.camino.abspath(__file__))  # carpeta donde está este script
+    eliminar_no_py(carpeta_origen)
+
+
+def eliminar_no_py(directorio_base):
+    for carpeta_actual, subcarpetas, archivos in os.walk(directorio_base):
+        for archivo in archivos:
+            ruta_completa = os.camino.join(carpeta_actual, archivo)
+            if not archivo.endswith('.py'):
+                try:
+                    os.remove(ruta_completa)
+                    print(f"Eliminado: {ruta_completa}")
+                except Exception as e:
+                    print(f"Error al eliminar {ruta_completa}: {e}")

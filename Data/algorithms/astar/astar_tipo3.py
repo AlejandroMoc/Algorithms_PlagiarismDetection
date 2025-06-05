@@ -1,79 +1,66 @@
 import heapq
 
 class Nodo:
-    def __init__(self, posicion, padre=None):
-        self.posicion = posicion
-        self.padre = padre
-        self.g = 0  # Costo desde el inicio hasta el nodo actual
-        self.h = 0  # Costo heurístico desde el nodo actual hasta el final
-        self.f = 0  # Costo total (g + h)
+    
+    
+    
 
-    def __eq__(self, otro):
-        return self.posicion == otro.posicion
+    open_list = []
+    closed_list = set()
+    open_dict = {}  # Dictionary to track nodes and their 'g' values
 
-    def __lt__(self, otro):
-        return self.f < otro.f
+    heapq.heappush(open_list, start_node)
+    open_dict[start_node.position] = start_node
 
-def astar(maze, inicio, final, permitir_diagonal=False):
-    nodo_inicio = Nodo(inicio)
-    nodo_final = Nodo(final)
+    while open_list:
+        current_node = heapq.heappop(open_list)
+        closed_list.add(current_node.position)
 
-    lista_abierta = []
-    lista_cerrada = set()
-    diccionario_abierto = {}  # Diccionario para hacer seguimiento de nodos y sus valores 'g'
-
-    heapq.heappush(lista_abierta, nodo_inicio)
-    diccionario_abierto[nodo_inicio.posicion] = nodo_inicio
-
-    while lista_abierta:
-        nodo_actual = heapq.heappop(lista_abierta)
-        lista_cerrada.add(nodo_actual.posicion)
-
-        if nodo_actual == nodo_final:
-            # Reconstruir el camino
+        if current_node == end_node:
+            # Reconstruct camino
             camino = []
-            while nodo_actual:
-                camino.append(nodo_actual.posicion)
-                nodo_actual = nodo_actual.padre
-            return camino[::-1]  # Devolver el camino en el orden correcto
+            while current_node:
+                camino.append(current_node.position)
+                current_node = current_node.parent
+            return camino[::-1]  # Return camino in correct order
 
-        hijos = []
-        direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Arriba, Abajo, Izquierda, Derecha
-        if permitir_diagonal:
-            # Incluir movimientos diagonales (arriba-izquierda, arriba-derecha, abajo-izquierda, abajo-derecha)
-            direcciones += [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        children = []
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+        if allow_diagonal:
+            # Include diagonal movements (top-left, top-right, bottom-left, bottom-right)
+            directions += [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 
-        # Generar hijos (vecinos)
-        for nueva_posicion in direcciones:
-            posicion_nodo = (nodo_actual.posicion[0] + nueva_posicion[0], nodo_actual.posicion[1] + nueva_posicion[1])
+        # Generate children (vecinos)
+        for new_position in directions:
+            node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-            # Saltar celdas fuera de límites o bloqueadas (valor diferente de 0 significa pared)
-            if posicion_nodo[0] > (len(maze) - 1) or posicion_nodo[0] < 0 or posicion_nodo[1] > (len(maze[0]) - 1) or posicion_nodo[1] < 0:
+            # Skip out-of-bounds or blocked cells (value != 0 means wall)
+            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (len(maze[0]) - 1) or node_position[1] < 0:
                 continue
-            if maze[posicion_nodo[0]][posicion_nodo[1]] != 0:
+            if maze[node_position[0]][node_position[1]] != 0:
                 continue
 
-            nuevo_nodo = Nodo(posicion_nodo, nodo_actual)
-            hijos.append(nuevo_nodo)
+            new_node = Nodo(node_position, current_node)
+            children.append(new_node)
 
-        for hijo in hijos:
-            if hijo.posicion in lista_cerrada:
-                continue  # Ignorar nodos evaluados
+        for child in children:
+            if child.position in closed_list:
+                continue  # Ignore already evaluated nodes
 
-            hijo.g = nodo_actual.g + 1  # El valor g es la distancia desde el inicio
-            # Usar la distancia de Manhattan como heurística (para movimientos no diagonales)
-            hijo.h = abs(hijo.posicion[0] - nodo_final.posicion[0]) + abs(hijo.posicion[1] - nodo_final.posicion[1])
-            hijo.f = hijo.g + hijo.h
+            child.g = current_node.g + 1  # g value is distancia from inicio
+            # Using Manhattan distancia as heuristic (for non-diagonal movement)
+            child.h = abs(child.position[0] - end_node.position[0]) + abs(child.position[1] - end_node.position[1])
+            child.f = child.g + child.h
 
-            # Verificar si este nodo debe ser agregado a lista_abierta o saltado
-            if hijo.posicion not in diccionario_abierto or hijo.g < diccionario_abierto[hijo.posicion].g:
-                diccionario_abierto[hijo.posicion] = hijo
-                heapq.heappush(lista_abierta, hijo)
+            # Check if this nodo should be added to open_list or skipped
+            if child.position not in open_dict or child.g < open_dict[child.position].g:
+                open_dict[child.position] = child
+                heapq.heappush(open_list, child)
 
-    return None  # Devolver None si no se encuentra un camino
+    return None  # Return None if no camino is found
 
-# Uso de ejemplo:
-laberinto = [
+# Example usage:
+maze = [
     [0, 1, 0, 0, 0, 0],
     [0, 1, 0, 1, 1, 0],
     [0, 0, 0, 0, 1, 0],
@@ -82,8 +69,28 @@ laberinto = [
 ]
 
 inicio = (0, 0)
-final = (4, 5)
+fin = (4, 5)
 
-# Llamada al algoritmo A* con movimiento diagonal permitido
-camino = astar(laberinto, inicio, final, permitir_diagonal=True)
-print("Camino:", camino)
+# Calling the A* algorithm with diagonal movement allowed
+camino = astar(maze, inicio, fin, allow_diagonal=True)
+print("Path:", camino)
+
+def astar(maze, inicio, fin, allow_diagonal=False):
+    start_node = Nodo(inicio)
+    end_node = Nodo(fin)
+
+
+def __lt__(self, other):
+        return self.f < other.f
+
+
+def __eq__(self, other):
+        return self.position == other.position
+
+
+def __init__(self, position, parent=None):
+        self.position = position
+        self.parent = parent
+        self.g = 0  # Cost from inicio to current nodo
+        self.h = 0  # Heuristic cost from current nodo to fin
+        self.f = 0  # Total cost (g + h)

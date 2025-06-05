@@ -1,23 +1,66 @@
 import pandas as pd
 from sklearn.impute import SimpleImputer
 
-def completar_numericos_con_media(df: pd.DataFrame, columnas: list) -> pd.DataFrame:
-    columnas_faltantes = [col for col in columnas if col not in df.columns]
-    if columnas_faltantes:
-        raise ValueError(f"Las columnas {columnas_faltantes} no existen en el DataFrame.")
+
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - columns (list): List of column names to impute.
+
+    Returns:
+    - pd.DataFrame: A new DataFrame with missing numeric values imputed with the mean.
+
+    Raises:
+    - ValueError: If any of the columns do not exist in the DataFrame.
+    """
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columns {missing_cols} do not exist in the DataFrame.")
     
-    imputador = SimpleImputer(strategy='mean')
-    df[columnas] = imputador.fit_transform(df[columnas])
+    imputer = SimpleImputer(strategy='mean')
+    df[columns] = imputer.fit_transform(df[columns])
     return df
 
-def completar_categoricos_con_moda(df: pd.DataFrame, columnas: list) -> pd.DataFrame:
-    columnas_faltantes = [col for col in columnas if col not in df.columns]
-    if columnas_faltantes:
-        raise ValueError(f"Las columnas {columnas_faltantes} no existen en el DataFrame.")
+
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - columns (list): List of column names to impute.
+
+    Returns:
+    - pd.DataFrame: A new DataFrame with missing categorical values imputed with the mode.
+
+    Raises:
+    - ValueError: If any of the columns do not exist in the DataFrame.
+    """
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columns {missing_cols} do not exist in the DataFrame.")
     
-    imputador = SimpleImputer(strategy='most_frequent')
-    df[columnas] = imputador.fit_transform(df[columnas])
+    imputer = SimpleImputer(strategy='most_frequent')
+    df[columns] = imputer.fit_transform(df[columns])
     return df
 
-def eliminar_faltantes(df: pd.DataFrame, umbral: float = 0.5) -> pd.DataFrame:
-    return df.dropna(thresh=int(df.shape[1] * umbral))
+
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - threshold (float): Proportion of non-null values required in a row to keep it. Default is 0.5.
+
+    Returns:
+    - pd.DataFrame: A new DataFrame with rows dropped based on the missing value threshold.
+    """
+    # Drop rows where the number of non-null values is less than the threshold
+    return df.dropna(thresh=int(df.shape[1] * threshold))
+
+
+def drop_missing(df: pd.DataFrame, threshold: float = 0.5) -> pd.DataFrame:
+    """
+    Drop rows with missing values if the number of missing values exceeds a given threshold.
+
+
+def impute_categorical_with_mode(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+    """
+    Impute missing categorical values in specified columns with the most frequent value (mode).
+
+
+def impute_numeric_with_mean(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+    """
+    Impute missing numeric values in specified columns with the mean value of each column.

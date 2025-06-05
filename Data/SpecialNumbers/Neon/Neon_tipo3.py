@@ -5,25 +5,38 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def check_neon_number(num: int) -> bool:
-    if num < 0:
+
+    A Neon number is a number where the sum of the digits of its square is equal to the number itself.
+
+    Args:
+        number (int): The number to check.
+
+    Returns:
+        bool: True if the number is a Neon number, False otherwise.
+    """
+    if number < 0:
         logging.error("Number must be a non-negative integer.")
         raise ValueError("Number must be a non-negative integer.")
 
-    squared_num = num ** 2
-    sum_of_digits = sum(int(d) for d in str(squared_num))
-    logging.debug(f"Digit sum of {squared_num}: {sum_of_digits}")
+    square = number ** 2
+    digit_sum = sum(int(digit) for digit in str(square))
+    logging.debug(f"Digit sum of {square}: {digit_sum}")
 
-    if sum_of_digits == num:
-        logging.info(f"{num} is a Neon number.")
+    if digit_sum == number:
+        logging.info(f"{number} is a Neon number.")
         return True
     else:
-        logging.info(f"{num} is not a Neon number.")
+        logging.info(f"{number} is not a Neon number.")
         return False
 
 if __name__ == "__main__":
     try:
-        check_neon_number(9)
-        check_neon_number(20)
-    except ValueError as error:
-        logging.error(f"Error: {error}")
+        is_neon(9)
+        is_neon(20)
+    except ValueError as ve:
+        logging.error(f"Error: {ve}")
+       
+
+def is_neon(number: int) -> bool:
+    """
+    Determine if a number is a Neon number.

@@ -1,22 +1,19 @@
 import cv2
 import matplotlib.pyplot as plt
 
-def estimacion_profundidad(imagen_izquierda, imagen_derecha):
-    """
-    Estima un mapa de profundidad a partir de imágenes estéreo usando Semi-Global Block Matching
     
     Args:
-        imagen_izquierda: Imagen estéreo izquierda
-        imagen_derecha: Imagen estéreo derecha
+        left_img: Left stereo image
+        right_img: Right stereo image
         
     Returns:
-        Mapa de profundidad
+        Depth map
     """
-    # Convertir imágenes a escala de grises
-    gris_izquierda = cv2.cvtColor(imagen_izquierda, cv2.COLOR_BGR2GRAY)
-    gris_derecha = cv2.cvtColor(imagen_derecha, cv2.COLOR_BGR2GRAY)
+    # Convert images to grayscale
+    left_gray = cv2.cvtColor(left_img, cv2.COLOR_BGR2GRAY)
+    right_gray = cv2.cvtColor(right_img, cv2.COLOR_BGR2GRAY)
     
-    # Crear objeto matcher estéreo
+    # Create stereo matcher object
     stereo = cv2.StereoSGBM_create(
         minDisparity=0,
         numDisparities=16*16,
@@ -29,44 +26,49 @@ def estimacion_profundidad(imagen_izquierda, imagen_derecha):
         speckleRange=32
     )
     
-    # Calcular mapa de disparidad
-    disparidad = stereo.compute(gris_izquierda, gris_derecha)
+    # Compute disparity map
+    disparity = stereo.compute(left_gray, right_gray)
     
-    # Normalizar mapa de disparidad para visualización
-    disparidad_normalizada = cv2.normalize(disparidad, None, alpha=0, beta=255,
+    # Normalize disparity map for visualization
+    disparity_normalized = cv2.normalize(disparity, None, alpha=0, beta=255,
                                        norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
     
-    return disparidad_normalizada
+    return disparity_normalized
 
 if __name__ == "__main__":
-    # Cargar imágenes estéreo
-    imagen_izquierda = cv2.imread('left_image.jpg')
-    imagen_derecha = cv2.imread('right_image.jpg')
+    # Load stereo images
+    left_img = cv2.imread('left_image.jpg')
+    right_img = cv2.imread('right_image.jpg')
     
-    if imagen_izquierda is None or imagen_derecha is None:
-        print("Error: No se pudieron cargar las imágenes")
+    if left_img is None or right_img is None:
+        print("Error: Could not load images")
         exit()
         
-    # Obtener mapa de profundidad
-    mapa_profundidad = estimacion_profundidad(imagen_izquierda, imagen_derecha)
+    # Get depth map
+    depth_map = depth_estimation(left_img, right_img)
     
-    # Mostrar resultados
+    # Display results
     plt.figure(figsize=(12, 5))
     
     plt.subplot(131)
-    plt.imshow(cv2.cvtColor(imagen_izquierda, cv2.COLOR_BGR2RGB))
-    plt.title('Imagen Izquierda')
+    plt.imshow(cv2.cvtColor(left_img, cv2.COLOR_BGR2RGB))
+    plt.title('Left Image')
     plt.axis('off')
     
     plt.subplot(132)
-    plt.imshow(cv2.cvtColor(imagen_derecha, cv2.COLOR_BGR2RGB))
-    plt.title('Imagen Derecha')
+    plt.imshow(cv2.cvtColor(right_img, cv2.COLOR_BGR2RGB))
+    plt.title('Right Image')
     plt.axis('off')
     
     plt.subplot(133)
-    plt.imshow(mapa_profundidad, cmap='hot')
-    plt.title('Mapa de Profundidad')
+    plt.imshow(depth_map, cmap='hot')
+    plt.title('Depth Map')
     plt.axis('off')
     
     plt.tight_layout()
     plt.show()
+
+
+def depth_estimation(left_img, right_img):
+    """
+    Estimate depth map from stereo images using Semi-Global Block Matching

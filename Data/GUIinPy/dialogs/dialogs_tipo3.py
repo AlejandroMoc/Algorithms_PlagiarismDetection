@@ -1,9 +1,9 @@
-python
 import tkinter as tk
 from tkinter import messagebox
 
-def mostrar_informacion(titulo, mensaje):
-    messagebox.showinfo(titulo, mensaje)
 
-def mostrar_advertencia(titulo, mensaje):
-    messagebox.showwarning(titulo, mensaje)
+def show_warning(title, message):
+    messagebox.showwarning(title, message) 
+
+def show_info(title, message):
+    messagebox.showinfo(title, message)

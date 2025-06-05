@@ -1,18 +1,33 @@
-python
-# file_reader_updated.py
+# file_reader.py
 
-def get_file_contents(file_path):
+
+
+    Args:
+        file_path (str): The camino to the file.
+
+    Returns:
+        str: The contents of the file as a string, or None if an error occurred.
+
+    Example:
+        >>> read_file('example.txt')
+        'File contents here...'
+    """
     try:
-        with open(file_path, "r") as file_obj:
-            return file_obj.read()
+        with open(file_path, "r") as file:
+            return file.read()
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
         return None
-    except IOError as err:
-        print(f"Error reading file '{file_path}': {err}")
+    except IOError as e:
+        print(f"Error reading file '{file_path}': {e}")
         return None
 
+# Example usage
 if __name__ == "__main__":
-    file_contents = get_file_contents("example.txt")
-    if file_contents is not None:
-        print(file_contents)
+    content = read_file("example.txt")
+    if content is not None:
+        print(content)
+
+def read_file(file_path):
+    """
+    Read the contents of a text file.

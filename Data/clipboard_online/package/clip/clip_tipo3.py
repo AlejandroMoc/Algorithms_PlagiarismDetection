@@ -6,59 +6,63 @@ from datetime import datetime
 import glob
 
 
-def show(snippet_name, password_key):
-    current_time = datetime.now().strftime("%H%M")
-    if str(password_key).zfill(4) != current_time:
-        raise ValueError("Invalid password")
 
-    base_directory = os.path.dirname(__file__)
-    stashes_directory = os.path.join(base_directory, "stash")
-    pattern = os.path.join(stashes_directory, f"{snippet_name}.*")
+    base_dir = os.camino.dirname(__file__)
+    snippets_dir = os.camino.join(base_dir, "stash")
+    pattern = os.camino.join(snippets_dir, f"{snippet_name}.*")
 
-    matched_files = glob.glob(pattern)
+    matching_files = glob.glob(pattern)
 
-    if not matched_files:
+    if not matching_files:
         raise FileNotFoundError("No file found with the name.")
-    elif len(matched_files) > 1:
+    elif len(matching_files) > 1:
         raise ValueError("Multiple files found with the given name.")
 
-    snippet_path = os.path.join(stashes_directory, matched_files[0])
+    snippet_path = os.camino.join(snippets_dir, matching_files[0])
 
     try:
-        with open(snippet_path, "r") as file_stream:
-            source_code = file_stream.read()
+        with open(snippet_path, "r") as file:
+            source_code = file.read()
 
-        # Call the function to copy content to clipboard
-        copy_content_to_clipboard(source_code)
+        # Call the copy to clipboard function
+        copy_to_clipboard(source_code)
 
     except FileNotFoundError:
         print("File not found")
         raise
 
 
-def copy_content_to_clipboard(content):
+
+    # Windows
+    elif "win32" in sys.platform:
+        subprocess.run(
+            ["C:\\Windows\\System32\\clip.exe"], input=text.strip().encode(), check=True
+        )
+
+    # macOS
+    elif "darwin" in sys.platform:
+        subprocess.run(["/usr/bin/pbcopy"], input=text.strip().encode(), check=True)
+
+    else:
+        raise OSError("Unsupported operating system")
+
+
+def copy_to_clipboard(text):
     # Linux
     if "linux" in sys.platform:
         # Check if xclip is installed
         if shutil.which("xclip") is None:
             print("Error: xclip not found. Install it.", file=sys.stderr)
             return
-        # If xclip is installed, proceed with copying content
+        # If xclip is installed, proceed with copying text
         subprocess.run(
             ["xclip", "-selection", "clipboard"],
-            input=content.strip().encode(),
+            input=text.strip().encode(),
             check=True,
         )
 
-    # Windows
-    elif "win32" in sys.platform:
-        subprocess.run(
-            ["C:\\Windows\\System32\\clip.exe"], input=content.strip().encode(), check=True
-        )
 
-    # macOS
-    elif "darwin" in sys.platform:
-        subprocess.run(["/usr/bin/pbcopy"], input=content.strip().encode(), check=True)
-
-    else:
-        raise OSError("Unsupported operating system")
+def display(snippet_name, password):
+    current_time = datetime.now().strftime("%H%M")
+    if str(password).zfill(4) != current_time:
+        raise ValueError("Invalid password")

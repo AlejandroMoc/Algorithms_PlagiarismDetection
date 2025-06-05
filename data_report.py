@@ -5,7 +5,7 @@ from difflib import SequenceMatcher
 from Algorithms.comparator_sa import comparator_sa
 
 # Ruta local del dataset
-data_root = r"C:\Users\Jacqui\Desktop\FinalAplicaciones\Algorithms_PlagiarismDetection\Data"
+data_root = r"C:/Users/aredc/OneDrive/Documentos/Plagio_project/Algorithms_PlagiarismDetection/Data"
 
 carpetas_con_py = []
 carpetas_con_subcarpetas = 0
@@ -95,20 +95,20 @@ for carpeta in carpetas_con_py:
         carpetas_tipo_12 += 1
 
 # Paso 5: Reporte
-print("\n📊 Reporte Final del Dataset")
+print("\n Reporte Final del Dataset")
 print("=" * 30)
-print(f"📁 Total de carpetas con archivos .py        : {total_carpetas}")
-print(f"📂 Total de carpetas madre (con subcarpetas): {carpetas_con_subcarpetas}")
-print(f"📄 Total de archivos .py                    : {total_archivos}")
+print(f" Total de carpetas con archivos .py        : {total_carpetas}")
+print(f" Total de carpetas madre (con subcarpetas): {carpetas_con_subcarpetas}")
+print(f" Total de archivos .py                    : {total_archivos}")
 print("")
-print(f"✅ Total de carpetas con tipo 0,1,2,3        : {carpetas_tipo_0123}")
-print(f"✅ Total de carpetas con tipo 1,2,3          : {carpetas_tipo_123}")
-print(f"✅ Total de carpetas con tipo 1 y 2          : {carpetas_tipo_12}")
+print(f" Total de carpetas con tipo 0,1,2,3        : {carpetas_tipo_0123}")
+print(f" Total de carpetas con tipo 1,2,3          : {carpetas_tipo_123}")
+print(f" Total de carpetas con tipo 1 y 2          : {carpetas_tipo_12}")
 print("")
-print(f"🔢 Total de archivos tipo 0 (no plagio)      : {tipo0_total}")
-print(f"🔢 Total de archivos tipo 1 (plagio directo) : {tipo1_total}")
-print(f"🔢 Total de archivos tipo 2 (renombrado)     : {tipo2_total}")
-print(f"🔢 Total de archivos tipo 3 (reestructurado) : {tipo3_total}")
+print(f" Total de archivos tipo 0 (no plagio)      : {tipo0_total}")
+print(f" Total de archivos tipo 1 (plagio directo) : {tipo1_total}")
+print(f" Total de archivos tipo 2 (renombrado)     : {tipo2_total}")
+print(f" Total de archivos tipo 3 (reestructurado) : {tipo3_total}")
 print("")
-print("📝 30% de carpetas fueron marcadas con plagio tipo 1 (plagio_tipo1.txt)")
-print("🔁 Máximo 3 combinaciones tipo 0 generadas por carpeta madre con filtro de similitud.")
+print(" 30% de carpetas fueron marcadas con plagio tipo 1 (plagio_tipo1.txt)")
+print(" Máximo 3 combinaciones tipo 0 generadas por carpeta madre con filtro de similitud.")

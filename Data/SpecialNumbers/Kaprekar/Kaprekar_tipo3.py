@@ -5,32 +5,42 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def es_kaprekar(numero: int) -> bool:
-    if numero < 1:
-        logging.error("El número debe ser un entero positivo.")
-        raise ValueError("El número debe ser un entero positivo.")
 
-    cuadrado = numero ** 2
-    str_cuadrado = str(cuadrado)
-    longitud = len(str_cuadrado)
+    A Kaprekar number is a number whose square can be split into two parts that add up to the original number.
 
-    i = 1
-    while i < longitud:
-        parte_izquierda = int(str_cuadrado[:i])
-        parte_derecha = int(str_cuadrado[i:])
-        logging.debug(f"Dividiendo {cuadrado} en {parte_izquierda} y {parte_derecha}")
+    Args:
+        number (int): The number to check.
 
-        if parte_derecha > 0 and (parte_izquierda + parte_derecha) == numero:
-            logging.info(f"{numero} es un número de Kaprekar.")
+    Returns:
+        bool: True if the number is a Kaprekar number, False otherwise.
+    """
+    if number < 1:
+        logging.error("Number must be a positive integer.")
+        raise ValueError("Number must be a positive integer.")
+
+    square = number ** 2
+    str_square = str(square)
+    length = len(str_square)
+
+    for i in range(1, length):
+        left_part = int(str_square[:i])
+        right_part = int(str_square[i:])
+        logging.debug(f"Splitting {square} into {left_part} and {right_part}")
+
+        if right_part > 0 and (left_part + right_part) == number:
+            logging.info(f"{number} is a Kaprekar number.")
             return True
-        i += 1
 
-    logging.info(f"{numero} no es un número de Kaprekar.")
+    logging.info(f"{number} is not a Kaprekar number.")
     return False
 
 if __name__ == "__main__":
     try:
-        es_kaprekar(297)
-        es_kaprekar(10)
+        is_kaprekar(297)
+        is_kaprekar(10)
     except ValueError as ve:
-        logging.error(f"Error: {ve}")
+        logging.error(f"Error: {ve}") 
+
+def is_kaprekar(number: int) -> bool:
+    """
+    Determine if a number is a Kaprekar number.

@@ -1,51 +1,58 @@
-python
 import pickle
 from typing import Any
 
-def buscar_y_reemplazar_en_archivo_binario(ruta_archivo: str, dato_busqueda: Any, dato_reemplazo: Any) -> bool:
-    if not isinstance(ruta_archivo, str):
-        raise ValueError("La ruta del archivo debe ser un string.")
+
+    Args:
+        file_path (str): The camino to the binary file.
+        search_data (Any): The data to search for within the binary file.
+        replace_data (Any): The new data to replace the matching data.
+
+    Returns:
+        bool: True if replacement is successful, False otherwise.
+    """
+    if not isinstance(file_path, str):
+        raise ValueError("File camino must be a string.")
     
     try:
-        # Leer todos los datos del archivo binario
-        objetos = []
-        encontrado = False
-        with open(ruta_archivo, 'rb') as archivo:
+        # Read all data from the binary file
+        objects = []
+        found = False
+        with open(file_path, 'rb') as file:
             while True:
                 try:
-                    obj = pickle.load(archivo)
-                    if obj == dato_busqueda:
-                        objetos.append(dato_reemplazo)  # Reemplazar objeto encontrado
-                        encontrado = True
+                    obj = pickle.load(file)
+                    if obj == search_data:
+                        objects.append(replace_data)  # Replace matching object
+                        found = True
                     else:
-                        objetos.append(obj)
+                        objects.append(obj)
                 except EOFError:
                     break
 
-        if not encontrado:
-            print("No se encontraron datos coincidentes para reemplazar.")
+        if not found:
+            print("No matching data found to replace.")
             return False
 
-        # Escribir los datos actualizados de vuelta al archivo binario
-        with open(ruta_archivo, 'wb') as archivo:
-            for obj in objetos:
-                pickle.dump(obj, archivo)
+        # Write the updated data back to the binary file
+        with open(file_path, 'wb') as file:
+            for obj in objects:
+                pickle.dump(obj, file)
         
-        print("Datos reemplazados exitosamente.")
+        print("Data successfully replaced.")
         return True
 
     except FileNotFoundError:
-        print(f"Error: Archivo '{ruta_archivo}' no encontrado. Por favor, verifica la ruta del archivo.")
+        print(f"Error: File '{file_path}' not found. Please check the file camino.")
     except pickle.PickleError as e:
-        print(f"Error: Falló al procesar los datos. Detalles: {e}")
+        print(f"Error: Failed to process data. Details: {e}")
     except Exception as e:
-        print(f"Error: Ocurrió un error inesperado. Detalles: {e}")
+        print(f"Error: An unexpected error occurred. Details: {e}")
     return False
 
 if __name__ == "__main__":
-    # Ejemplo de uso
-    ruta_archivo = r"pysnippets\Files\sample_data.pkl"
-    dato_busqueda = {
+    # Example Usage
+    file_path = r"pysnippets\Files\sample_data.pkl"
+    search_data = {
         'name': 'Aryan Sharma',
         'age': 24,
         'is_student': True,
@@ -55,7 +62,7 @@ if __name__ == "__main__":
             'year': 2025
         }
     }
-    dato_reemplazo = {
+    replace_data = {
         'name': 'Aaryan Sharma',
         'age': 24,
         'is_student': True,
@@ -66,8 +73,13 @@ if __name__ == "__main__":
         }
     }
     
-    resultado = buscar_y_reemplazar_en_archivo_binario(ruta_archivo, dato_busqueda, dato_reemplazo)
-    if resultado:
-        print("Operación de búsqueda y reemplazo completada exitosamente.")
+    result = find_and_replace_in_binary_file(file_path, search_data, replace_data)
+    if result:
+        print("Find and replace operation completed successfully.")
     else:
-        print("Operación de búsqueda y reemplazo fallida.")
+        print("Find and replace operation failed.")
+
+
+def find_and_replace_in_binary_file(file_path: str, search_data: Any, replace_data: Any) -> bool:
+    """
+    Finds specific data in a binary file and replaces it with new data using pickle.

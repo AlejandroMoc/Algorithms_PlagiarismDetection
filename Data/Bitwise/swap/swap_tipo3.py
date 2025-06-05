@@ -1,5 +1,8 @@
-def intercambiar_numeros(x, y):
-    x ^= y
-    y ^= x
-    x ^= y
-    return x, y
+
+
+def swap_numbers(a, b):
+    """Swaps two numbers using XOR for efficiency."""
+    a ^= b
+    b ^= a
+    a ^= b
+    return a, b

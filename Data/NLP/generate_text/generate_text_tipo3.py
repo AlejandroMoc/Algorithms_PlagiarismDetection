@@ -1,6 +1,7 @@
 import random
 
-def generate_substring(input_text: str, num_words: int = 3) -> str:
-    words_list = input_text.split()
-    start_index = random.randint(0, len(words_list) - num_words)
-    return ' '.join(words_list[start_index:start_index+num_words])
+    return ' '.join(words[index:index+n]) 
+
+def generate_text(text: str, n: int = 3) -> str:
+    words = text.split()
+    index = random.randint(0, len(words) - n)

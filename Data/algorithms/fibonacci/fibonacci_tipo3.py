@@ -1,7 +1,17 @@
 from functools import lru_cache
 from typing import List, Generator
 
-def generate_fibonacci_sequence(n: int) -> List[int]:
+    
+    Args:
+        n (int): The number of terms to generate.
+    
+    Returns:
+        List[int]: A list containing the Fibonacci sequence up to the nth term.
+    
+    Example:
+        >>> fibonacci(5)
+        [0, 1, 1, 2, 3]
+    """
     if n <= 0:
         return []
     elif n == 1:
@@ -10,44 +20,99 @@ def generate_fibonacci_sequence(n: int) -> List[int]:
         return [0, 1]
 
     fib_seq = [0, 1]
-    i = 2
-    while i < n:
+    for i in range(2, n):
         fib_seq.append(fib_seq[i - 1] + fib_seq[i - 2])
-        i += 1
 
     return fib_seq
 
-def generate_fibonacci_sequence_generator(n: int) -> Generator[int, None, None]:
+
+    
+    Args:
+        n (int): The number of terms to generate.
+    
+    Yields:
+        int: The next term in the Fibonacci sequence.
+    
+    Example:
+        >>> list(fibonacci_generator(5))
+        [0, 1, 1, 2, 3]
+    """
     a, b = 0, 1
-    i = 0
-    while i < n:
+    for _ in range(n):
         yield a
         a, b = b, a + b
-        i += 1
+
 
 @lru_cache(maxsize=None)
-def calculate_fibonacci_number(n: int) -> int:
+    
+    Args:
+        n (int): The position in the Fibonacci sequence.
+    
+    Returns:
+        int: The nth Fibonacci number.
+    
+    Example:
+        >>> fibonacci_lru(5)
+        5
+    """
     if n <= 0:
         return 0
     elif n == 1:
         return 1
-    return calculate_fibonacci_number(n - 1) + calculate_fibonacci_number(n - 2)
+    return fibonacci_lru(n - 1) + fibonacci_lru(n - 2)
 
-def calculate_fibonacci_number_iterative(n: int) -> int:
+
+    
+    Args:
+        n (int): The position in the Fibonacci sequence.
+    
+    Returns:
+        int: The nth Fibonacci number.
+    
+    Example:
+        >>> fibonacci_iterative(5)
+        5
+    """
     if n <= 0:
         return 0
     elif n == 1:
         return 1
 
     a, b = 0, 1
-    i = 2
-    while i < n + 1:
+    for _ in range(2, n + 1):
         a, b = b, a + b
-        i += 1
     return b
 
+
+# Example usage
 if __name__ == "__main__":
-    print(f"Fibonacci sequence (list): {generate_fibonacci_sequence(5)}")
-    print(f"Fibonacci sequence (generator): {list(generate_fibonacci_sequence_generator(5))}")
-    print(f"5th Fibonacci number (LRU Cache): {calculate_fibonacci_number(5)}")
-    print(f"5th Fibonacci number (Iterative): {calculate_fibonacci_number_iterative(5)}")
+    # Example of generating a Fibonacci sequence as a list
+    print(f"Fibonacci sequence (list): {fibonacci(5)}")
+
+    # Example of generating Fibonacci sequence using a generator
+    print(f"Fibonacci sequence (generator): {list(fibonacci_generator(5))}")
+
+    # Example of using LRU cache for nth Fibonacci number
+    print(f"5th Fibonacci number (LRU Cache): {fibonacci_lru(5)}")
+
+    # Example of generating nth Fibonacci number iteratively
+    print(f"5th Fibonacci number (Iterative): {fibonacci_iterative(5)}")
+
+def fibonacci_iterative(n: int) -> int:
+    """
+    Generates the nth Fibonacci number using an iterative approach.
+
+
+def fibonacci_lru(n: int) -> int:
+    """
+    Computes the nth Fibonacci number using memoization with LRU cache.
+
+
+def fibonacci_generator(n: int) -> Generator[int, None, None]:
+    """
+    Generates the Fibonacci sequence up to the nth term using a generator.
+
+
+def fibonacci(n: int) -> List[int]:
+    """
+    Generates the Fibonacci sequence up to the nth term.

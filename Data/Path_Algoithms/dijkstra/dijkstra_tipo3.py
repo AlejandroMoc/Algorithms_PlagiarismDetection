@@ -1,41 +1,41 @@
-python
 from typing import Tuple, List
-from data_classes import Graph
+from data_classes import Mapa
 from logger_config import logger
 
-def calcular_camino_minimo(grafo: Graph, inicio: str, final: str) -> Tuple[List[str], int]:
-    try:
-        no_visitados = {vertice: float('inf') for vertice in grafo.vertices}
-        no_visitados[inicio] = 0
-        visitados = {}
-        camino = {}
 
-        while no_visitados:
-            actual = min(no_visitados, key=no_visitados.get)
-            distancia_actual = no_visitados[actual]
+        while unvisited:
+            current = min(unvisited, key=unvisited.get)
+            current_distance = unvisited[current]
 
-            if actual == final:
-                visitados[actual] = distancia_actual
+            if current == fin:
+                visitados[current] = current_distance
                 break
 
-            for vecino, peso in grafo.edges.get(actual, {}).items():
-                distancia = distancia_actual + peso
-                if distancia < no_visitados.get(vecino, float('inf')):
-                    no_visitados[vecino] = distancia
-                    camino[vecino] = actual
+            for neighbor, weight in mapa.conexiones.get(current, {}).items():
+                distancia = current_distance + weight
+                if distancia < unvisited.get(neighbor, float('inf')):
+                    unvisited[neighbor] = distancia
+                    camino[neighbor] = current
 
-            visitados[actual] = distancia_actual
-            del no_visitados[actual]
+            visitados[current] = current_distance
+            del unvisited[current]
 
-        if final not in visitados or visitados[final] == float('inf'):
-            raise ValueError("Camino no encontrado")
+        if fin not in visitados or visitados[fin] == float('inf'):
+            raise ValueError("Path not found")
 
-        ruta = []
-        while final:
-            ruta.insert(0, final)
-            final = camino.get(final)
+        route = []
+        while fin:
+            route.insert(0, fin)
+            fin = camino.get(fin)
 
-        return ruta, visitados[ruta[-1]]
+        return route, visitados[route[-1]]
     except Exception as e:
-        logger.error(f"Error en el algoritmo de Dijkstra: {e}")
-        raise
+        logger.error(f"Error in Dijkstra's algorithm: {e}")
+        raise 
+
+def dijkstra(mapa: Mapa, inicio: str, fin: str) -> Tuple[List[str], int]:
+    try:
+        unvisited = {vertex: float('inf') for vertex in mapa.puntos}
+        unvisited[inicio] = 0
+        visitados = {}
+        camino = {}

@@ -1,30 +1,33 @@
 import asyncio
 import logging
 
-# Configuración básica del registro
+# Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-async def tarea(nombre, retardo):
-    """Simula una tarea asíncrona con un retardo"""
-    logging.info(f"Tarea {nombre} iniciando")
-    await asyncio.sleep(retardo)
-    logging.info(f"Tarea {nombre} completada")
-    return f"Resultado de la tarea {nombre}"
-
-async def principal():
-    # Crear múltiples tareas para ejecutar de manera concurrente
-    tareas = [
-        asyncio.create_task(tarea("A", 2)),
-        asyncio.create_task(tarea("B", 1)),
-        asyncio.create_task(tarea("C", 3))
-    ]
+async 
+async     
+    # Wait for all tasks to complete
+    results = await asyncio.gather(*tasks)
     
-    # Esperar a que todas las tareas se completen
-    resultados = await asyncio.gather(*tareas)
-    
-    # Procesar los resultados
-    for resultado in resultados:
-        logging.info(resultado)
+    # Process results
+    for result in results:
+        logging.info(result)
 
 if __name__ == "__main__":
-    asyncio.run(principal())
+    asyncio.run(main())
+
+def main():
+    # Create multiple tasks to run concurrently
+    tasks = [
+        asyncio.create_task(task("A", 2)),
+        asyncio.create_task(task("B", 1)),
+        asyncio.create_task(task("C", 3))
+    ]
+
+
+def task(name, delay):
+    """Simulates an async task with a delay"""
+    logging.info(f"Task {name} starting")
+    await asyncio.sleep(delay)
+    logging.info(f"Task {name} completed")
+    return f"Result from task {name}"

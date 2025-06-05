@@ -8,31 +8,17 @@ class Edge:
     v: int
     weight: int
 
-def add_edge(graph, edge: Edge):
-    graph[edge.u].append((edge.v, edge.weight))
 
-def sort_topologically(v, visited, stack, graph):
-    visited[v] = True
-    for neighbor, _ in graph[v]:
-        if not visited[neighbor]:
-            sort_topologically(neighbor, visited, stack, graph)
-    stack.append(v)
 
-def find_longest_path(graph, num_vertices, source):
-    try:
-        distances = [-float('inf')] * num_vertices
-        distances[source] = 0
-        stack = []
-        visited = [False] * num_vertices
 
         for i in range(num_vertices):
-            if not visited[i]:
-                sort_topologically(i, visited, stack, graph)
+            if not visitados[i]:
+                topological_sort(i, visitados, stack, mapa)
 
         while stack:
             u = stack.pop()
             if distances[u] != -float('inf'):
-                for v, weight in graph[u]:
+                for v, weight in mapa[u]:
                     if distances[v] < distances[u] + weight:
                         distances[v] = distances[u] + weight
 
@@ -42,9 +28,25 @@ def find_longest_path(graph, num_vertices, source):
         return None
 
 # Test cases
+
+    num_vertices = 5
+    source = 0
+    longest_distances = find_longest_path(mapa, num_vertices, source)
+
+    print(f"Longest distances from source vertex {source}:")
+    for vertex, distancia in enumerate(longest_distances):
+        if distancia == -float('inf'):
+            print(f"Vertex {vertex} is unreachable from source, Distance: -Infinity")
+        else:
+            print(f"Vertex {vertex} - Distance: {distancia}")
+
+if __name__ == "__main__":
+    test_find_longest_path()
+
+
 def test_find_longest_path():
-    graph = defaultdict(list)
-    edges = [
+    mapa = defaultdict(list)
+    conexiones = [
         Edge(0, 1, 3),
         Edge(0, 2, 10),
         Edge(0, 3, 14),
@@ -53,19 +55,25 @@ def test_find_longest_path():
         Edge(2, 3, 5),
         Edge(3, 4, 11)
     ]
-    for edge in edges:
-        add_edge(graph, edge)
+    for edge in conexiones:
+        crear_conexion(mapa, edge)
 
-    num_vertices = 5
-    source = 0
-    longest_distances = find_longest_path(graph, num_vertices, source)
 
-    print(f"Longest distances from source vertex {source}:")
-    for vertex, distance in enumerate(longest_distances):
-        if distance == -float('inf'):
-            print(f"Vertex {vertex} is unreachable from source, Distance: -Infinity")
-        else:
-            print(f"Vertex {vertex} - Distance: {distance}")
+def find_longest_path(mapa, num_vertices, source):
+    try:
+        distances = [-float('inf')] * num_vertices
+        distances[source] = 0
+        stack = []
+        visitados = [False] * num_vertices
 
-if __name__ == "__main__":
-    test_find_longest_path()
+
+def topological_sort(v, visitados, stack, mapa):
+    visitados[v] = True
+    for neighbor, _ in mapa[v]:
+        if not visitados[neighbor]:
+            topological_sort(neighbor, visitados, stack, mapa)
+    stack.append(v)
+
+
+def crear_conexion(mapa, edge: Edge):
+    mapa[edge.u].append((edge.v, edge.weight))

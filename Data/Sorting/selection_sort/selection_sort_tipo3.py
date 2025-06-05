@@ -1,17 +1,19 @@
-def orden_seleccion(lista):
-    longitud = len(lista)
-    for i in range(longitud):
-        indice_min = i
-        for j in range(i + 1, longitud):
-            if lista[j] < lista[indice_min]:
-                indice_min = j
-        lista[i], lista[indice_min] = lista[indice_min], lista[i]
-    return lista
 
 if __name__ == "__main__":
-    # Entrada: enteros separados por espacios
-    datos_entrada = input("Ingresa los números a ordenar, separados por espacios: ")
-    lista = list(map(int, datos_entrada.split()))
+    # Input: space-separated integers
+    input_data = input("Enter numbers to sort, separated by spaces: ")
+    arr = list(map(int, input_data.split()))
     
-    lista_ordenada = orden_seleccion(lista)
-    print("Lista ordenada:", lista_ordenada)
+    sorted_arr = selection_sort(arr)
+    print("Sorted array:", sorted_arr)
+
+
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr

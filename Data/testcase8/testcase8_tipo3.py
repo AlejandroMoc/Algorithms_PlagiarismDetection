@@ -1,15 +1,19 @@
-class NodoArbol:
-    def __init__(self, valor=0, izquierda=None, derecha=None):
-        self.valor = valor
-        self.izquierda = izquierda
-        self.derecha = derecha
+class TreeNode:
+    
 
-def construir_arbol(preorden, inorden):
-    if not preorden or not inorden:
+
+def build_tree(preorder, inorder):
+    if not preorder or not inorder:
         return None
-    valor_raiz = preorden.pop(0)
-    raiz = NodoArbol(valor_raiz)
-    indice_inorden = inorden.index(valor_raiz)
-    raiz.izquierda = construir_arbol(preorden, inorden[:indice_inorden])
-    raiz.derecha = construir_arbol(preorden, inorden[indice_inorden + 1:])
-    return raiz
+    root_value = preorder.pop(0)
+    root = TreeNode(root_value)
+    inorder_index = inorder.index(root_value)
+    root.left = build_tree(preorder, inorder[:inorder_index])
+    root.right = build_tree(preorder, inorder[inorder_index + 1:])
+    return root
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

@@ -3,52 +3,75 @@ import pandas as pd
 from outlier_detection import remove_outliers_iqr, remove_outliers_zscore
 
 class TestOutlierDetection(unittest.TestCase):
-    def setUp(self):
-        self.data_frame = pd.DataFrame({
-            'Salary': [50000, 60000, 55000, 120000, 58000, 59000, 61000]
-        })
+    
+    
+    
+    
+    
+if __name__ == '__main__':
+    unittest.main()
 
-    def test_remove_outliers_iqr(self):
-        cleaned_data_frame = remove_outliers_iqr(self.data_frame, 'Salary')
-        
-        self.assertFalse((cleaned_data_frame['Salary'] == 120000).any())
-        
-        self.assertEqual(len(cleaned_data_frame), len(self.data_frame) - 1, "One row should be removed when outlier is detected.")
 
-    def test_remove_outliers_zscore(self):
-        cleaned_data_frame = remove_outliers_zscore(self.data_frame, 'Salary', threshold=2)
-        
-        self.assertFalse((cleaned_data_frame['Salary'] == 120000).any())
-        
-        self.assertEqual(len(cleaned_data_frame), len(self.data_frame) - 1, "One row should be removed when outlier is detected.")
-
-    def test_no_outliers(self):
-        data_frame_no_outliers = pd.DataFrame({
-            'Salary': [50000, 60000, 55000, 58000, 59000, 61000]
-        })
-        
-        cleaned_data_frame = remove_outliers_iqr(data_frame_no_outliers, 'Salary')
-        self.assertEqual(len(cleaned_data_frame), len(data_frame_no_outliers), "No rows should be removed if there are no outliers.")
-        
-        cleaned_data_frame = remove_outliers_zscore(data_frame_no_outliers, 'Salary', threshold=2)
-        self.assertEqual(len(cleaned_data_frame), len(data_frame_no_outliers), "No rows should be removed if there are no outliers.")
-
-    def test_multiple_outliers(self):
-        data_frame_multiple_outliers = pd.DataFrame({
+def test_multiple_outliers(self):
+        # Data with multiple outliers
+        df_multiple_outliers = pd.DataFrame({
             'Salary': [50000, 60000, 55000, 120000, 130000, 140000, 61000]
         })
         
-        cleaned_data_frame = remove_outliers_iqr(data_frame_multiple_outliers, 'Salary')
-        self.assertNotIn(120000, cleaned_data_frame['Salary'].values)
-        self.assertNotIn(130000, cleaned_data_frame['Salary'].values)
-        self.assertNotIn(140000, cleaned_data_frame['Salary'].values)
-        self.assertEqual(len(cleaned_data_frame), len(data_frame_multiple_outliers) - 3, "Three outliers should be removed.")
+        # Remove outliers using IQR method
+        cleaned_df = remove_outliers_iqr(df_multiple_outliers, 'Salary')
+        self.assertNotIn(120000, cleaned_df['Salary'].values)
+        self.assertNotIn(130000, cleaned_df['Salary'].values)
+        self.assertNotIn(140000, cleaned_df['Salary'].values)
+        self.assertEqual(len(cleaned_df), len(df_multiple_outliers) - 3, "Three outliers should be removed.")
         
-        cleaned_data_frame = remove_outliers_zscore(data_frame_multiple_outliers, 'Salary', threshold=2)
-        self.assertNotIn(120000, cleaned_data_frame['Salary'].values)
-        self.assertNotIn(130000, cleaned_data_frame['Salary'].values)
-        self.assertNotIn(140000, cleaned_data_frame['Salary'].values)
-        self.assertEqual(len(cleaned_data_frame), len(data_frame_multiple_outliers) - 3, "Three outliers should be removed.")
+        # Remove outliers using Z-score method
+        cleaned_df = remove_outliers_zscore(df_multiple_outliers, 'Salary', threshold=2)
+        self.assertNotIn(120000, cleaned_df['Salary'].values)
+        self.assertNotIn(130000, cleaned_df['Salary'].values)
+        self.assertNotIn(140000, cleaned_df['Salary'].values)
+        self.assertEqual(len(cleaned_df), len(df_multiple_outliers) - 3, "Three outliers should be removed.")
 
-if __name__ == '__main__':
-    unittest.main()
+
+def test_no_outliers(self):
+        # A DataFrame with no outliers
+        df_no_outliers = pd.DataFrame({
+            'Salary': [50000, 60000, 55000, 58000, 59000, 61000]
+        })
+        
+        # Check if the length remains the same
+        cleaned_df = remove_outliers_iqr(df_no_outliers, 'Salary')
+        self.assertEqual(len(cleaned_df), len(df_no_outliers), "No rows should be removed if there are no outliers.")
+        
+        # Also test using Z-score method with a threshold of 2
+        cleaned_df = remove_outliers_zscore(df_no_outliers, 'Salary', threshold=2)
+        self.assertEqual(len(cleaned_df), len(df_no_outliers), "No rows should be removed if there are no outliers.")
+
+
+def test_remove_outliers_zscore(self):
+        # Remove outliers using Z-score method (with a threshold of 2)
+        cleaned_df = remove_outliers_zscore(self.df, 'Salary', threshold=2)
+        
+        # Ensure that the outlier (120000) is removed
+        self.assertFalse((cleaned_df['Salary'] == 120000).any())
+        
+        # Check if the length of the DataFrame is reduced by one (1 outlier should be removed)
+        self.assertEqual(len(cleaned_df), len(self.df) - 1, "One row should be removed when outlier is detected.")
+
+
+def test_remove_outliers_iqr(self):
+        # Remove outliers using IQR method
+        cleaned_df = remove_outliers_iqr(self.df, 'Salary')
+        
+        # Ensure that the outlier (120000) is removed
+        self.assertFalse((cleaned_df['Salary'] == 120000).any())
+        
+        # Check if the length of the DataFrame is reduced by one (1 outlier should be removed)
+        self.assertEqual(len(cleaned_df), len(self.df) - 1, "One row should be removed when outlier is detected.")
+
+
+def setUp(self):
+        # A sample DataFrame with salary data, including an outlier (120000)
+        self.df = pd.DataFrame({
+            'Salary': [50000, 60000, 55000, 120000, 58000, 59000, 61000]
+        })

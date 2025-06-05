@@ -1,37 +1,43 @@
-def encontrar_caminos_unicos(filas, columnas):
-    if not (isinstance(filas, int) and isinstance(columnas, int)) or filas <= 0 or columnas <= 0:
-        raise ValueError("Ambos filas y columnas deben ser enteros positivos.")
 
-    dp = [1] * columnas
+    dp = [1] * n  # Only one row needed for storage, initialized with 1
 
-    for i in range(1, filas):
-        for j in range(1, columnas):
-            dp[j] += dp[j - 1]
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[j] += dp[j - 1]  # Update dp[j] with paths from the cell above
 
-    return dp[-1]
+    return dp[-1]  # The last element contains the number of unique paths
 
-def test_encontrar_caminos_unicos():
-    casos_prueba = [
-        (3, 7, 28),
+# Example function definition for testing
+    
+    for m, n, expected in test_cases:
+        result = unique_paths(m, n)
+        assert result == expected, f"Expected {expected}, got {result}"
+
+# Test cases
+if __name__ == "__main__":
+    test_cases = [
+        (3, 7),  # Output: 28
+        (3, 2),  # Output: 3
+        (1, 1),  # Output: 1
+        (5, 5),  # Output: 70
+        (2, 3),  # Output: 3
+        (7, 3),  # Output: 28
+        (10, 10) # Output: 48620
+    ]
+    
+    for m, n in test_cases:
+        num_paths = unique_paths(m, n)
+        print(f"The number of unique paths in a grid of size {m} x {n} is: {num_paths}")
+
+def test_unique_paths():
+    test_cases = [
+        (3, 7, 28),  # Example test case
         (3, 2, 3),
         (7, 3, 28)
     ]
-    
-    for filas, columnas, esperado in casos_prueba:
-        resultado = encontrar_caminos_unicos(filas, columnas)
-        assert resultado == esperado, f"Esperado {esperado}, obtenido {resultado}"
 
-if __name__ == "__main__":
-    casos_prueba = [
-        (3, 7),
-        (3, 2),
-        (1, 1),
-        (5, 5),
-        (2, 3),
-        (7, 3),
-        (10, 10)
-    ]
-    
-    for filas, columnas in casos_prueba:
-        num_caminos = encontrar_caminos_unicos(filas, columnas)
-        print(f"El número de caminos únicos en una cuadrícula de tamaño {filas} x {columnas} es: {num_caminos}")
+
+def unique_paths(m, n):
+    # Input validation
+    if not (isinstance(m, int) and isinstance(n, int)) or m <= 0 or n <= 0:
+        raise ValueError("Both m and n must be positive integers.")

@@ -2,9 +2,10 @@ import unittest
 
 from test_dijkstra import TestDijkstra
 
-def cargar_pruebas(cargador, pruebas, patron):
-    pruebas.addTests(cargador.loadTestsFromTestCase(TestDijkstra))
-    return pruebas
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 
+
+def load_tests(loader, tests, pattern):
+    tests.addTests(loader.loadTestsFromTestCase(TestDijkstra))
+    return tests

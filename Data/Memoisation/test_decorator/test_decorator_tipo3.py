@@ -3,18 +3,19 @@ from decorator import memoize
 
 class TestMemoizeDecorator(unittest.TestCase):
     
-    def test_memoize_add_function(self):
-        count_calls = 0
+    
+if __name__ == "__main__":
+    unittest.main() 
+
+def test_memoize_add_function(self):
+        call_count = 0
         
         @memoize
-        def sum_numbers(x, y):
-            nonlocal count_calls
-            count_calls += 1
-            return x + y
+        def add(a, b):
+            nonlocal call_count
+            call_count += 1
+            return a + b
         
-        self.assertEqual(sum_numbers(2, 3), 5)
-        self.assertEqual(sum_numbers(2, 3), 5)
-        self.assertEqual(count_calls, 1)
-
-if __name__ == "__main__":
-    unittest.main()
+        self.assertEqual(add(2, 3), 5)
+        self.assertEqual(add(2, 3), 5)
+        self.assertEqual(call_count, 1)

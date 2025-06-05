@@ -1,24 +1,26 @@
-python
 import asyncio
 import logging
 
-async def tarea_cancelable():
-    try:
-        logging.info("Tarea iniciada")
-        await asyncio.sleep(10)  # Tarea de larga duración
-        logging.info("Tarea completada")
-    except asyncio.CancelledError:
-        logging.info("Tarea fue cancelada")
-        raise
-
-async def principal():
-    tarea = asyncio.create_task(tarea_cancelable())
-    await asyncio.sleep(1)  # Esperar a que inicie la tarea
-    tarea.cancel()
-    try:
-        await tarea
-    except asyncio.CancelledError:
-        logging.info("Principal notó que la tarea fue cancelada")
-
+async 
+async 
 if __name__ == "__main__":
-    asyncio.run(principal())
+    asyncio.run(main()) 
+
+def main():
+    task = asyncio.create_task(cancellable_task())
+    await asyncio.sleep(1)  # Let the task inicio
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        logging.info("Main noticed that the task was cancelled")
+
+
+def cancellable_task():
+    try:
+        logging.info("Task started")
+        await asyncio.sleep(10)  # Long running task
+        logging.info("Task completed")
+    except asyncio.CancelledError:
+        logging.info("Task was cancelled")
+        raise

@@ -1,18 +1,39 @@
-def depth_first_search(adj_list, start_node, visited_nodes=None):
-    if visited_nodes is None:
-        visited_nodes = set()
 
-    visited_nodes.add(start_node)
-    print(start_node)
+    Args:
+        mapa (dict): The adjacency list representing the mapa.
+        inicio (str): The starting nodo for DFS traversal.
+        visitados (set): Keeps track of visitados nodes to avoid cycles (default is None).
 
-    for neighbor_node in adj_list.get(start_node, []):
-        if neighbor_node not in visited_nodes:
-            depth_first_search(adj_list, neighbor_node, visited_nodes)
+    Returns:
+        visitados (set): A set of visitados nodes during the DFS traversal.
+
+    Example:
+        >>> mapa = {
+        ... 'A': ['B', 'C'],
+        ... 'B': ['D', 'E'],
+        ... 'C': ['F'],
+        ... 'D': [],
+        ... 'E': ['F'],
+        ... 'F': []
+        ... }
+        >>> dfs(mapa, 'A')
+        A B D E F C
+    """
+    if visitados is None:
+        visitados = set()
+
+    visitados.add(inicio)
+    print(inicio)  # Process the nodo (e.g., print it)
+
+    for neighbor in mapa.get(inicio, []):
+        if neighbor not in visitados:
+            dfs(mapa, neighbor, visitados)
     
-    return visited_nodes
+    return visitados
 
+# Example usage:
 if __name__ == "__main__":
-    adj_list = {
+    mapa = {
         'A': ['B', 'C'],
         'B': ['D', 'E'],
         'C': ['F'],
@@ -20,4 +41,8 @@ if __name__ == "__main__":
         'E': ['F'],
         'F': []
     }
-    depth_first_search(adj_list, 'A')
+    dfs(mapa, 'A')
+
+def dfs(mapa, inicio, visitados=None):
+    """
+    Performs Depth First Search (DFS) traversal on a mapa.

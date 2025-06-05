@@ -1,24 +1,57 @@
 import pandas as pd
 import numpy as np
 
-def eliminar_atipicos_iqr(datos: pd.DataFrame, columna: str) -> pd.DataFrame:
-    if columna not in datos.columns:
-        raise ValueError(f"La columna '{columna}' no existe en el DataFrame.")
-    
-    Q1 = datos[columna].quantile(0.25)
-    Q3 = datos[columna].quantile(0.75)
-    IQR = Q3 - Q1
-    limite_inferior = Q1 - 1.5 * IQR
-    limite_superior = Q3 + 1.5 * IQR
-    
-    return datos[(datos[columna] >= limite_inferior) & (datos[columna] <= limite_superior)]
 
-def eliminar_atipicos_zscore(datos: pd.DataFrame, columna: str, umbral: float = 3.0) -> pd.DataFrame:
-    if columna not in datos.columns:
-        raise ValueError(f"La columna '{columna}' no existe en el DataFrame.")
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - column (str): The column name to remove outliers from.
+
+    Returns:
+    - pd.DataFrame: A new DataFrame with outliers removed based on the IQR method.
     
-    media = datos[columna].mean()
-    desviacion_estandar = datos[columna].std()
-    z_scores = (datos[columna] - media) / desviacion_estandar
+    Raises:
+    - ValueError: If the column does not exist in the DataFrame.
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
     
-    return datos[np.abs(z_scores) <= umbral]
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Remove rows where the column's value is outside the IQR bounds
+    return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+
+
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - column (str): The column name to remove outliers from.
+    - threshold (float): The Z-score threshold to identify outliers (default is 3.0).
+
+    Returns:
+    - pd.DataFrame: A new DataFrame with outliers removed based on the Z-Score method.
+    
+    Raises:
+    - ValueError: If the column does not exist in the DataFrame.
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
+    
+    mean = df[column].mean()
+    std = df[column].std()
+    z_scores = (df[column] - mean) / std
+    
+    # Remove rows where the absolute Z-Score exceeds the threshold
+    return df[np.abs(z_scores) <= threshold]
+
+
+def remove_outliers_zscore(df: pd.DataFrame, column: str, threshold: float = 3.0) -> pd.DataFrame:
+    """
+    Remove outliers from a specified column using the Z-Score method.
+
+
+def remove_outliers_iqr(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """
+    Remove outliers from a specified column using the Interquartile Range (IQR) method.

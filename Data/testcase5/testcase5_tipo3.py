@@ -1,20 +1,26 @@
 class TreeNode:
-    def __init__(self, valor=0, izquierda=None, derecha=None):
-        self.valor = valor
-        self.izquierda = izquierda
-        self.derecha = derecha
+    
 
-def diametro_arbol(raiz):
-    diametro = 0
+    
+    depth(root)
+    return diameter
 
-    def profundidad(nodo):
-        nonlocal diametro
+
+def depth(nodo):
+        nonlocal diameter
         if not nodo:
             return 0
-        profundidad_izquierda = profundidad(nodo.izquierda)
-        profundidad_derecha = profundidad(nodo.derecha)
-        diametro = max(diametro, profundidad_izquierda + profundidad_derecha)
-        return 1 + max(profundidad_izquierda, profundidad_derecha)
+        left_depth = depth(nodo.left)
+        right_depth = depth(nodo.right)
+        diameter = max(diameter, left_depth + right_depth)
+        return 1 + max(left_depth, right_depth)
 
-    profundidad(raiz)
-    return diametro
+
+def tree_diameter(root):
+    diameter = 0
+
+
+def __init__(self, value=0, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right

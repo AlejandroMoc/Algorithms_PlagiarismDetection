@@ -1,12 +1,13 @@
 import logging
 
-def configurar_logger():
-    registrador = logging.getLogger('Algoritmos_Ruta')
-    registrador.setLevel(logging.DEBUG)
-    controlador = logging.StreamHandler()
-    formateador = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    controlador.setFormatter(formateador)
-    registrador.addHandler(controlador)
-    return registrador
 
-registrador = configurar_logger()
+logger = setup_logger() 
+
+def setup_logger():
+    logger = logging.getLogger('Path_Algorithms')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger

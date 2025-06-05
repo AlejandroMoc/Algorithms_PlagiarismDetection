@@ -2,75 +2,85 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 
-# Generar par de claves RSA
-def generar_par_claves():
-    clave_privada = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048,
-        backend=default_backend()
-    )
-    clave_publica = clave_privada.public_key()
-    return clave_privada, clave_publica
+# Generate RSA key pair
 
-# Encriptar datos usando clave pública
-def encriptar(clave_publica, mensaje):
-    texto_cifrado = clave_publica.encrypt(
-        mensaje,
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None
-        )
-    )
-    return texto_cifrado
+# Encrypt data using public key
 
-# Desencriptar datos usando clave privada
-def desencriptar(clave_privada, texto_cifrado):
-    texto_plano = clave_privada.decrypt(
-        texto_cifrado,
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None
-        )
-    )
-    return texto_plano
+# Decrypt data using private key
 
-# Serializar la clave privada para guardarla en un archivo
-def serializar_clave_privada(clave_privada, contraseña=None):
-    pem = clave_privada.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.BestAvailableEncryption(contraseña) if contraseña else serialization.NoEncryption()
-    )
-    return pem
+# Serialize the private key to save it to a file
 
-# Serializar la clave pública para guardarla en un archivo
-def serializar_clave_publica(clave_publica):
-    pem = clave_publica.public_bytes(
+# Serialize the public key to save it to a file
+
+# Example usage
+if __name__ == "__main__":
+    message = b"Asymmetric encryption example with RSA"
+    
+    # Generate RSA key pair
+    private_key, public_key = generate_key_pair()
+
+    # Encrypt the message
+    ciphertext = encrypt(public_key, message)
+    print("Encrypted:", ciphertext)
+    
+    # Decrypt the message
+    decrypted_message = decrypt(private_key, ciphertext)
+    print("Decrypted:", decrypted_message.decode('utf-8'))
+
+    # Optional: Serialize keys if you want to save them
+    private_pem = serialize_private_key(private_key, password=b'mypassword')
+    public_pem = serialize_public_key(public_key)
+
+    print("\nPrivate Key PEM format:\n", private_pem.decode('utf-8'))
+    print("\nPublic Key PEM format:\n", public_pem.decode('utf-8'))
+
+
+def serialize_public_key(public_key):
+    pem = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
     return pem
 
-# Ejemplo de uso
-if __name__ == "__main__":
-    mensaje = b"Ejemplo de encriptacion asimetrica con RSA"
-    
-    # Generar par de claves RSA
-    clave_privada, clave_publica = generar_par_claves()
 
-    # Encriptar el mensaje
-    texto_cifrado = encriptar(clave_publica, mensaje)
-    print("Cifrado:", texto_cifrado)
-    
-    # Desencriptar el mensaje
-    mensaje_desencriptado = desencriptar(clave_privada, texto_cifrado)
-    print("Desencriptado:", mensaje_desencriptado.decode('utf-8'))
+def serialize_private_key(private_key, password=None):
+    pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.BestAvailableEncryption(password) if password else serialization.NoEncryption()
+    )
+    return pem
 
-    # Opcional: Serializar claves si se desea guardarlas
-    clave_privada_pem = serializar_clave_privada(clave_privada, contraseña=b'micontrasena')
-    clave_publica_pem = serializar_clave_publica(clave_publica)
 
-    print("\nClave Privada formato PEM:\n", clave_privada_pem.decode('utf-8'))
-    print("\nClave Pública formato PEM:\n", clave_publica_pem.decode('utf-8'))
+def decrypt(private_key, ciphertext):
+    plaintext = private_key.decrypt(
+        ciphertext,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return plaintext
+
+
+def encrypt(public_key, message):
+    ciphertext = public_key.encrypt(
+        message,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return ciphertext
+
+
+def generate_key_pair():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    public_key = private_key.public_key()
+    return private_key, public_key
