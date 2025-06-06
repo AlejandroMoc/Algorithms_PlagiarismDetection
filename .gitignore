@@ -1,7 +1,5 @@
-#Latex Proyect
 *.aux
 *.log
-*.pdf
 *.toc
 *.out
 *.lof

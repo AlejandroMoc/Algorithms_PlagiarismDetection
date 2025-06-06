@@ -15,11 +15,9 @@ Los archivos a verificar son los siguientes:
 
 - Para ejecutar la demostración del detector de plagio:
 
-    
     python plagiarim_detector.py
 
-<!-- - El archivo principal, el detector de plagio, puede encontrarse [aquí](plagiarism_detector.py)
-- El artículo, escrito en LaTex, puede ser consultado [aquí](Article/Articulo.tex) -->
+- El artículo puede ser consultado [aquí](DeteccionPlagio.pdf) -->
 
 <!-- ## Créditos
 
