@@ -1,4 +1,4 @@
-//Ir al sitio correspondiente
+// Navegation between sites
 function goTo(action) {
   if (action === 'index') {
     location.href = "index.html";

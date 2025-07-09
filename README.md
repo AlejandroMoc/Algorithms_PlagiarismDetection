@@ -1,24 +1,25 @@
-# Analizador de plagio usando Machine Learning.
+# Plagiarism detector by using Machine Learning
 
-Detector de plagio usando Machine Learning
+Website for detecting plagiarism in Python codes using Suffix Array, AST, and Machine Learning.
 
-- A01736339 - Jacqueline Villa Asencio
-- A01736671 - José Juan Irene Cervantes
-- A01736346 - Augusto Gómez Maxil
-- A01736353 - Alejandro Daniel Moctezuma Cruz
+- Jacqueline Villa Asencio
+- José Juan Irene Cervantes
+- Augusto Gómez Maxil
+- Alejandro Daniel Moctezuma Cruz
 
-## Archivos a revisar
+## Execution
 
-Los archivos a verificar son los siguientes:
+- To execute the local website, open the [document](Website/index.html) in your browser.
 
-- Para ejecutar la interfaz gráfica
-
-- Para ejecutar la demostración del detector de plagio:
+- To run a standalone execution of the detector in the terminal, use the following command:
 
     python plagiarim_detector.py
 
-- El artículo puede ser consultado [aquí](DeteccionPlagio.pdf) -->
+## Documents (in Spanish)
 
-<!-- ## Créditos
+- The article can be consulted in its [document](Documents/PlagiarismDetector_Article.pdf).
+- The presentation can be consulted in its [document](Documents/PlagiarismDetector_Presentation.pdf).
+
+<!-- ## Credits
 
 La base de datos utilizada fue -->

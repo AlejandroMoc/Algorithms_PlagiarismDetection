@@ -6,9 +6,9 @@ const folderPath = document.getElementById("folderPath");
 const uploadButton = document.getElementById("uploadButton");
 
 let filesSelected = [];
-let filesMap = {}; // Mapea nombres a objetos File
+let filesMap = {}; // Map names to File objects
 
-// Navegación
+// Navegation between sites
 function goTo(action) {
   if (action === 'index') {
     location.href = "index.html";
@@ -19,7 +19,7 @@ function goTo(action) {
   }
 }
 
-// Selección de archivos individuales
+// Individual file selection
 fileInput.addEventListener("change", () => {
   for (const file of fileInput.files) {
     addFile(file);
@@ -27,7 +27,7 @@ fileInput.addEventListener("change", () => {
   updateCounter();
 });
 
-// Selección de carpeta completa (sin subida automática)
+// Complete folder selection (no auto upload)
 folderInput.addEventListener("change", () => {
   if (folderInput.files.length > 0) {
     const fullPath = folderInput.files[0].webkitRelativePath;
@@ -41,7 +41,7 @@ folderInput.addEventListener("change", () => {
   }
 });
 
-// Agrega archivo a lista visual
+// Add file to visual list
 function addFile(file) {
   if (filesSelected.includes(file.name)) return;
 
@@ -65,16 +65,16 @@ function addFile(file) {
   fileList.appendChild(li);
 }
 
-// Contador de archivos
+// File counting
 function updateCounter() {
   fileCount.textContent = `${filesSelected.length} elementos seleccionados`;
 }
 
-// Subida al backend
+// Backend uploading
 function subirArchivos() {
   if (filesSelected.length === 0) {
     alert("⚠️ No hay archivos para subir.");
-    window.location.href = "./compare.html"; // Redirige incluso si no hay archivos
+    // window.location.href = "./compare.html";
     return;
   }
 
@@ -90,7 +90,7 @@ function subirArchivos() {
     .then(res => res.json())
     .then(data => {
       alert("✅ Archivos subidos correctamente:\n" + data.uploaded.join("\n"));
-      window.location.href = "./compare.html"; // Redirige tras subir
+      window.location.href = "./compare.html"; // Redirect after uploading
     })
     .catch(err => {
       alert("❌ Error al subir archivos.");
@@ -98,5 +98,5 @@ function subirArchivos() {
     });
 }
 
-// Evento del botón "Subir Archivos"
+// Button event for "Subir archivos" button
 uploadButton.addEventListener("click", subirArchivos);

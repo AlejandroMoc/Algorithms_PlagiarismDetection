@@ -8,16 +8,18 @@
 <body>
 
   <header>
-    <!-- Elementos a la izquierda -->
+    <!-- Elements to the left -->
     <h1><a href="#compare" onclick="goTo('index')">Comparador de plagio</a></h1>
 
-    <!-- Elementos a la derecha -->
+    <!-- Elements to the right -->
     <nav class="header-right">
       <ul class="nav-links">
         <li><a href="#compare" onclick="goTo('compare')">Comparar archivos</a></li>
         <li><a href="#index" onclick="goTo('index')">Menu principal</a></li>
       </ul>
-      <div class="menu-icon">&#9776;</div>
+
+      <!-- Hamburger Menu -->
+      <!-- <div class="menu-icon">&#9776;</div> -->
     </nav>
   </header>
 
@@ -29,7 +31,7 @@
         <button onclick="document.getElementById('fileInput').click()">
           <img src="https://img.icons8.com/ios-filled/70/FFFFFF/upload.png" alt="Subir archivos" />
         </button>
-        <p>Subir archivos</p>
+        <p>Subir archivo(s)</p>
       </section>
 
       <section class="menu-option">
@@ -49,7 +51,7 @@
     </div>
 
     <div class="actions">
-      <button class="confirm" onclick="alert('Archivos confirmados')">Confirmar</button>
+      <!-- <button class="confirm" onclick="alert('Archivos confirmados')">Confirmar</button> -->
       <button class="cancel" onclick="location.href='index.html'">Cancelar</button>
       <button id="uploadButton">Subir Archivos</button>
 
